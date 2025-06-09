@@ -757,7 +757,7 @@ export const ImportPage: React.FC = () => {
                 <CheckCircle className={`w-6 h-6 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
               </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Call to Action */}
           <motion.div 
