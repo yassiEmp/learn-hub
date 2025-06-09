@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Bell, User, Menu, X, Sparkles, Sun, Moon } from 'lucide-react';
+import { Search, Bell, User, Menu, X, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../contexts/ThemeContext';
 
 interface HeaderProps {
   currentView: string;
@@ -10,7 +9,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isDark, toggleTheme } = useTheme();
 
   const navItems = [
     { id: 'import', label: 'Create Course' },
@@ -43,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
 
   return (
     <motion.header 
-      className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-colors duration-300"
+      className="bg-white border-b border-gray-200 sticky top-0 z-50"
       variants={headerVariants}
       initial="hidden"
       animate="visible"
@@ -62,9 +60,9 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 >
-                  <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <Sparkles className="w-6 h-6 text-purple-600" />
                 </motion.div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent font-unbounded">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-unbounded">
                   LearnHub
                 </h1>
               </motion.div>
@@ -91,8 +89,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                 onClick={() => onViewChange(item.id)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 font-unbounded ${
                   currentView === item.id
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
                 variants={itemVariants}
                 whileHover={{ scale: 1.05 }}
@@ -119,28 +117,16 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           >
             <motion.div className="relative" variants={itemVariants}>
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
                 placeholder="Search courses..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 font-unbounded transition-all duration-300 text-gray-900 dark:text-gray-100"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-unbounded transition-all duration-300"
               />
             </motion.div>
-            
-            {/* Theme Toggle */}
             <motion.button 
-              onClick={toggleTheme}
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              variants={itemVariants}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </motion.button>
-            
-            <motion.button 
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-2 text-gray-400 hover:text-gray-500 transition-colors duration-200"
               variants={itemVariants}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -148,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
               <Bell className="h-6 w-6" />
             </motion.button>
             <motion.button 
-              className="flex items-center space-x-2 p-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center space-x-2 p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200"
               variants={itemVariants}
               whileHover={{ scale: 1.05 }}
             >
@@ -163,22 +149,12 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
 
           {/* Mobile menu button */}
           <motion.div 
-            className="md:hidden flex items-center space-x-2"
+            className="md:hidden"
             variants={itemVariants}
           >
-            {/* Mobile Theme Toggle */}
-            <motion.button 
-              onClick={toggleTheme}
-              className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </motion.button>
-            
             <motion.button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-all duration-200"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -213,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
           }}
           className="md:hidden overflow-hidden"
         >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
             {navItems.map((item) => (
               <motion.button
                 key={item.id}
@@ -223,8 +199,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => 
                 }}
                 className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium font-unbounded transition-all duration-200 ${
                   currentView === item.id
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                 }`}
                 variants={{
                   open: {
