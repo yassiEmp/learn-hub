@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { StarBorder } from './ui/StarBorder';
-import { Sparkles, BookOpen, Zap, Users, Trophy, Clock, Brain, Target, CheckCircle, ArrowRight, Star, Play, Heart, Eye, Download, Code, Database, Palette, Smartphone, Settings, Globe, Shield, Rocket, Award, TrendingUp, BarChart3, Lightbulb, Layers, Quote } from 'lucide-react';
+import { Sparkles, BookOpen, Zap, Users, Trophy, Clock, Brain, Target, CheckCircle, ArrowRight, Star, Play, Heart, Eye, Download, Code, Database, Palette, Smartphone, Settings, Globe, Shield, Rocket, Award, TrendingUp, BarChart3, Lightbulb, Layers } from 'lucide-react';
 import Title from '../features/import/components/Title';
 import InputSection from '../features/import/components/InputSection';
 import { motion } from 'framer-motion';
@@ -11,7 +11,7 @@ const ChromeGrid = lazy(() => import('./ui/ChromeGrid').then(module => ({ defaul
 
 // Loading fallback for ChromeGrid
 const ChromeGridFallback = () => (
-  <div className="h-full w-full bg-black relative z-0 pointer-events-none" />
+  <div className="h-full w-full bg-gray-900 dark:bg-black relative z-0 pointer-events-none" />
 );
 
 // Category icon mapping
@@ -102,43 +102,6 @@ export const ImportPage: React.FC = () => {
       }
     }
   };
-
-  // Success stories data
-  const successStories = React.useMemo(() => [
-    {
-      id: 1,
-      name: "Sarah Chen",
-      role: "Software Engineer",
-      company: "Google",
-      avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      story: "LearnHub's AI-powered course creation helped me transition from marketing to tech in just 6 months. The personalized learning paths were exactly what I needed.",
-      rating: 5,
-      course: "Full-Stack Development",
-      achievement: "Landed dream job at Google"
-    },
-    {
-      id: 2,
-      name: "Marcus Johnson",
-      role: "Data Scientist",
-      company: "Microsoft",
-      avatar: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      story: "The AI-generated content was so comprehensive and well-structured. I went from zero Python knowledge to building ML models in production.",
-      rating: 5,
-      course: "Machine Learning Mastery",
-      achievement: "300% salary increase"
-    },
-    {
-      id: 3,
-      name: "Emma Rodriguez",
-      role: "UX Designer",
-      company: "Airbnb",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      story: "The interactive projects and real-world case studies made all the difference. I built a portfolio that got me hired at my dream company.",
-      rating: 5,
-      course: "UX Design Bootcamp",
-      achievement: "Portfolio led to 5 job offers"
-    }
-  ], []);
 
   // Optimized community courses data without external images
   const communityCoursesData = React.useMemo(() => [
@@ -232,8 +195,8 @@ export const ImportPage: React.FC = () => {
   ], []);
 
   return (
-    <div className={`min-h-screen relative overflow-hidden ${isDark ? 'bg-black' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'} transition-colors duration-300`}>
-      {/* ChromeGrid Background with Suspense - Only show in dark mode */}
+    <div className="min-h-screen relative overflow-hidden bg-gray-900 dark:bg-black transition-colors duration-300">
+      {/* ChromeGrid Background with Suspense - only show in dark mode */}
       {isDark && (
         <div className="absolute inset-0 z-0">
           <Suspense fallback={<ChromeGridFallback />}>
@@ -241,13 +204,13 @@ export const ImportPage: React.FC = () => {
           </Suspense>
         </div>
       )}
-
-      {/* Light mode background pattern */}
+      
+      {/* Light mode gradient background */}
       {!isDark && (
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(59,130,246,0.05)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(147,51,234,0.05)_0%,transparent_50%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_48%,rgba(59,130,246,0.02)_49%,rgba(59,130,246,0.02)_51%,transparent_52%)] bg-[length:20px_20px]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.1),transparent_50%)]" />
         </div>
       )}
 
@@ -270,7 +233,7 @@ export const ImportPage: React.FC = () => {
               >
                 <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2">
                   <Sparkles className={`w-3 h-3 sm:w-4 sm:h-4 ${isDark ? 'text-yellow-300' : 'text-blue-500'} animate-pulse`} />
-                  <span className={`text-sm sm:text-base font-medium ${isDark ? 'text-white' : 'text-gray-700'} font-unbounded tracking-wide`}>optimized-learn</span>
+                  <span className={`text-sm sm:text-base font-medium ${isDark ? 'text-white' : 'text-gray-800'} font-unbounded tracking-wide`}>optimized-learn</span>
                 </div>
               </StarBorder>
             </motion.div>
@@ -346,14 +309,14 @@ export const ImportPage: React.FC = () => {
                 <div className={`absolute inset-0 rounded-xl ${
                   isDark 
                     ? 'bg-gradient-to-br from-purple-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-blue-500/3 group-hover:to-purple-500/5' 
-                    : 'bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:via-purple-500/3 group-hover:to-blue-500/5'
+                    : 'bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/5 group-hover:to-blue-500/10'
                   } transition-all duration-500 blur-2xl`} />
                 
                 {/* Ultra-translucent card content */}
                 <div className={`relative ${
                   isDark 
                     ? 'bg-black/10 backdrop-blur-sm border border-white/5 hover:border-white/15 group-hover:bg-black/15' 
-                    : 'bg-white/40 backdrop-blur-sm border border-gray-200/30 hover:border-gray-300/50 group-hover:bg-white/60'
+                    : 'bg-white/40 backdrop-blur-sm border border-gray-200/50 hover:border-gray-300/70 group-hover:bg-white/60'
                   } rounded-xl p-6 transition-all duration-500 shadow-lg ${
                   isDark ? 'hover:shadow-purple-500/5' : 'hover:shadow-blue-500/10'
                   } max-h-[200px] min-w-[150px]`}>
@@ -362,227 +325,38 @@ export const ImportPage: React.FC = () => {
                     className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto ${
                       isDark 
                         ? 'bg-white/5 backdrop-blur-sm border border-white/10 group-hover:border-white/20 group-hover:bg-white/10' 
-                        : 'bg-white/60 backdrop-blur-sm border border-gray-200/50 group-hover:border-gray-300/70 group-hover:bg-white/80'
+                        : 'bg-gray-100/50 backdrop-blur-sm border border-gray-200/50 group-hover:border-gray-300/70 group-hover:bg-gray-200/60'
                       } transition-all duration-300`}
                     whileHover={{ rotate: 180 }}
                     transition={{ duration: 0.4 }}
                   >
                     <feature.icon className={`w-6 h-6 ${
-                      isDark ? 'text-white/80 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-800'
+                      isDark 
+                        ? 'text-white/80 group-hover:text-white' 
+                        : 'text-gray-600 group-hover:text-gray-800'
                       } transition-colors duration-300`} />
                   </motion.div>
                   
                   <h3 className={`${
-                    isDark ? 'text-white/90 group-hover:text-white' : 'text-gray-800 group-hover:text-gray-900'
+                    isDark 
+                      ? 'text-white/90 group-hover:text-white' 
+                      : 'text-gray-800 group-hover:text-gray-900'
                     } font-semibold text-sm mb-3 transition-colors duration-300 font-unbounded`}>{feature.title}</h3>
                   <p className={`${
-                    isDark ? 'text-white/60 group-hover:text-white/75' : 'text-gray-600 group-hover:text-gray-700'
+                    isDark 
+                      ? 'text-white/60 group-hover:text-white/75' 
+                      : 'text-gray-600 group-hover:text-gray-700'
                     } text-sm leading-relaxed font-light transition-colors duration-300 font-unbounded`}>{feature.desc}</p>
                   
                   {/* Subtle accent line */}
                   <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[0.5px] ${
-                    isDark ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-400/30 to-transparent'
+                    isDark 
+                      ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent' 
+                      : 'bg-gradient-to-r from-transparent via-gray-400/40 to-transparent'
                     } group-hover:w-2/3 transition-all duration-500`} />
                 </div>
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Success Stories Section */}
-      <motion.div 
-        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-32"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: 0.6,
-          delay: 0.3,
-          ease: [0.22, 1, 0.36, 1]
-        }}
-      >
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <motion.div 
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
-                isDark 
-                  ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-white/20' 
-                  : 'bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200'
-                } backdrop-blur-sm mb-6`}
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.15 }}
-            >
-              <Trophy className={`w-4 h-4 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
-              <span className={`${isDark ? 'text-white/90' : 'text-green-800'} font-medium font-unbounded text-sm`}>Success Stories</span>
-            </motion.div>
-            
-            <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 font-unbounded`}>
-              Real People,
-              <span className={`block ${
-                isDark 
-                  ? 'bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400' 
-                  : 'bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600'
-                } bg-clip-text text-transparent`}>
-                Real Results
-              </span>
-            </h2>
-            
-            <p className={`text-lg sm:text-xl ${isDark ? 'text-white/80' : 'text-gray-600'} max-w-3xl mx-auto leading-relaxed font-light`}>
-              Join thousands who've transformed their careers with AI-powered learning. Here are just a few of their incredible journeys.
-            </p>
-          </motion.div>
-
-          {/* Success Stories Grid */}
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
-                  delayChildren: 0.5
-                }
-              }
-            }}
-            initial="hidden"
-            animate="visible"
-          >
-            {successStories.map((story, index) => (
-              <motion.div
-                key={story.id}
-                className="group relative overflow-hidden"
-                variants={{
-                  hidden: { opacity: 0, y: 20, scale: 0.98 },
-                  visible: { 
-                    opacity: 1, 
-                    y: 0, 
-                    scale: 1,
-                    transition: { duration: 0.5 }
-                  }
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
-              >
-                {/* Card background with gradient border */}
-                <div className={`absolute inset-0 rounded-2xl ${
-                  isDark 
-                    ? 'bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-[1px] group-hover:from-green-400/20 group-hover:via-white/10 group-hover:to-emerald-400/20' 
-                    : 'bg-gradient-to-br from-gray-200/50 via-gray-100/30 to-gray-200/50 p-[1px] group-hover:from-green-400/30 group-hover:via-gray-200/50 group-hover:to-emerald-400/30'
-                  } transition-all duration-300`}>
-                  <div className={`w-full h-full ${
-                    isDark ? 'bg-black/20' : 'bg-white/60'
-                    } backdrop-blur-xl rounded-2xl`} />
-                </div>
-                
-                {/* Subtle glow effect */}
-                <div className={`absolute inset-0 rounded-2xl ${
-                  isDark 
-                    ? 'bg-gradient-to-br from-green-500/0 via-emerald-500/0 to-green-500/0 group-hover:from-green-500/10 group-hover:via-emerald-500/5 group-hover:to-green-500/10' 
-                    : 'bg-gradient-to-br from-green-500/0 via-emerald-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:via-emerald-500/3 group-hover:to-green-500/5'
-                  } transition-all duration-300 blur-xl`} />
-                
-                {/* Card content */}
-                <div className="relative p-8 h-full">
-                  {/* Quote icon */}
-                  <motion.div 
-                    className={`w-12 h-12 rounded-xl ${
-                      isDark 
-                        ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-white/10' 
-                        : 'bg-gradient-to-br from-green-200/60 to-emerald-200/60 border border-green-300/50'
-                      } flex items-center justify-center mb-6 group-hover:border-white/20 transition-all duration-300`}
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <Quote className={`w-6 h-6 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
-                  </motion.div>
-                  
-                  {/* Story text */}
-                  <blockquote className={`${
-                    isDark ? 'text-white/90' : 'text-gray-700'
-                    } text-lg leading-relaxed mb-6 font-light italic`}>
-                    "{story.story}"
-                  </blockquote>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center mb-6">
-                    {[...Array(story.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  
-                  {/* Author info */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <img 
-                      src={story.avatar} 
-                      alt={story.name}
-                      className="w-12 h-12 rounded-full border-2 border-white/20"
-                      loading="lazy"
-                    />
-                    <div>
-                      <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold font-unbounded`}>
-                        {story.name}
-                      </h4>
-                      <p className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
-                        {story.role} at {story.company}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Achievement badge */}
-                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${
-                    isDark 
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
-                      : 'bg-green-100 text-green-700 border border-green-200'
-                    } text-sm font-medium`}>
-                    <Trophy className="w-4 h-4" />
-                    {story.achievement}
-                  </div>
-                  
-                  {/* Course taken */}
-                  <div className="mt-4">
-                    <p className={`${isDark ? 'text-white/60' : 'text-gray-500'} text-sm`}>
-                      Course: <span className={`${isDark ? 'text-white/80' : 'text-gray-700'} font-medium`}>{story.course}</span>
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Call to Action */}
-          <motion.div 
-            className="text-center mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <motion.div 
-              className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl ${
-                isDark 
-                  ? 'bg-gradient-to-r from-green-600/80 to-emerald-600/80 border border-white/20 hover:from-green-500/90 hover:to-emerald-500/90' 
-                  : 'bg-gradient-to-r from-green-500 to-emerald-500 border border-green-600 hover:from-green-600 hover:to-emerald-600'
-                } backdrop-blur-sm text-white transition-all duration-200 group cursor-pointer`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.99 }}
-            >
-              <Trophy className="w-5 h-5" />
-              <span className="font-semibold font-unbounded">Start Your Success Story</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-            </motion.div>
-            
-            <p className={`${isDark ? 'text-white/60' : 'text-gray-500'} text-sm mt-4 font-unbounded`}>
-              Join 50,000+ learners who've transformed their careers
-            </p>
           </motion.div>
         </div>
       </motion.div>
@@ -621,11 +395,7 @@ export const ImportPage: React.FC = () => {
             
             <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 font-unbounded`}>
               Join the
-              <span className={`block ${
-                isDark 
-                  ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400' 
-                  : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600'
-                } bg-clip-text text-transparent`}>
+              <span className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                 Learning Revolution
               </span>
             </h2>
@@ -707,7 +477,7 @@ export const ImportPage: React.FC = () => {
                 
                 {/* Glow effect */}
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.color} ${
-                  isDark ? 'opacity-0 group-hover:opacity-40' : 'opacity-0 group-hover:opacity-20'
+                  isDark ? 'opacity-0 group-hover:opacity-40' : 'opacity-0 group-hover:opacity-60'
                   } transition-all duration-300 blur-xl`} />
                 
                 {/* Content */}
@@ -822,18 +592,24 @@ export const ImportPage: React.FC = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <feature.icon className={`w-6 h-6 ${
-                        isDark ? 'text-white/80 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-800'
+                        isDark 
+                          ? 'text-white/80 group-hover:text-white' 
+                          : 'text-gray-600 group-hover:text-gray-800'
                         } transition-colors duration-300`} />
                     </motion.div>
                     
                     <div>
                       <h4 className={`${
-                        isDark ? 'text-white group-hover:text-white' : 'text-gray-900 group-hover:text-gray-900'
+                        isDark 
+                          ? 'text-white group-hover:text-white' 
+                          : 'text-gray-900 group-hover:text-gray-900'
                         } font-semibold text-lg mb-2 transition-colors duration-200 font-unbounded`}>
                         {feature.title}
                       </h4>
                       <p className={`${
-                        isDark ? 'text-white/70 group-hover:text-white/85' : 'text-gray-600 group-hover:text-gray-700'
+                        isDark 
+                          ? 'text-white/70 group-hover:text-white/85' 
+                          : 'text-gray-600 group-hover:text-gray-700'
                         } leading-relaxed transition-colors duration-200`}>
                         {feature.description}
                       </p>
@@ -856,15 +632,15 @@ export const ImportPage: React.FC = () => {
                 <div className={`absolute inset-0 ${
                   isDark 
                     ? 'bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-cyan-500/20' 
-                    : 'bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-cyan-500/10'
+                    : 'bg-gradient-to-br from-purple-200/40 via-blue-200/20 to-cyan-200/40'
                   } rounded-3xl blur-2xl`} />
                 
                 {/* Card */}
                 <div className={`relative ${
-                  isDark ? 'bg-black/20' : 'bg-white/60'
-                  } backdrop-blur-xl rounded-3xl border ${
-                  isDark ? 'border-white/10' : 'border-gray-200/50'
-                  } p-8 overflow-hidden`}>
+                  isDark 
+                    ? 'bg-black/20 backdrop-blur-xl border border-white/10' 
+                    : 'bg-white/60 backdrop-blur-xl border border-gray-200/50'
+                  } rounded-3xl p-8 overflow-hidden`}>
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
@@ -877,10 +653,10 @@ export const ImportPage: React.FC = () => {
                       </div>
                       <div>
                         <h4 className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold font-unbounded`}>Course Analytics</h4>
-                        <p className={`${isDark ? 'text-white/60' : 'text-gray-500'} text-sm`}>Real-time insights</p>
+                        <p className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm`}>Real-time insights</p>
                       </div>
                     </div>
-                    <div className="text-green-400 text-sm font-medium">+24% this week</div>
+                    <div className="text-green-500 text-sm font-medium">+24% this week</div>
                   </div>
                   
                   {/* Mock chart */}
@@ -919,7 +695,7 @@ export const ImportPage: React.FC = () => {
                       className={`flex-1 ${
                         isDark 
                           ? 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 text-white hover:from-purple-500/30 hover:to-blue-500/30' 
-                          : 'bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200'
+                          : 'bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 text-purple-800 hover:from-purple-200 hover:to-blue-200'
                         } py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -981,7 +757,7 @@ export const ImportPage: React.FC = () => {
                 <CheckCircle className={`w-6 h-6 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
               </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
 
           {/* Call to Action */}
           <motion.div 
@@ -995,16 +771,16 @@ export const ImportPage: React.FC = () => {
                 isDark 
                   ? 'bg-gradient-to-r from-emerald-600/80 to-teal-600/80 border border-white/20 hover:from-emerald-500/90 hover:to-teal-500/90' 
                   : 'bg-gradient-to-r from-emerald-500 to-teal-500 border border-emerald-600 hover:from-emerald-600 hover:to-teal-600'
-                } backdrop-blur-sm text-white transition-all duration-200 group cursor-pointer`}
+                } backdrop-blur-sm transition-all duration-200 group cursor-pointer`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.99 }}
             >
-              <Rocket className="w-5 h-5" />
-              <span className="font-semibold font-unbounded">Experience the Platform</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+              <Rocket className="w-5 h-5 text-white" />
+              <span className="text-white font-semibold font-unbounded">Experience the Platform</span>
+              <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" />
             </motion.div>
             
-            <p className={`${isDark ? 'text-white/60' : 'text-gray-500'} text-sm mt-4 font-unbounded`}>
+            <p className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm mt-4 font-unbounded`}>
               Join thousands of educators already transforming education
             </p>
           </motion.div>
@@ -1045,11 +821,7 @@ export const ImportPage: React.FC = () => {
             
             <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 font-unbounded`}>
               The Future of
-              <span className={`block ${
-                isDark 
-                  ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400' 
-                  : 'bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600'
-                } bg-clip-text text-transparent`}>
+              <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
                 Learning is Here
               </span>
             </h2>
@@ -1150,7 +922,7 @@ export const ImportPage: React.FC = () => {
                 
                 {/* Subtle glow effect */}
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${benefit.color} ${
-                  isDark ? 'opacity-0 group-hover:opacity-30' : 'opacity-0 group-hover:opacity-20'
+                  isDark ? 'opacity-0 group-hover:opacity-30' : 'opacity-0 group-hover:opacity-50'
                   } transition-all duration-300 blur-xl`} />
                 
                 {/* Card content */}
@@ -1180,20 +952,26 @@ export const ImportPage: React.FC = () => {
                   
                   {/* Title and description */}
                   <h3 className={`text-xl font-bold ${
-                    isDark ? 'text-white group-hover:text-white' : 'text-gray-900 group-hover:text-gray-900'
+                    isDark 
+                      ? 'text-white group-hover:text-white' 
+                      : 'text-gray-900 group-hover:text-gray-900'
                     } mb-4 transition-colors duration-200 font-unbounded`}>
                     {benefit.title}
                   </h3>
                   
                   <p className={`${
-                    isDark ? 'text-white/70 group-hover:text-white/85' : 'text-gray-600 group-hover:text-gray-700'
+                    isDark 
+                      ? 'text-white/70 group-hover:text-white/85' 
+                      : 'text-gray-600 group-hover:text-gray-700'
                     } leading-relaxed transition-colors duration-200 font-light`}>
                     {benefit.description}
                   </p>
                   
                   {/* Subtle accent line */}
                   <div className={`absolute bottom-0 left-8 right-8 h-[1px] ${
-                    isDark ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300/40 to-transparent'
+                    isDark 
+                      ? 'bg-gradient-to-r from-transparent via-white/20 to-transparent' 
+                      : 'bg-gradient-to-r from-transparent via-gray-400/40 to-transparent'
                     } opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                 </div>
               </motion.div>
@@ -1212,16 +990,16 @@ export const ImportPage: React.FC = () => {
                 isDark 
                   ? 'bg-gradient-to-r from-purple-600/80 to-blue-600/80 border border-white/20 hover:from-purple-500/90 hover:to-blue-500/90' 
                   : 'bg-gradient-to-r from-purple-500 to-blue-500 border border-purple-600 hover:from-purple-600 hover:to-blue-600'
-                } backdrop-blur-sm text-white transition-all duration-200 group cursor-pointer`}
+                } backdrop-blur-sm transition-all duration-200 group cursor-pointer`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.99 }}
             >
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-semibold font-unbounded">Start Creating Your First Course</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+              <CheckCircle className="w-5 h-5 text-white" />
+              <span className="text-white font-semibold font-unbounded">Start Creating Your First Course</span>
+              <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" />
             </motion.div>
             
-            <p className={`${isDark ? 'text-white/60' : 'text-gray-500'} text-sm mt-4 font-unbounded`}>
+            <p className={`${isDark ? 'text-white/60' : 'text-gray-600'} text-sm mt-4 font-unbounded`}>
               No credit card required • 14-day free trial • Cancel anytime
             </p>
           </motion.div>
@@ -1243,21 +1021,23 @@ export const ImportPage: React.FC = () => {
         <div className={`absolute inset-0 rounded-[16px] ${
           isDark 
             ? 'bg-gradient-to-br from-white/8 via-white/4 to-white/8 p-[1px]' 
-            : 'bg-gradient-to-br from-gray-200/60 via-gray-100/40 to-gray-200/60 p-[1px]'
+            : 'bg-gradient-to-br from-gray-300/60 via-gray-200/40 to-gray-300/60 p-[1px]'
           }`}>
           <div className="w-full h-full bg-transparent rounded-[15px]" />
         </div>
         
         {/* Enhanced translucent content */}
         <div className={`relative ${
-          isDark ? 'bg-black/15' : 'bg-white/60'
-          } backdrop-blur-xl rounded-[16px] border ${
-          isDark ? 'border-white/15' : 'border-gray-200/50'
-          } shadow-2xl overflow-hidden`}>
+          isDark 
+            ? 'bg-black/15 backdrop-blur-xl border border-white/15' 
+            : 'bg-white/60 backdrop-blur-xl border border-gray-200/50'
+          } rounded-[16px] shadow-2xl overflow-hidden`}>
           {/* Enhanced header */}
           <motion.div 
             className={`w-full h-16 sm:h-20 border-b ${
-              isDark ? 'border-white/15 bg-gradient-to-r from-white/8 via-white/4 to-white/8' : 'border-gray-200/50 bg-gradient-to-r from-gray-100/60 via-gray-50/40 to-gray-100/60'
+              isDark 
+                ? 'border-white/15 bg-gradient-to-r from-white/8 via-white/4 to-white/8' 
+                : 'border-gray-200/50 bg-gradient-to-r from-gray-100/60 via-gray-50/40 to-gray-100/60'
               } relative`}
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
@@ -1288,18 +1068,22 @@ export const ImportPage: React.FC = () => {
               
               <motion.div 
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                  isDark ? 'bg-white/10 border border-white/20' : 'bg-gray-100/60 border border-gray-200/50'
+                  isDark 
+                    ? 'bg-white/10 border border-white/20' 
+                    : 'bg-gray-100/60 border border-gray-200/50'
                   }`}
                 whileHover={{ scale: 1.02 }}
               >
                 <Eye className={`w-4 h-4 ${isDark ? 'text-white/80' : 'text-gray-600'}`} />
-                <span className={`text-sm ${isDark ? 'text-white/90' : 'text-gray-700'} font-unbounded`}>24.5k views today</span>
+                <span className={`text-sm ${isDark ? 'text-white/90' : 'text-gray-800'} font-unbounded`}>24.5k views today</span>
               </motion.div>
             </div>
             
             {/* Enhanced accent */}
             <div className={`absolute bottom-0 left-6 right-6 h-[1px] ${
-              isDark ? 'bg-gradient-to-r from-transparent via-white/25 to-transparent' : 'bg-gradient-to-r from-transparent via-gray-300/50 to-transparent'
+              isDark 
+                ? 'bg-gradient-to-r from-transparent via-white/25 to-transparent' 
+                : 'bg-gradient-to-r from-transparent via-gray-400/50 to-transparent'
               }`} />
           </motion.div>
           
@@ -1401,7 +1185,9 @@ export const ImportPage: React.FC = () => {
                       {/* Category */}
                       <div className="absolute top-3 right-3">
                         <span className={`px-2 py-1 text-xs font-medium ${
-                          isDark ? 'bg-black/50 text-white/90 border border-white/20' : 'bg-white/70 text-gray-700 border border-gray-200/50'
+                          isDark 
+                            ? 'bg-black/50 text-white/90 border border-white/20' 
+                            : 'bg-white/70 text-gray-800 border border-gray-300/50'
                           } rounded-full backdrop-blur-sm`}>
                           {course.category}
                         </span>
@@ -1412,7 +1198,9 @@ export const ImportPage: React.FC = () => {
                     <div className="p-5">
                       {/* Title */}
                       <h3 className={`${
-                        isDark ? 'text-white/95 group-hover:text-white' : 'text-gray-900 group-hover:text-gray-900'
+                        isDark 
+                          ? 'text-white/95 group-hover:text-white' 
+                          : 'text-gray-900 group-hover:text-gray-900'
                         } font-bold text-lg mb-2 line-clamp-2 transition-colors font-unbounded`}>
                         {course.title}
                       </h3>
@@ -1422,8 +1210,8 @@ export const ImportPage: React.FC = () => {
                         <img 
                           src={course.authorAvatar} 
                           alt={course.author}
-                          className={`w-6 h-6 rounded-full border ${
-                            isDark ? 'border-white/20' : 'border-gray-200/50'
+                          className={`w-6 h-6 rounded-full ${
+                            isDark ? 'border border-white/20' : 'border border-gray-300/50'
                             }`}
                           loading="lazy"
                         />
@@ -1456,7 +1244,7 @@ export const ImportPage: React.FC = () => {
                             className={`px-2 py-1 text-xs ${
                               isDark 
                                 ? 'bg-white/10 text-white/80 border border-white/10' 
-                                : 'bg-gray-100/60 text-gray-600 border border-gray-200/50'
+                                : 'bg-gray-100/60 text-gray-700 border border-gray-200/50'
                               } rounded-full`}
                           >
                             {tag}
@@ -1469,7 +1257,9 @@ export const ImportPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <motion.button 
                             className={`flex items-center gap-1 ${
-                              isDark ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+                              isDark 
+                                ? 'text-white/70 hover:text-white' 
+                                : 'text-gray-600 hover:text-gray-800'
                               } transition-colors`}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -1480,7 +1270,9 @@ export const ImportPage: React.FC = () => {
                           
                           <motion.button 
                             className={`flex items-center gap-1 ${
-                              isDark ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+                              isDark 
+                                ? 'text-white/70 hover:text-white' 
+                                : 'text-gray-600 hover:text-gray-800'
                               } transition-colors`}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -1512,7 +1304,7 @@ export const ImportPage: React.FC = () => {
                 className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${
                   isDark 
                     ? 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 text-white/90 hover:from-purple-500/30 hover:to-blue-500/30 hover:border-white/30' 
-                    : 'bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 hover:border-purple-300'
+                    : 'bg-gradient-to-r from-purple-100 to-blue-100 border border-purple-200 text-purple-800 hover:from-purple-200 hover:to-blue-200 hover:border-purple-300'
                   } transition-all duration-200 backdrop-blur-sm group`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.99 }}
