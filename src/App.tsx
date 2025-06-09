@@ -5,6 +5,7 @@ import { CourseBrowser } from './components/CourseBrowser';
 import { CourseDetail } from './components/CourseDetail';
 import { VideoPlayer } from './components/VideoPlayer';
 import { Course } from './types/course';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Lazy load ImportPage for better initial performance
 const ImportPage = lazy(() => import('./components/ImportPage').then(module => ({ default: module.ImportPage })));
@@ -13,15 +14,15 @@ type ViewType = 'dashboard' | 'courses' | 'my-learning' | 'course-detail' | 'vid
 
 // Loading fallback component
 const LoadingFallback = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
     <div className="text-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p className="text-gray-600">Loading...</p>
+      <p className="text-gray-600 dark:text-gray-400">Loading...</p>
     </div>
   </div>
 );
 
-function App() {
+function AppContent() {
   const [currentView, setCurrentView] = useState<ViewType>('import');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
@@ -114,12 +115,20 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {currentView !== 'video-player' && currentView !== 'import' && (
         <Header currentView={currentView} onViewChange={handleViewChange} />
       )}
       {renderContent()}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import AnimatedTextCycle from '../../../components/ui/AnimatedTextCycle';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const headingPhrases = [
     "Create Courses",
@@ -12,6 +13,8 @@ const headingPhrases = [
 ];
 
 const Title: React.FC = React.memo(() => {
+    const { isDark } = useTheme();
+    
     const titleVariants = {
         hidden: { 
             opacity: 0, 
@@ -55,13 +58,13 @@ const Title: React.FC = React.memo(() => {
             animate="visible"
         >
             <motion.span 
-                className="text-white drop-shadow-lg transition-all duration-300 flex justify-center items-center"
+                className={`${isDark ? 'text-white' : 'text-gray-900'} drop-shadow-lg transition-all duration-300 flex justify-center items-center`}
                 variants={lineVariants}
             >
                 <AnimatedTextCycle 
                     words={headingPhrases}
                     interval={3000}
-                    className="text-white drop-shadow-lg text-center"
+                    className={`${isDark ? 'text-white' : 'text-gray-900'} drop-shadow-lg text-center`}
                 />
             </motion.span>
             <motion.span 

@@ -1,5 +1,6 @@
 import { cn } from "../../lib/utils"
 import { ElementType, ComponentPropsWithoutRef } from "react"
+import { useTheme } from "../../contexts/ThemeContext"
 
 interface StarBorderProps<T extends ElementType> {
   as?: T
@@ -18,7 +19,8 @@ export function StarBorder<T extends ElementType = "button">({
   ...props
 }: StarBorderProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof StarBorderProps<T>>) {
   const Component = as || "button"
-  const defaultColor = color || "#fbbf24"
+  const { isDark } = useTheme()
+  const defaultColor = color || (isDark ? "#fbbf24" : "#3b82f6")
 
   return (
     <Component 
@@ -45,7 +47,11 @@ export function StarBorder<T extends ElementType = "button">({
       />
       
       {/* Content container with translucent styling matching your design */}
-      <div className="relative z-10 bg-black/20 backdrop-blur-md rounded-full border border-white/20 shadow-xl">
+      <div className={`relative z-10 ${
+        isDark 
+          ? 'bg-black/20 backdrop-blur-md border border-white/20' 
+          : 'bg-white/60 backdrop-blur-md border border-gray-200/50'
+        } rounded-full shadow-xl transition-all duration-300`}>
         {children}
       </div>
     </Component>
