@@ -116,14 +116,14 @@ const InputSection: React.FC = () => {
             <div className="relative group w-full">
                 {/* Enhanced glow effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-blue-500/15 to-purple-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 group-hover:blur-2xl transition-all duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-2xl blur opacity-60 group-hover:opacity-80 transition-all duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-200/20 dark:from-white/5 via-gray-100/30 dark:via-white/10 to-gray-200/20 dark:to-white/5 rounded-2xl blur opacity-60 group-hover:opacity-80 transition-all duration-300" />
                 
                 {/* Metallic border effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-gray-400/20 via-white/30 to-gray-400/20 p-[1px] group-hover:from-purple-400/30 group-hover:via-white/40 group-hover:to-blue-400/30 transition-all duration-300">
-                    <div className="w-full h-full bg-black/20 backdrop-blur-xl rounded-2xl" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-gray-300/40 dark:from-gray-400/20 via-gray-100/60 dark:via-white/30 to-gray-300/40 dark:to-gray-400/20 p-[1px] group-hover:from-purple-400/30 group-hover:via-gray-200/70 dark:group-hover:via-white/40 group-hover:to-blue-400/30 transition-all duration-300">
+                    <div className="w-full h-full bg-white/80 dark:bg-black/20 backdrop-blur-xl rounded-2xl" />
                 </div>
                 
-                <div className="relative bg-black/10 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl group-hover:border-white/20 transition-all duration-300">
+                <div className="relative bg-white/60 dark:bg-black/10 backdrop-blur-2xl rounded-2xl border border-gray-200/50 dark:border-white/10 shadow-2xl group-hover:border-gray-300/70 dark:group-hover:border-white/20 transition-all duration-300">
                     <div className="flex flex-col gap-4 p-4 sm:p-6">
                         {/* Main input row */}
                         <motion.div 
@@ -131,18 +131,18 @@ const InputSection: React.FC = () => {
                             variants={itemVariants}
                         >
                             <motion.div 
-                                className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10"
+                                className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-gray-200/50 dark:border-white/10"
                                 whileHover={{ scale: 1.03, rotate: 2 }}
                                 transition={{ duration: 0.15 }}
                             >
-                                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white/90 flex-shrink-0" />
+                                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-gray-700 dark:text-white/90 flex-shrink-0" />
                             </motion.div>
                             <div className="flex-1">
                                 <motion.div variants={itemVariants}>
                                     <Textarea
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
-                                        className="bg-black/20 border border-white/10 rounded-xl text-white placeholder:text-white/50 text-base sm:text-lg resize-none min-h-[100px] p-4 focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-200 backdrop-blur-sm"
+                                        className="bg-white/60 dark:bg-black/20 border border-gray-200/50 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/50 text-base sm:text-lg resize-none min-h-[100px] p-4 focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-200 backdrop-blur-sm"
                                         placeholder={`create course for ${placeholderText}`}
                                     />
                                 </motion.div>
@@ -172,7 +172,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-black/20 border border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
+                                        className="bg-white/60 dark:bg-black/20 border border-gray-200/50 dark:border-white/20 text-gray-700 dark:text-white hover:bg-gray-100/70 dark:hover:bg-white/10 hover:border-gray-300/70 dark:hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <Video className="w-4 h-4" />
@@ -184,7 +184,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-black/20 border border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
+                                        className="bg-white/60 dark:bg-black/20 border border-gray-200/50 dark:border-white/20 text-gray-700 dark:text-white hover:bg-gray-100/70 dark:hover:bg-white/10 hover:border-gray-300/70 dark:hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <Image className="w-4 h-4" />
@@ -196,7 +196,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-black/20 border border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
+                                        className="bg-white/60 dark:bg-black/20 border border-gray-200/50 dark:border-white/20 text-gray-700 dark:text-white hover:bg-gray-100/70 dark:hover:bg-white/10 hover:border-gray-300/70 dark:hover:border-white/30 transition-all duration-200 gap-2 backdrop-blur-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         More
@@ -212,7 +212,7 @@ const InputSection: React.FC = () => {
                                 <Button
                                     size="lg"
                                     type="submit"
-                                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-500/90 hover:to-blue-500/90 text-white border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-200 rounded-xl group backdrop-blur-sm"
+                                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-500/90 hover:to-blue-500/90 text-white border border-purple-200/50 dark:border-white/20 shadow-xl hover:shadow-2xl transition-all duration-200 rounded-xl group backdrop-blur-sm"
                                 >
                                     <span className="mr-2 font-semibold">Create Course</span>
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />

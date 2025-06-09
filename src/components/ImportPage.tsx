@@ -10,7 +10,7 @@ const ChromeGrid = lazy(() => import('./ui/ChromeGrid').then(module => ({ defaul
 
 // Loading fallback for ChromeGrid
 const ChromeGridFallback = () => (
-  <div className="h-full w-full bg-black relative z-0 pointer-events-none" />
+  <div className="h-full w-full bg-gray-100 dark:bg-black relative z-0 pointer-events-none transition-colors duration-200" />
 );
 
 // Category icon mapping
@@ -191,72 +191,8 @@ export const ImportPage: React.FC = () => {
     }
   ], []);
 
-  // Testimonials data
-  const testimonialsData = React.useMemo(() => [
-    {
-      id: 1,
-      name: "Dr. Sarah Mitchell",
-      role: "Computer Science Professor",
-      company: "Stanford University",
-      avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "LearnHub's AI has revolutionized how I create course content. What used to take me weeks now takes hours, and the quality is consistently excellent.",
-      stats: { courses: 12, students: 15000 }
-    },
-    {
-      id: 2,
-      name: "Marcus Rodriguez",
-      role: "Senior Developer",
-      company: "Google",
-      avatar: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "The AI understands complex technical concepts and breaks them down perfectly for learners. My students' completion rates have increased by 40%.",
-      stats: { courses: 8, students: 8500 }
-    },
-    {
-      id: 3,
-      name: "Emily Chen",
-      role: "UX Design Lead",
-      company: "Airbnb",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "Creating design courses has never been easier. The AI captures my teaching style and creates engaging content that resonates with my audience.",
-      stats: { courses: 15, students: 22000 }
-    },
-    {
-      id: 4,
-      name: "David Kim",
-      role: "Data Science Manager",
-      company: "Netflix",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "The platform's ability to generate comprehensive data science curricula is incredible. It's like having a teaching assistant that never sleeps.",
-      stats: { courses: 6, students: 12000 }
-    },
-    {
-      id: 5,
-      name: "Lisa Thompson",
-      role: "Marketing Director",
-      company: "HubSpot",
-      avatar: "https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "I've trained over 10,000 marketers using courses created with LearnHub. The AI understands industry trends and creates relevant, up-to-date content.",
-      stats: { courses: 20, students: 35000 }
-    },
-    {
-      id: 6,
-      name: "Alex Johnson",
-      role: "Mobile Developer",
-      company: "Spotify",
-      avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=80&h=80&fit=crop",
-      rating: 5,
-      quote: "From React Native to Flutter, the AI creates comprehensive mobile development courses that keep up with the latest frameworks and best practices.",
-      stats: { courses: 10, students: 18000 }
-    }
-  ], []);
-
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-gray-50 dark:bg-black transition-colors duration-200">
       {/* ChromeGrid Background with Suspense */}
       <div className="absolute inset-0 z-0">
         <Suspense fallback={<ChromeGridFallback />}>
@@ -293,7 +229,7 @@ export const ImportPage: React.FC = () => {
             </motion.div>
 
             <motion.h2 
-              className="text-base sm:text-lg md:text-xl text-white/90 w-full sm:w-[90%] md:w-[80%] mx-auto leading-relaxed font-light drop-shadow-lg font-unbounded"
+              className="text-base sm:text-lg md:text-xl text-gray-700 dark:text-white/90 w-full sm:w-[90%] md:w-[80%] mx-auto leading-relaxed font-light drop-shadow-lg font-unbounded transition-colors duration-200"
               variants={itemVariants}
             >
               Transform your ideas into comprehensive courses in minutes. Just describe what you want to teach, and let
@@ -347,7 +283,7 @@ export const ImportPage: React.FC = () => {
                 }}
               >
                 {/* Subtle border glow */}
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-[0.5px] group-hover:from-purple-400/20 group-hover:via-white/10 group-hover:to-blue-400/20 transition-all duration-500">
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-200/20 dark:from-white/5 via-gray-100/10 dark:via-white/2 to-gray-200/20 dark:to-white/5 p-[0.5px] group-hover:from-purple-400/20 group-hover:via-gray-200/20 dark:group-hover:via-white/10 group-hover:to-blue-400/20 transition-all duration-500">
                   <div className="w-full h-full bg-transparent rounded-xl" />
                 </div>
                 
@@ -355,21 +291,21 @@ export const ImportPage: React.FC = () => {
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-blue-500/3 group-hover:to-purple-500/5 transition-all duration-500 blur-2xl" />
                 
                 {/* Ultra-translucent card content */}
-                <div className="relative bg-black/10 backdrop-blur-sm rounded-xl p-6 border border-white/5 hover:border-white/15 transition-all duration-500 shadow-lg hover:shadow-purple-500/5 max-h-[200px] min-w-[150px] group-hover:bg-black/15">
+                <div className="relative bg-white/60 dark:bg-black/10 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-white/5 hover:border-gray-300/70 dark:hover:border-white/15 transition-all duration-500 shadow-lg hover:shadow-purple-500/5 max-h-[200px] min-w-[150px] group-hover:bg-white/70 dark:group-hover:bg-black/15">
                   {/* Minimalist icon container */}
                   <motion.div 
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto bg-white/5 backdrop-blur-sm border border-white/10 group-hover:border-white/20 transition-all duration-300 group-hover:bg-white/10"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto bg-gray-100/50 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10 group-hover:border-gray-300/70 dark:group-hover:border-white/20 transition-all duration-300 group-hover:bg-gray-200/60 dark:group-hover:bg-white/10"
                     whileHover={{ rotate: 180 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <feature.icon className="w-6 h-6 text-white/80 group-hover:text-white transition-colors duration-300" />
+                    <feature.icon className="w-6 h-6 text-gray-600 dark:text-white/80 group-hover:text-gray-800 dark:group-hover:text-white transition-colors duration-300" />
                   </motion.div>
                   
-                  <h3 className="text-white/90 font-semibold text-sm mb-3 group-hover:text-white transition-colors duration-300 font-unbounded">{feature.title}</h3>
-                  <p className="text-white/60 text-sm leading-relaxed font-light group-hover:text-white/75 transition-colors duration-300 font-unbounded">{feature.desc}</p>
+                  <h3 className="text-gray-800 dark:text-white/90 font-semibold text-sm mb-3 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300 font-unbounded">{feature.title}</h3>
+                  <p className="text-gray-600 dark:text-white/60 text-sm leading-relaxed font-light group-hover:text-gray-700 dark:group-hover:text-white/75 transition-colors duration-300 font-unbounded">{feature.desc}</p>
                   
                   {/* Subtle accent line */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[0.5px] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:w-2/3 transition-all duration-500" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[0.5px] bg-gradient-to-r from-transparent via-gray-400/40 dark:via-white/20 to-transparent group-hover:w-2/3 transition-all duration-500" />
                 </div>
               </motion.div>
             ))}
@@ -379,7 +315,7 @@ export const ImportPage: React.FC = () => {
 
       {/* New Platform Showcase Section */}
       <motion.div 
-        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-32"
+        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-32 bg-white/80 dark:bg-transparent transition-colors duration-200"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ 
@@ -397,22 +333,22 @@ export const ImportPage: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <motion.div 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-white/20 backdrop-blur-sm mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-200/50 dark:border-white/20 backdrop-blur-sm mb-6"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.15 }}
             >
-              <Globe className="w-4 h-4 text-emerald-400" />
-              <span className="text-white/90 font-medium font-unbounded text-sm">Trusted Worldwide</span>
+              <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="text-emerald-800 dark:text-white/90 font-medium font-unbounded text-sm">Trusted Worldwide</span>
             </motion.div>
             
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 font-unbounded">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 font-unbounded">
               Join the
-              <span className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-400 dark:via-teal-400 dark:to-cyan-400 bg-clip-text text-transparent">
                 Learning Revolution
               </span>
             </h2>
             
-            <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-light">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-white/80 max-w-3xl mx-auto leading-relaxed font-light">
               Discover why educators and learners from 150+ countries choose LearnHub to transform their teaching and learning experience
             </p>
           </motion.div>
@@ -477,8 +413,8 @@ export const ImportPage: React.FC = () => {
                 }}
               >
                 {/* Card background */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-[1px] group-hover:from-white/10 group-hover:via-white/5 group-hover:to-white/10 transition-all duration-300">
-                  <div className="w-full h-full bg-black/20 backdrop-blur-xl rounded-2xl" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-100/50 dark:from-white/5 via-gray-50/30 dark:via-white/2 to-gray-100/50 dark:to-white/5 p-[1px] group-hover:from-gray-200/70 dark:group-hover:from-white/10 group-hover:via-gray-100/50 dark:group-hover:via-white/5 group-hover:to-gray-200/70 dark:group-hover:to-white/10 transition-all duration-300">
+                  <div className="w-full h-full bg-white/80 dark:bg-black/20 backdrop-blur-xl rounded-2xl" />
                 </div>
                 
                 {/* Glow effect */}
@@ -487,15 +423,15 @@ export const ImportPage: React.FC = () => {
                 {/* Content */}
                 <div className="relative p-8 text-center">
                   <motion.div 
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} border border-white/10 flex items-center justify-center mx-auto mb-4 group-hover:border-white/20 transition-all duration-300`}
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} border border-gray-200/50 dark:border-white/10 flex items-center justify-center mx-auto mb-4 group-hover:border-gray-300/70 dark:group-hover:border-white/20 transition-all duration-300`}
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6 }}
                   >
-                    <stat.icon className="w-8 h-8 text-white/90" />
+                    <stat.icon className="w-8 h-8 text-gray-700 dark:text-white/90" />
                   </motion.div>
                   
                   <motion.div 
-                    className="text-3xl sm:text-4xl font-bold text-white mb-2 font-unbounded"
+                    className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 font-unbounded"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
@@ -503,7 +439,7 @@ export const ImportPage: React.FC = () => {
                     {stat.value}
                   </motion.div>
                   
-                  <div className="text-white/70 font-medium font-unbounded">
+                  <div className="text-gray-600 dark:text-white/70 font-medium font-unbounded">
                     {stat.label}
                   </div>
                 </div>
@@ -525,10 +461,10 @@ export const ImportPage: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
               >
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-6 font-unbounded">
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 font-unbounded">
                   Everything you need to succeed
                 </h3>
-                <p className="text-white/70 text-lg leading-relaxed mb-8">
+                <p className="text-gray-600 dark:text-white/70 text-lg leading-relaxed mb-8">
                   From AI-powered content generation to advanced analytics, we provide all the tools you need to create, share, and optimize your learning experience.
                 </p>
               </motion.div>
@@ -585,18 +521,18 @@ export const ImportPage: React.FC = () => {
                     transition={{ duration: 0.2 }}
                   >
                     <motion.div 
-                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-white/20 transition-all duration-300"
+                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100/50 dark:from-white/10 to-gray-50/30 dark:to-white/5 border border-gray-200/50 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-gray-300/70 dark:group-hover:border-white/20 transition-all duration-300"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <feature.icon className="w-6 h-6 text-white/80 group-hover:text-white transition-colors duration-300" />
+                      <feature.icon className="w-6 h-6 text-gray-600 dark:text-white/80 group-hover:text-gray-800 dark:group-hover:text-white transition-colors duration-300" />
                     </motion.div>
                     
                     <div>
-                      <h4 className="text-white font-semibold text-lg mb-2 group-hover:text-white transition-colors duration-200 font-unbounded">
+                      <h4 className="text-gray-900 dark:text-white font-semibold text-lg mb-2 group-hover:text-gray-800 dark:group-hover:text-white transition-colors duration-200 font-unbounded">
                         {feature.title}
                       </h4>
-                      <p className="text-white/70 leading-relaxed group-hover:text-white/85 transition-colors duration-200">
+                      <p className="text-gray-600 dark:text-white/70 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-white/85 transition-colors duration-200">
                         {feature.description}
                       </p>
                     </div>
@@ -618,19 +554,19 @@ export const ImportPage: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-cyan-500/20 rounded-3xl blur-2xl" />
                 
                 {/* Card */}
-                <div className="relative bg-black/20 backdrop-blur-xl rounded-3xl border border-white/10 p-8 overflow-hidden">
+                <div className="relative bg-white/80 dark:bg-black/20 backdrop-blur-xl rounded-3xl border border-gray-200/50 dark:border-white/10 p-8 overflow-hidden">
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-white/20 flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-white/90" />
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-gray-200/50 dark:border-white/20 flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-gray-700 dark:text-white/90" />
                       </div>
                       <div>
-                        <h4 className="text-white font-semibold font-unbounded">Course Analytics</h4>
-                        <p className="text-white/60 text-sm">Real-time insights</p>
+                        <h4 className="text-gray-900 dark:text-white font-semibold font-unbounded">Course Analytics</h4>
+                        <p className="text-gray-600 dark:text-white/60 text-sm">Real-time insights</p>
                       </div>
                     </div>
-                    <div className="text-green-400 text-sm font-medium">+24% this week</div>
+                    <div className="text-green-600 dark:text-green-400 text-sm font-medium">+24% this week</div>
                   </div>
                   
                   {/* Mock chart */}
@@ -648,10 +584,10 @@ export const ImportPage: React.FC = () => {
                         transition={{ duration: 0.4, delay: 1 + index * 0.1 }}
                       >
                         <div className="flex justify-between text-sm">
-                          <span className="text-white/80">{metric.label}</span>
-                          <span className="text-white font-medium">{metric.value}%</span>
+                          <span className="text-gray-600 dark:text-white/80">{metric.label}</span>
+                          <span className="text-gray-900 dark:text-white font-medium">{metric.value}%</span>
                         </div>
-                        <div className="w-full bg-white/10 rounded-full h-2">
+                        <div className="w-full bg-gray-200/50 dark:bg-white/10 rounded-full h-2">
                           <motion.div 
                             className={`${metric.color} h-2 rounded-full`}
                             initial={{ width: 0 }}
@@ -666,14 +602,14 @@ export const ImportPage: React.FC = () => {
                   {/* Action buttons */}
                   <div className="flex gap-3">
                     <motion.button 
-                      className="flex-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 text-white py-2 px-4 rounded-lg text-sm font-medium hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-200"
+                      className="flex-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-gray-200/50 dark:border-white/20 text-gray-800 dark:text-white py-2 px-4 rounded-lg text-sm font-medium hover:from-purple-500/30 hover:to-blue-500/30 transition-all duration-200"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       View Details
                     </motion.button>
                     <motion.button 
-                      className="bg-white/10 border border-white/20 text-white p-2 rounded-lg hover:bg-white/20 transition-all duration-200"
+                      className="bg-gray-100/50 dark:bg-white/10 border border-gray-200/50 dark:border-white/20 text-gray-700 dark:text-white p-2 rounded-lg hover:bg-gray-200/60 dark:hover:bg-white/20 transition-all duration-200"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -685,7 +621,7 @@ export const ImportPage: React.FC = () => {
 
               {/* Floating elements */}
               <motion.div 
-                className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-2xl border border-white/10 backdrop-blur-sm flex items-center justify-center"
+                className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-yellow-400/20 to-orange-400/20 rounded-2xl border border-gray-200/50 dark:border-white/10 backdrop-blur-sm flex items-center justify-center"
                 animate={{ 
                   y: [0, -10, 0],
                   rotate: [0, 5, 0]
@@ -696,11 +632,11 @@ export const ImportPage: React.FC = () => {
                   ease: "easeInOut"
                 }}
               >
-                <Lightbulb className="w-8 h-8 text-yellow-400" />
+                <Lightbulb className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
               </motion.div>
 
               <motion.div 
-                className="absolute -bottom-6 -left-6 w-16 h-16 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-xl border border-white/10 backdrop-blur-sm flex items-center justify-center"
+                className="absolute -bottom-6 -left-6 w-16 h-16 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-xl border border-gray-200/50 dark:border-white/10 backdrop-blur-sm flex items-center justify-center"
                 animate={{ 
                   y: [0, 10, 0],
                   rotate: [0, -5, 0]
@@ -712,7 +648,7 @@ export const ImportPage: React.FC = () => {
                   delay: 1
                 }}
               >
-                <CheckCircle className="w-6 h-6 text-green-400" />
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
               </motion.div>
             </motion.div>
           </motion.div>
@@ -725,7 +661,7 @@ export const ImportPage: React.FC = () => {
             transition={{ duration: 0.5, delay: 1.2 }}
           >
             <motion.div 
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600/80 to-teal-600/80 border border-white/20 backdrop-blur-sm hover:from-emerald-500/90 hover:to-teal-500/90 transition-all duration-200 group cursor-pointer"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600/80 to-teal-600/80 border border-emerald-200/50 dark:border-white/20 backdrop-blur-sm hover:from-emerald-500/90 hover:to-teal-500/90 transition-all duration-200 group cursor-pointer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.99 }}
             >
@@ -734,7 +670,7 @@ export const ImportPage: React.FC = () => {
               <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" />
             </motion.div>
             
-            <p className="text-white/60 text-sm mt-4 font-unbounded">
+            <p className="text-gray-600 dark:text-white/60 text-sm mt-4 font-unbounded">
               Join thousands of educators already transforming education
             </p>
           </motion.div>
@@ -743,7 +679,7 @@ export const ImportPage: React.FC = () => {
 
       {/* New Benefits Section */}
       <motion.div 
-        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24"
+        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-24 bg-gray-50/80 dark:bg-transparent transition-colors duration-200"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ 
@@ -761,22 +697,22 @@ export const ImportPage: React.FC = () => {
             transition={{ duration: 0.4, delay: 0.4 }}
           >
             <motion.div 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 backdrop-blur-sm mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-200/50 dark:border-white/20 backdrop-blur-sm mb-6"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.15 }}
             >
-              <Trophy className="w-4 h-4 text-yellow-400" />
-              <span className="text-white/90 font-medium font-unbounded text-sm">Why Choose LearnHub</span>
+              <Trophy className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+              <span className="text-purple-800 dark:text-white/90 font-medium font-unbounded text-sm">Why Choose LearnHub</span>
             </motion.div>
             
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 font-unbounded">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 font-unbounded">
               The Future of
-              <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 bg-clip-text text-transparent">
                 Learning is Here
               </span>
             </h2>
             
-            <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-light">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-white/80 max-w-3xl mx-auto leading-relaxed font-light">
               Join thousands of educators and learners who are already transforming education with AI-powered course creation
             </p>
           </motion.div>
@@ -860,8 +796,8 @@ export const ImportPage: React.FC = () => {
                 }}
               >
                 {/* Card background with gradient border */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-[1px] group-hover:from-white/10 group-hover:via-white/5 group-hover:to-white/10 transition-all duration-300">
-                  <div className="w-full h-full bg-black/20 backdrop-blur-xl rounded-2xl" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-100/50 dark:from-white/5 via-gray-50/30 dark:via-white/2 to-gray-100/50 dark:to-white/5 p-[1px] group-hover:from-gray-200/70 dark:group-hover:from-white/10 group-hover:via-gray-100/50 dark:group-hover:via-white/5 group-hover:to-gray-200/70 dark:group-hover:to-white/10 transition-all duration-300">
+                  <div className="w-full h-full bg-white/80 dark:bg-black/20 backdrop-blur-xl rounded-2xl" />
                 </div>
                 
                 {/* Subtle glow effect */}
@@ -872,11 +808,11 @@ export const ImportPage: React.FC = () => {
                   {/* Icon and stats */}
                   <div className="flex items-start justify-between mb-6">
                     <motion.div 
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.color} border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-all duration-300`}
+                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.color} border border-gray-200/50 dark:border-white/10 flex items-center justify-center group-hover:border-gray-300/70 dark:group-hover:border-white/20 transition-all duration-300`}
                       whileHover={{ rotate: 180 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <benefit.icon className="w-7 h-7 text-white/90" />
+                      <benefit.icon className="w-7 h-7 text-gray-700 dark:text-white/90" />
                     </motion.div>
                     
                     <motion.div 
@@ -885,22 +821,22 @@ export const ImportPage: React.FC = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3, delay: 0.6 + index * 0.05 }}
                     >
-                      <div className="text-xs text-white/60 font-unbounded uppercase tracking-wider">Impact</div>
-                      <div className="text-sm font-bold text-white/90 font-unbounded">{benefit.stats}</div>
+                      <div className="text-xs text-gray-500 dark:text-white/60 font-unbounded uppercase tracking-wider">Impact</div>
+                      <div className="text-sm font-bold text-gray-800 dark:text-white/90 font-unbounded">{benefit.stats}</div>
                     </motion.div>
                   </div>
                   
                   {/* Title and description */}
-                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-white transition-colors duration-200 font-unbounded">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-gray-800 dark:group-hover:text-white transition-colors duration-200 font-unbounded">
                     {benefit.title}
                   </h3>
                   
-                  <p className="text-white/70 leading-relaxed group-hover:text-white/85 transition-colors duration-200 font-light">
+                  <p className="text-gray-600 dark:text-white/70 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-white/85 transition-colors duration-200 font-light">
                     {benefit.description}
                   </p>
                   
                   {/* Subtle accent line */}
-                  <div className="absolute bottom-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                  <div className="absolute bottom-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-gray-400/40 dark:via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
                 </div>
               </motion.div>
             ))}
@@ -914,7 +850,7 @@ export const ImportPage: React.FC = () => {
             transition={{ duration: 0.4, delay: 0.8 }}
           >
             <motion.div 
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600/80 to-blue-600/80 border border-white/20 backdrop-blur-sm hover:from-purple-500/90 hover:to-blue-500/90 transition-all duration-200 group cursor-pointer"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600/80 to-blue-600/80 border border-purple-200/50 dark:border-white/20 backdrop-blur-sm hover:from-purple-500/90 hover:to-blue-500/90 transition-all duration-200 group cursor-pointer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.99 }}
             >
@@ -923,7 +859,7 @@ export const ImportPage: React.FC = () => {
               <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" />
             </motion.div>
             
-            <p className="text-white/60 text-sm mt-4 font-unbounded">
+            <p className="text-gray-600 dark:text-white/60 text-sm mt-4 font-unbounded">
               No credit card required • 14-day free trial • Cancel anytime
             </p>
           </motion.div>
@@ -942,15 +878,15 @@ export const ImportPage: React.FC = () => {
         }}
       >
         {/* Enhanced border effect */}
-        <div className="absolute inset-0 rounded-[16px] bg-gradient-to-br from-white/8 via-white/4 to-white/8 p-[1px]">
+        <div className="absolute inset-0 rounded-[16px] bg-gradient-to-br from-gray-200/40 dark:from-white/8 via-gray-100/20 dark:via-white/4 to-gray-200/40 dark:to-white/8 p-[1px]">
           <div className="w-full h-full bg-transparent rounded-[15px]" />
         </div>
         
         {/* Enhanced translucent content */}
-        <div className="relative bg-black/15 backdrop-blur-xl rounded-[16px] border border-white/15 shadow-2xl overflow-hidden">
+        <div className="relative bg-white/70 dark:bg-black/15 backdrop-blur-xl rounded-[16px] border border-gray-200/50 dark:border-white/15 shadow-2xl overflow-hidden">
           {/* Enhanced header */}
           <motion.div 
-            className="w-full h-16 sm:h-20 border-b border-white/15 bg-gradient-to-r from-white/8 via-white/4 to-white/8 relative"
+            className="w-full h-16 sm:h-20 border-b border-gray-200/50 dark:border-white/15 bg-gradient-to-r from-gray-100/40 dark:from-white/8 via-gray-50/20 dark:via-white/4 to-gray-100/40 dark:to-white/8 relative"
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
@@ -958,33 +894,33 @@ export const ImportPage: React.FC = () => {
             <div className="flex items-center justify-between h-full px-6">
               <div className="flex items-center gap-3">
                 <motion.div 
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-white/20 flex items-center justify-center"
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-gray-200/50 dark:border-white/20 flex items-center justify-center"
                   whileHover={{ rotate: 180 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <Users className="w-5 h-5 text-white/90" />
+                  <Users className="w-5 h-5 text-gray-700 dark:text-white/90" />
                 </motion.div>
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-white/95 font-unbounded">
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white/95 font-unbounded">
                     Community Courses
                   </h2>
-                  <p className="text-sm text-white/70 font-unbounded">
+                  <p className="text-sm text-gray-600 dark:text-white/70 font-unbounded">
                     Discover amazing courses shared by our community
                   </p>
                 </div>
               </div>
               
               <motion.div 
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 border border-white/20"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100/50 dark:bg-white/10 border border-gray-200/50 dark:border-white/20"
                 whileHover={{ scale: 1.02 }}
               >
-                <Eye className="w-4 h-4 text-white/80" />
-                <span className="text-sm text-white/90 font-unbounded">24.5k views today</span>
+                <Eye className="w-4 h-4 text-gray-600 dark:text-white/80" />
+                <span className="text-sm text-gray-800 dark:text-white/90 font-unbounded">24.5k views today</span>
               </motion.div>
             </div>
             
             {/* Enhanced accent */}
-            <div className="absolute bottom-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="absolute bottom-0 left-6 right-6 h-[1px] bg-gradient-to-r from-transparent via-gray-400/50 dark:via-white/25 to-transparent" />
           </motion.div>
           
           {/* Enhanced content area */}
@@ -1017,7 +953,7 @@ export const ImportPage: React.FC = () => {
                 return (
                   <motion.div 
                     key={course.id} 
-                    className="group relative overflow-hidden rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer"
+                    className="group relative overflow-hidden rounded-xl bg-white/60 dark:bg-white/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10 hover:bg-white/80 dark:hover:bg-white/10 hover:border-gray-300/70 dark:hover:border-white/20 transition-all duration-300 cursor-pointer"
                     variants={{
                       hidden: { opacity: 0, scale: 0.96, y: 10 },
                       visible: { 
@@ -1089,7 +1025,7 @@ export const ImportPage: React.FC = () => {
                     {/* Course info */}
                     <div className="p-5">
                       {/* Title */}
-                      <h3 className="text-white/95 font-bold text-lg mb-2 line-clamp-2 group-hover:text-white transition-colors font-unbounded">
+                      <h3 className="text-gray-900 dark:text-white/95 font-bold text-lg mb-2 line-clamp-2 group-hover:text-gray-800 dark:group-hover:text-white transition-colors font-unbounded">
                         {course.title}
                       </h3>
                       
@@ -1098,17 +1034,17 @@ export const ImportPage: React.FC = () => {
                         <img 
                           src={course.authorAvatar} 
                           alt={course.author}
-                          className="w-6 h-6 rounded-full border border-white/20"
+                          className="w-6 h-6 rounded-full border border-gray-200/50 dark:border-white/20"
                           loading="lazy"
                         />
-                        <span className="text-white/70 text-sm font-medium">{course.author}</span>
+                        <span className="text-gray-600 dark:text-white/70 text-sm font-medium">{course.author}</span>
                       </div>
                       
                       {/* Stats */}
                       <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-4 text-sm text-white/60">
+                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-white/60">
                           <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
                             <span>{course.rating}</span>
                           </div>
                           <div className="flex items-center gap-1">
@@ -1127,7 +1063,7 @@ export const ImportPage: React.FC = () => {
                         {course.tags.slice(0, 3).map((tag, tagIndex) => (
                           <span 
                             key={tagIndex}
-                            className="px-2 py-1 text-xs bg-white/10 text-white/80 rounded-full border border-white/10"
+                            className="px-2 py-1 text-xs bg-gray-100/60 dark:bg-white/10 text-gray-700 dark:text-white/80 rounded-full border border-gray-200/50 dark:border-white/10"
                           >
                             {tag}
                           </span>
@@ -1138,7 +1074,7 @@ export const ImportPage: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <motion.button 
-                            className="flex items-center gap-1 text-white/70 hover:text-white transition-colors"
+                            className="flex items-center gap-1 text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white transition-colors"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -1147,7 +1083,7 @@ export const ImportPage: React.FC = () => {
                           </motion.button>
                           
                           <motion.button 
-                            className="flex items-center gap-1 text-white/70 hover:text-white transition-colors"
+                            className="flex items-center gap-1 text-gray-500 dark:text-white/70 hover:text-gray-700 dark:hover:text-white transition-colors"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
@@ -1156,7 +1092,7 @@ export const ImportPage: React.FC = () => {
                           </motion.button>
                         </div>
                         
-                        <div className="flex items-center gap-1 text-white/60 text-sm">
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-white/60 text-sm">
                           <Eye className="w-4 h-4" />
                           <span>{course.views.toLocaleString()}</span>
                         </div>
@@ -1175,7 +1111,7 @@ export const ImportPage: React.FC = () => {
               transition={{ duration: 0.3, delay: 0.8 }}
             >
               <motion.button 
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 text-white/90 hover:from-purple-500/30 hover:to-blue-500/30 hover:border-white/30 transition-all duration-200 backdrop-blur-sm group"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-gray-200/50 dark:border-white/20 text-gray-800 dark:text-white/90 hover:from-purple-500/30 hover:to-blue-500/30 hover:border-gray-300/70 dark:hover:border-white/30 transition-all duration-200 backdrop-blur-sm group"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.99 }}
               >
@@ -1183,176 +1119,6 @@ export const ImportPage: React.FC = () => {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </motion.button>
             </motion.div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Testimonials Section - Now at the bottom */}
-      <motion.div 
-        className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-32"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: 0.6,
-          delay: 0.3,
-          ease: [0.22, 1, 0.36, 1]
-        }}
-      >
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <motion.div 
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-white/20 backdrop-blur-sm mb-6"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.15 }}
-            >
-              <Star className="w-4 h-4 text-yellow-400" />
-              <span className="text-white/90 font-medium font-unbounded text-sm">Success Stories</span>
-            </motion.div>
-            
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 font-unbounded">
-              Trusted by
-              <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                Industry Leaders
-              </span>
-            </h2>
-            
-            <p className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed font-light">
-              See how educators from top companies and universities are transforming their teaching with AI-powered course creation
-            </p>
-          </motion.div>
-
-          {/* Testimonials Grid */}
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
-                  delayChildren: 0.5
-                }
-              }
-            }}
-            initial="hidden"
-            animate="visible"
-          >
-            {testimonialsData.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.id}
-                className="group relative overflow-hidden"
-                variants={{
-                  hidden: { opacity: 0, y: 30, scale: 0.95 },
-                  visible: { 
-                    opacity: 1, 
-                    y: 0, 
-                    scale: 1,
-                    transition: { duration: 0.5 }
-                  }
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
-              >
-                {/* Card background with gradient border */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/8 via-white/4 to-white/8 p-[1px] group-hover:from-white/12 group-hover:via-white/6 group-hover:to-white/12 transition-all duration-300">
-                  <div className="w-full h-full bg-black/20 backdrop-blur-xl rounded-2xl" />
-                </div>
-                
-                {/* Subtle glow effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/10 via-blue-500/5 to-purple-500/10 opacity-0 group-hover:opacity-40 transition-all duration-300 blur-xl" />
-                
-                {/* Card content */}
-                <div className="relative p-8 h-full flex flex-col">
-                  {/* Quote icon and rating */}
-                  <div className="flex items-start justify-between mb-6">
-                    <motion.div 
-                      className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-all duration-300"
-                      whileHover={{ rotate: 180 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <svg className="w-6 h-6 text-white/80" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
-                      </svg>
-                    </motion.div>
-                    
-                    <div className="flex items-center gap-1">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Quote */}
-                  <blockquote className="text-white/90 leading-relaxed mb-6 flex-grow group-hover:text-white transition-colors duration-200 font-light">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  
-                  {/* Author info */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full border-2 border-white/20 group-hover:border-white/30 transition-all duration-200"
-                      loading="lazy"
-                    />
-                    <div>
-                      <h4 className="text-white font-semibold font-unbounded group-hover:text-white transition-colors duration-200">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-white/70 text-sm">
-                        {testimonial.role}
-                      </p>
-                      <p className="text-white/60 text-sm font-medium">
-                        {testimonial.company}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Stats */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/10 group-hover:border-white/20 transition-all duration-200">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-white font-unbounded">{testimonial.stats.courses}</div>
-                      <div className="text-xs text-white/60 font-unbounded">Courses</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-white font-unbounded">{testimonial.stats.students.toLocaleString()}</div>
-                      <div className="text-xs text-white/60 font-unbounded">Students</div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Call to Action */}
-          <motion.div 
-            className="text-center mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <motion.div 
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600/80 to-blue-600/80 border border-white/20 backdrop-blur-sm hover:from-purple-500/90 hover:to-blue-500/90 transition-all duration-200 group cursor-pointer"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.99 }}
-            >
-              <Users className="w-5 h-5 text-white" />
-              <span className="text-white font-semibold font-unbounded">Join These Industry Leaders</span>
-              <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" />
-            </motion.div>
-            
-            <p className="text-white/60 text-sm mt-4 font-unbounded">
-              Start creating professional courses in minutes
-            </p>
           </motion.div>
         </div>
       </motion.div>

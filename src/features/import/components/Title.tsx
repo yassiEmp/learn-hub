@@ -55,17 +55,17 @@ const Title: React.FC = React.memo(() => {
             animate="visible"
         >
             <motion.span 
-                className="text-white drop-shadow-lg transition-all duration-300 flex justify-center items-center"
+                className="text-gray-900 dark:text-white drop-shadow-lg transition-all duration-300 flex justify-center items-center"
                 variants={lineVariants}
             >
                 <AnimatedTextCycle 
                     words={headingPhrases}
                     interval={3000}
-                    className="text-white drop-shadow-lg text-center"
+                    className="text-gray-900 dark:text-white drop-shadow-lg text-center"
                 />
             </motion.span>
             <motion.span 
-                className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center"
+                className="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 dark:from-pink-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center"
                 variants={lineVariants}
             >
                 with AI
