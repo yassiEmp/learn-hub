@@ -74,8 +74,8 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
     { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-    { id: 'courses', label: 'Explore', path: '/courses' },
-    { id: 'my-learning', label: 'Learning', path: '/my-learning' },
+    { id: 'courses', label: 'Courses', path: '/courses' },
+    { id: 'exams', label: 'Learning', path: '/exams' },
   ];
 
   return (

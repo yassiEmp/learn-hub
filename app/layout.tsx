@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Syne } from "next/font/google";
+import { Syne } from "next/font/google";
 import "./globals.css";
 import Bagde from "@/components/Bagde";
-import { useEffect } from "react";
 
 const syne = Syne({
   subsets: ["latin"],
