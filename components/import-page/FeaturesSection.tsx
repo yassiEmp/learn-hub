@@ -7,10 +7,10 @@ export const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center mb-20"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
         >
           <span className="px-4 py-2 text-sm font-geist-mono text-white bg-white/15 backdrop-blur-md rounded-full border border-white/30 inline-block mb-8 shadow-lg">
             Powerful Features
@@ -30,33 +30,43 @@ export const FeaturesSection = () => {
             visible: {
               opacity: 1,
               transition: {
-                staggerChildren: 0.2,
-                delayChildren: 0.3
+                staggerChildren: 0.15,
+                delayChildren: 0.2,
+                ease: "easeOut"
               }
             }
           }}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
         >
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center hover:border-white/20 transition-all duration-300 group"
+              className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center hover:border-white/20 transition-all duration-500 group"
               variants={{
-                hidden: { opacity: 0, y: 30 },
+                hidden: { opacity: 0, y: 20 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  transition: { duration: 0.5 }
+                  transition: { 
+                    duration: 0.8, 
+                    ease: "easeOut"
+                  }
                 }
               }}
-              whileHover={{ scale: 1.02, y: -5 }}
+              whileHover={{ 
+                scale: 1.02, 
+                y: -5,
+                transition: { duration: 0.3, ease: "easeOut" }
+              }}
             >
               <motion.div
                 className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} border border-white/10 flex items-center justify-center mx-auto mb-6`}
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
+                whileHover={{ 
+                  rotate: 360,
+                  transition: { duration: 0.8, ease: "easeInOut" }
+                }}
               >
                 <feature.icon className={`w-8 h-8 ${feature.iconColor}`} />
               </motion.div>
@@ -68,4 +78,4 @@ export const FeaturesSection = () => {
       </div>
     </div>
   );
-}; 
+};

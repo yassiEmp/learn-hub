@@ -52,17 +52,17 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
   if (viewMode === 'list') {
     return (
       <motion.div 
-        className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-300"
+        className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
         onClick={() => onCourseSelect(course)}
         whileHover={{ 
           scale: 1.01,
           y: -2,
-          transition: { duration: 0.3 }
+          transition: { duration: 0.3, ease: "easeOut" }
         }}
         whileTap={{ scale: 0.99 }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="p-6">
           <div className="flex items-start space-x-6">
@@ -70,8 +70,10 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             <div className="flex-shrink-0">
               <motion.div
                 className={`w-24 h-24 bg-gradient-to-br ${categoryColor} rounded-xl relative overflow-hidden border border-white/10`}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  transition: { duration: 0.3, ease: "easeOut" }
+                }}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:8px_8px]" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -90,7 +92,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
                     </span>
                     <span className="text-white/50 text-xs font-geist-mono">{course.level}</span>
                   </div>
-                  <h3 className="text-xl font-syne font-medium text-white mb-2 group-hover:text-white/90 transition-colors">
+                  <h3 className="text-xl font-syne font-medium text-white mb-2 group-hover:text-white/90 transition-colors duration-300">
                     {course.title}
                   </h3>
                   <p className="text-white/60 text-sm font-geist-mono line-clamp-2 mb-3">
@@ -144,7 +146,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
                       className="bg-green-400 h-1.5 rounded-full" 
                       initial={{ width: 0 }}
                       animate={{ width: `${course.progress}%` }}
-                      transition={{ duration: 1, delay: 0.5 }}
+                      transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
                     />
                   </div>
                 </div>
@@ -158,24 +160,26 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
 
   return (
     <motion.div 
-      className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-300"
+      className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
       onClick={() => onCourseSelect(course)}
       whileHover={{ 
         scale: 1.02,
         y: -5,
-        transition: { duration: 0.3 }
+        transition: { duration: 0.3, ease: "easeOut" }
       }}
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="relative overflow-hidden h-48">
         {/* Gradient background */}
         <motion.div
           className={`w-full h-full bg-gradient-to-br ${categoryColor} relative`}
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.6 }}
+          whileHover={{ 
+            scale: 1.05,
+            transition: { duration: 0.6, ease: "easeOut" }
+          }}
         >
           {/* Pattern overlay */}
           <div className="absolute inset-0 opacity-30">
@@ -188,7 +192,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center"
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             >
               <CategoryIcon className="w-8 h-8 text-white" />
             </motion.div>
@@ -202,8 +206,11 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         >
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            whileHover={{ 
+              scale: 1, 
+              opacity: 1,
+              transition: { duration: 0.3, ease: "easeOut" }
+            }}
             className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center"
           >
             <Play className="h-6 w-6 text-white ml-0.5" />
@@ -215,7 +222,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             className="absolute top-4 left-4 bg-red-500/20 text-red-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-red-500/20"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
           >
             Sale
           </motion.div>
@@ -225,7 +232,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             className="absolute top-4 right-4 bg-green-500/20 text-green-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-green-500/20"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
+            transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
           >
             Enrolled
           </motion.div>
@@ -236,19 +243,22 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         className="p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
       >
         <div className="mb-3">
           <motion.span 
             className="inline-block bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full font-geist-mono"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ 
+              scale: 1.05,
+              transition: { duration: 0.2, ease: "easeOut" }
+            }}
           >
             {course.category}
           </motion.span>
           <span className="ml-2 text-white/50 text-xs font-geist-mono">{course.level}</span>
         </div>
         
-        <h3 className="text-lg font-syne font-medium text-white mb-2 line-clamp-2 group-hover:text-white/90 transition-colors">
+        <h3 className="text-lg font-syne font-medium text-white mb-2 line-clamp-2 group-hover:text-white/90 transition-colors duration-300">
           {course.title}
         </h3>
         
@@ -258,8 +268,10 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         
         <motion.div 
           className="flex items-center mb-4"
-          whileHover={{ x: 2 }}
-          transition={{ duration: 0.2 }}
+          whileHover={{ 
+            x: 2,
+            transition: { duration: 0.2, ease: "easeOut" }
+          }}
         >
           <img
             src={course.instructorAvatar}
@@ -297,7 +309,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
                 className="bg-green-400 h-1.5 rounded-full" 
                 initial={{ width: 0 }}
                 animate={{ width: `${course.progress}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
+                transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
               />
             </div>
           </div>
@@ -311,9 +323,12 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               )}
               <motion.span 
                 className="text-xl font-syne font-medium text-white"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1,
+                  transition: { duration: 0.4, delay: 0.4, ease: "easeOut" }
+                }}
               >
                 ${course.price}
               </motion.span>
