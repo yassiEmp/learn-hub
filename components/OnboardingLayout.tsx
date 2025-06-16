@@ -15,6 +15,7 @@ import {
   Rocket,
   ChevronDown
 } from 'lucide-react';
+import FloatingParticle from './FloatingParticle';
 
 interface OnboardingStep {
   id: string;
@@ -270,27 +271,7 @@ export const OnboardingLayout: React.FC = () => {
           className="absolute inset-0"
         />
         
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/20 rounded-full"
-            animate={{
-              x: [0, Math.random() * 100 - 50],
-              y: [0, Math.random() * 100 - 50],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: Math.random() * 4 + 3,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-          />
-        ))}
+       <FloatingParticle />
       </motion.div>
 
       {/* Fixed Header */}

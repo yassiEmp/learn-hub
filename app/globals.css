@@ -178,7 +178,7 @@ html,body{
   animation: badgePulse 2s ease-in-out infinite;
 }
 
-/* Enhanced prose styles for the editor */
+/* Enhanced prose styles for the editor
 .prose-enhanced {
   @apply prose prose-invert max-w-none;
 }
@@ -221,4 +221,4 @@ html,body{
 
 .prose-enhanced blockquote {
   @apply border-l-4 border-l-blue-400 bg-blue-400/5 pl-4 py-2 rounded-r-lg my-4 text-white/90 font-geist-mono;
-}
+} */

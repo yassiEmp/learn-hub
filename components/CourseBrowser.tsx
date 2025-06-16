@@ -4,6 +4,7 @@ import { courses, categories } from '../data/courses';
 import { CourseCard } from './CourseCard';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
+import FloatingParticle from './FloatingParticle';
 
 interface CourseBrowserProps {
   onCourseSelect: (course: Course) => void;
@@ -69,34 +70,7 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
       
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => {
-          const baseX = (i * 5) % 100;
-          const baseY = (i * 7) % 100;
-          const duration = 4 + (i % 3);
-          const delay = (i * 0.2) % 2;
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/10 rounded-full"
-              animate={{
-                x: [0, (baseX - 50)],
-                y: [0, (baseY - 50)],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: duration,
-                repeat: Infinity,
-                delay: delay,
-              }}
-              style={{
-                left: `${baseX}%`,
-                top: `${baseY}%`,
-              }}
-            />
-          );
-        })}
+      <FloatingParticle />
 
       <motion.div 
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12"

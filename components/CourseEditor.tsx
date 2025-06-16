@@ -18,6 +18,7 @@ import {
   Settings,
   MoreVertical
 } from 'lucide-react';
+import FloatingParticle from './FloatingParticle';
 
 interface CourseEditorProps {
   content: string;
@@ -58,27 +59,8 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
       
-      {/* Floating particles */}
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-white/10 rounded-full"
-          animate={{
-            x: [0, Math.random() * 100 - 50],
-            y: [0, Math.random() * 100 - 50],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 6 + 4,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-        />
-      ))}
+     
+      <FloatingParticle />
 
       <div className={cn("relative z-10 flex h-screen", className)}>
         {/* Header */}
