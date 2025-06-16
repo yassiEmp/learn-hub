@@ -21,7 +21,13 @@ import {
   ChevronDown,
   ChevronRight,
   Edit3,
-  MoreVertical
+  MoreVertical,
+  Send,
+  MessageCircle,
+  Sparkles,
+  X,
+  Minimize2,
+  Maximize2
 } from 'lucide-react';
 import FloatingParticle from './FloatingParticle';
 
@@ -40,6 +46,13 @@ interface ExamSection {
   description: string;
   questions: Question[];
   isExpanded: boolean;
+}
+
+interface ChatMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
 }
 
 const questionTypes = [
@@ -63,6 +76,20 @@ export const CreateExamEditor: React.FC = () => {
     }
   ]);
   const [selectedQuestionType, setSelectedQuestionType] = useState<string>('multiple-choice');
+  
+  // AI Chat states
+  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      type: 'ai',
+      content: 'Hello! I\'m your AI assistant. I can help you create better exam questions, suggest improvements, and provide insights about your exam structure. What would you like to work on?',
+      timestamp: new Date()
+    }
+  ]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const addSection = () => {
     const newSection: ExamSection = {
@@ -118,6 +145,44 @@ export const CreateExamEditor: React.FC = () => {
         ? { ...section, isExpanded: !section.isExpanded }
         : section
     ));
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: newMessage,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setNewMessage('');
+    setIsTyping(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: getAIResponse(newMessage),
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, aiResponse]);
+      setIsTyping(false);
+    }, 1500);
+  };
+
+  const getAIResponse = (message: string): string => {
+    const responses = [
+      "I can help you create multiple choice questions for that topic. Would you like me to suggest some options?",
+      "That's a great question type for this subject. Consider adding some scenario-based questions to test practical application.",
+      "For better assessment, try mixing different question types. I can generate some true/false questions to complement your multiple choice ones.",
+      "I notice your exam could benefit from more higher-order thinking questions. Would you like me to suggest some analysis or synthesis questions?",
+      "The difficulty level seems appropriate. Consider adding a few challenging questions to differentiate top performers."
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const totalQuestions = sections.reduce((total, section) => total + section.questions.length, 0);
@@ -190,9 +255,20 @@ export const CreateExamEditor: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-4 gap-8">
+          {/* Responsive Grid Layout */}
+          <div className={cn(
+            "grid gap-8 transition-all duration-300",
+            isChatOpen && !isChatMinimized 
+              ? "lg:grid-cols-12" 
+              : "lg:grid-cols-4"
+          )}>
             {/* Main Content */}
-            <div className="lg:col-span-3 space-y-8">
+            <div className={cn(
+              "space-y-8 transition-all duration-300",
+              isChatOpen && !isChatMinimized 
+                ? "lg:col-span-6" 
+                : "lg:col-span-3"
+            )}>
               {/* Exam Details */}
               <motion.div
                 className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8"
@@ -264,7 +340,7 @@ export const CreateExamEditor: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <h3 className="text-lg font-syne font-medium text-white mb-6">Question Types</h3>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {questionTypes.map((type) => (
                     <motion.button
                       key={type.id}
@@ -389,9 +465,14 @@ export const CreateExamEditor: React.FC = () => {
               </div>
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar - Stats */}
             <motion.div
-              className="lg:col-span-1"
+              className={cn(
+                "space-y-6 transition-all duration-300",
+                isChatOpen && !isChatMinimized 
+                  ? "lg:col-span-3" 
+                  : "lg:col-span-1"
+              )}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -424,30 +505,6 @@ export const CreateExamEditor: React.FC = () => {
                   </div>
                 </div>
 
-                {/* AI Assistant */}
-                <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <motion.div 
-                      className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400/20 to-pink-400/20 border border-white/10 flex items-center justify-center"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Brain className="w-4 h-4 text-purple-400" />
-                    </motion.div>
-                    <h3 className="font-syne font-medium text-white">AI Assistant</h3>
-                  </div>
-                  <p className="text-white/60 font-geist-mono text-sm mb-4">
-                    Get AI-powered suggestions for questions and improvements.
-                  </p>
-                  <motion.button
-                    className="w-full px-4 py-2 bg-gradient-to-r from-purple-400/20 to-pink-400/20 border border-white/10 rounded-xl text-white hover:bg-gradient-to-r hover:from-purple-400/30 hover:to-pink-400/30 transition-all duration-300 font-geist-mono text-sm"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Generate Questions
-                  </motion.button>
-                </div>
-
                 {/* Settings */}
                 <div className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-6">
                   <div className="flex items-center space-x-3 mb-4">
@@ -471,14 +528,174 @@ export const CreateExamEditor: React.FC = () => {
                 </div>
               </div>
             </motion.div>
+
+            {/* AI Chat Interface */}
+            <AnimatePresence>
+              {isChatOpen && (
+                <motion.div
+                  className="lg:col-span-3 relative"
+                  initial={{ opacity: 0, x: 300 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 300 }}
+                  transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
+                >
+                  <div className="sticky top-8">
+                    <div className={cn(
+                      "bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden transition-all duration-300",
+                      isChatMinimized ? "h-16" : "h-[600px]"
+                    )}>
+                      {/* Chat Header */}
+                      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/20">
+                        <div className="flex items-center space-x-3">
+                          <motion.div 
+                            className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400/20 to-pink-400/20 border border-white/10 flex items-center justify-center"
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Brain className="w-4 h-4 text-purple-400" />
+                          </motion.div>
+                          <div>
+                            <h3 className="font-syne font-medium text-white">AI Assistant</h3>
+                            <p className="text-xs text-white/50 font-geist-mono">Online</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <motion.button
+                            onClick={() => setIsChatMinimized(!isChatMinimized)}
+                            className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            {isChatMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+                          </motion.button>
+                          <motion.button
+                            onClick={() => setIsChatOpen(false)}
+                            className="p-1 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <X className="w-4 h-4" />
+                          </motion.button>
+                        </div>
+                      </div>
+
+                      {!isChatMinimized && (
+                        <>
+                          {/* Chat Messages */}
+                          <div className="flex-1 p-4 space-y-4 h-[480px] overflow-y-auto scrollbar-thin">
+                            <AnimatePresence>
+                              {chatMessages.map((message) => (
+                                <motion.div
+                                  key={message.id}
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                  transition={{ duration: 0.3 }}
+                                  className={cn(
+                                    "flex",
+                                    message.type === 'user' ? 'justify-end' : 'justify-start'
+                                  )}
+                                >
+                                  <div className={cn(
+                                    "max-w-[80%] p-3 rounded-xl font-geist-mono text-sm",
+                                    message.type === 'user'
+                                      ? "bg-white text-black"
+                                      : "bg-white/10 text-white border border-white/10"
+                                  )}>
+                                    {message.content}
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </AnimatePresence>
+                            
+                            {isTyping && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex justify-start"
+                              >
+                                <div className="bg-white/10 border border-white/10 p-3 rounded-xl">
+                                  <div className="flex space-x-1">
+                                    <motion.div
+                                      className="w-2 h-2 bg-white/60 rounded-full"
+                                      animate={{ scale: [1, 1.2, 1] }}
+                                      transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+                                    />
+                                    <motion.div
+                                      className="w-2 h-2 bg-white/60 rounded-full"
+                                      animate={{ scale: [1, 1.2, 1] }}
+                                      transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+                                    />
+                                    <motion.div
+                                      className="w-2 h-2 bg-white/60 rounded-full"
+                                      animate={{ scale: [1, 1.2, 1] }}
+                                      transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+                                    />
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </div>
+
+                          {/* Chat Input */}
+                          <div className="p-4 border-t border-white/10">
+                            <div className="flex space-x-3">
+                              <input
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                placeholder="Ask me anything about your exam..."
+                                className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-200 font-geist-mono text-sm"
+                              />
+                              <motion.button
+                                onClick={sendMessage}
+                                disabled={!newMessage.trim()}
+                                className="p-2 bg-white text-black rounded-xl hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <Send className="w-4 h-4" />
+                              </motion.button>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
+
+          {/* Floating Chat Toggle (when chat is closed) */}
+          <AnimatePresence>
+            {!isChatOpen && (
+              <motion.button
+                onClick={() => setIsChatOpen(true)}
+                className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-purple-400/20 to-pink-400/20 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-purple-400 hover:scale-110 transition-all duration-300 shadow-lg z-50"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <MessageCircle className="w-6 h-6" />
+                <motion.div
+                  className="absolute -top-1 -right-1 w-3 h-3 bg-purple-400 rounded-full"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
   );
 };
 
-// Question Editor Component
+// Question Editor Component (unchanged)
 interface QuestionEditorProps {
   question: Question;
   questionIndex: number;
