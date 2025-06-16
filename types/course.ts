@@ -14,6 +14,7 @@ export interface Course {
   category: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
   tags: string[];
+  content?: string;
   lessons: Lesson[];
   isEnrolled?: boolean;
   progress?: number;

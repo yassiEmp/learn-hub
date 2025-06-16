@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
+import { CourseEditor } from './CourseEditor';
 
 interface CourseDetailProps {
   course: Course;
-  onBack: () => void;
-  onStartLearning: (course: Course) => void;
 }
 
 // Category icon mapping
@@ -45,14 +44,15 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, onStartLearning }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
+  const [activeTab, setActiveTab] = useState('lesson');
+  const [courseContent, setCourseContent] = useState(course.content || '');
   const CategoryIcon = getCategoryIcon(course.category);
   const categoryColor = getCategoryColor(course.category);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
-    { id: 'curriculum', label: 'Curriculum' },
+    { id: 'lesson', label: 'lesson' },
     { id: 'instructor', label: 'Instructor' },
   ];
 
@@ -121,7 +121,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, onSt
       >
         {/* Back Button */}
         <motion.button
-          onClick={onBack}
           className="flex items-center text-white/60 hover:text-white mb-8 group transition-all duration-300"
           variants={itemVariants}
           whileHover={{ x: -5 }}
@@ -268,9 +267,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, onSt
                   </div>
                 )}
 
-                {activeTab === 'curriculum' && (
+                {activeTab === 'lesson' && (
                   <div className="space-y-6">
-                    <h2 className="text-2xl font-syne font-medium text-white mb-6">Course Curriculum</h2>
+                    <h2 className="text-2xl font-syne font-medium text-white mb-6">Course lesson</h2>
                     <div className="space-y-3">
                       {course.lessons.map((lesson, index) => (
                         <motion.div 
@@ -400,7 +399,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course, onBack, onSt
                       </div>
                     )}
                     <motion.button
-                      onClick={() => onStartLearning(course)}
                       className="w-full bg-white text-black py-4 px-6 rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300 flex items-center justify-center space-x-2 group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
