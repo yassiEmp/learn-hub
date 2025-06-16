@@ -121,7 +121,6 @@
   }
 }
 
-
 *{
   box-sizing: border-box;
 }
@@ -129,6 +128,35 @@ html,body{
   width: 100%;
   height: 100%;
 }
+
+/* Custom scrollbar styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar for content areas */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 .bolt-badge {
   transition: all 0.3s ease;
 }
@@ -148,4 +176,49 @@ html,body{
 }
 .bolt-badge {
   animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* Enhanced prose styles for the editor */
+.prose-enhanced {
+  @apply prose prose-invert max-w-none;
+}
+
+.prose-enhanced h1 {
+  @apply text-3xl font-syne font-medium text-white mb-6 mt-8 first:mt-0;
+}
+
+.prose-enhanced h2 {
+  @apply text-2xl font-syne font-medium text-white mb-4 mt-8 first:mt-0;
+}
+
+.prose-enhanced h3 {
+  @apply text-xl font-syne font-medium text-white mb-3 mt-6;
+}
+
+.prose-enhanced p {
+  @apply text-white/90 leading-relaxed mb-4 font-geist-mono;
+}
+
+.prose-enhanced ul, .prose-enhanced ol {
+  @apply text-white/90 mb-4 font-geist-mono;
+}
+
+.prose-enhanced li {
+  @apply text-white/90 mb-1;
+}
+
+.prose-enhanced strong {
+  @apply text-blue-300 font-semibold;
+}
+
+.prose-enhanced code {
+  @apply text-cyan-300 bg-white/10 px-2 py-1 rounded-lg border border-white/10 font-geist-mono text-sm;
+}
+
+.prose-enhanced pre {
+  @apply bg-black/40 border border-white/10 rounded-xl p-4 overflow-x-auto font-geist-mono text-sm;
+}
+
+.prose-enhanced blockquote {
+  @apply border-l-4 border-l-blue-400 bg-blue-400/5 pl-4 py-2 rounded-r-lg my-4 text-white/90 font-geist-mono;
 }

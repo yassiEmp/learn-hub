@@ -3,25 +3,116 @@ import { CourseEditor } from '@/components/CourseEditor'
 import React, { useState } from 'react'
 
 const Page = () => {
-  const [content, setContent] = useState('')
+  const [content, setContent] = useState(`
+    <h1>Introduction to Web Development</h1>
+    <p>Welcome to this comprehensive course on web development. In this lesson, we'll cover the fundamentals of building modern web applications.</p>
+    
+    <h2>What You'll Learn</h2>
+    <ul>
+      <li>HTML structure and semantic markup</li>
+      <li>CSS styling and responsive design</li>
+      <li>JavaScript fundamentals and DOM manipulation</li>
+      <li>Modern development tools and workflows</li>
+    </ul>
+    
+    <h2>Getting Started</h2>
+    <p>Before we dive into coding, let's set up our development environment. You'll need a text editor and a web browser.</p>
+    
+    <blockquote>
+      <p><strong>Pro Tip:</strong> Use a modern code editor like VS Code for the best development experience.</p>
+    </blockquote>
+    
+    <h2>Your First HTML Document</h2>
+    <p>Let's create a simple HTML document to get started:</p>
+    
+    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;My First Web Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello, World!&lt;/h1&gt;
+    &lt;p&gt;This is my first web page.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    
+    <p>This basic structure forms the foundation of every web page. Let's break down each part...</p>
+  `)
+
+  const lessons = [
+    { 
+      id: "1", 
+      title: "Getting Started", 
+      isActive: true, 
+      duration: "15 min",
+      isCompleted: false 
+    },
+    { 
+      id: "2", 
+      title: "HTML Basics", 
+      duration: "25 min",
+      isCompleted: false 
+    },
+    { 
+      id: "3", 
+      title: "CSS Fundamentals", 
+      duration: "30 min",
+      isCompleted: false 
+    },
+    { 
+      id: "4", 
+      title: "JavaScript Introduction", 
+      duration: "35 min",
+      isCompleted: false 
+    },
+    { 
+      id: "5", 
+      title: "DOM Manipulation", 
+      duration: "40 min",
+      isCompleted: false 
+    },
+    { 
+      id: "6", 
+      title: "Responsive Design", 
+      duration: "45 min",
+      isCompleted: false 
+    },
+    { 
+      id: "7", 
+      title: "Modern CSS Features", 
+      duration: "30 min",
+      isCompleted: false 
+    },
+    { 
+      id: "8", 
+      title: "JavaScript ES6+", 
+      duration: "50 min",
+      isCompleted: false 
+    },
+    { 
+      id: "9", 
+      title: "Project Setup", 
+      duration: "20 min",
+      isCompleted: false 
+    },
+    { 
+      id: "10", 
+      title: "Final Project", 
+      duration: "60 min",
+      isCompleted: false 
+    }
+  ]
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-            <CourseEditor
-            content={content}
-            onChange={setContent}
-            courseTitle="Introduction to Web Development"
-            lessons={[
-                { id: "1", title: "Getting Started", isActive: true },
-                { id: "2", title: "HTML Basics" },
-                { id: "3", title: "CSS Fundamentals" },
-                // ... more lessons
-            ]}
-            className="h-[calc(100vh-2rem)]"
-            />
-        </div>
-    </main>
+    <CourseEditor
+      content={content}
+      onChange={setContent}
+      courseTitle="Introduction to Web Development"
+      lessons={lessons}
+      className="h-screen"
+    />
   )
 }
 
