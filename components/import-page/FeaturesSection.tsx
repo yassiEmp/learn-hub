@@ -23,22 +23,38 @@ export const FeaturesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <motion.div
+          className="grid md:grid-cols-3 gap-8"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.2,
+                ease: "easeOut"
+              }
+            }
+          }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           {features.map((feature, index) => (
             <motion.div
               key={index}
               className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center hover:border-white/20 transition-all duration-500 group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ 
-                opacity: 1, 
-                y: 0
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { 
+                    duration: 0.8, 
+                    ease: "easeOut"
+                  }
+                }
               }}
-              transition={{ 
-                duration: 0.8, 
-                delay: index * 0.15,
-                ease: "easeOut"
-              }}
-              viewport={{ once: true, margin: "-50px" }}
               whileHover={{ 
                 scale: 1.02, 
                 y: -5,
@@ -47,17 +63,6 @@ export const FeaturesSection = () => {
             >
               <motion.div
                 className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} border border-white/10 flex items-center justify-center mx-auto mb-6`}
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ 
-                  scale: 1, 
-                  opacity: 1
-                }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: 0.2 + index * 0.15,
-                  ease: "easeOut"
-                }}
-                viewport={{ once: true }}
                 whileHover={{ 
                   rotate: 360,
                   transition: { duration: 0.8, ease: "easeInOut" }
@@ -69,7 +74,7 @@ export const FeaturesSection = () => {
               <p className="text-white/80 font-geist-mono text-base leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -14,22 +14,37 @@ interface StatsGridProps {
 
 export const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <motion.div 
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2,
+            ease: "easeOut"
+          }
+        }
+      }}
+      initial="hidden"
+      animate="visible"
+    >
       {stats.map((stat, index) => (
         <motion.div 
           key={index} 
           className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-all duration-500"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ 
-            opacity: 1, 
-            y: 0
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { 
+              opacity: 1, 
+              y: 0,
+              transition: { 
+                duration: 0.8, 
+                ease: "easeOut"
+              }
+            }
           }}
-          transition={{ 
-            duration: 0.8, 
-            delay: index * 0.1,
-            ease: "easeOut"
-          }}
-          viewport={{ once: true, margin: "-50px" }}
           whileHover={{ 
             scale: 1.02,
             y: -2,
@@ -39,17 +54,6 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
           <div className="flex items-center justify-between mb-4">
             <motion.div 
               className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} border border-white/10 flex items-center justify-center`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              whileInView={{ 
-                scale: 1, 
-                opacity: 1
-              }}
-              transition={{ 
-                duration: 0.6, 
-                delay: 0.2 + index * 0.1,
-                ease: "easeOut"
-              }}
-              viewport={{ once: true }}
               whileHover={{ 
                 rotate: 360,
                 transition: { duration: 0.8, ease: "easeInOut" }
@@ -63,22 +67,21 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ stats }) => {
             <motion.p 
               className="text-2xl font-syne font-medium text-white"
               initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ 
+              animate={{ 
                 opacity: 1, 
-                scale: 1
+                scale: 1,
+                transition: { 
+                  duration: 0.6, 
+                  delay: 0.3 + index * 0.1,
+                  ease: "easeOut"
+                }
               }}
-              transition={{ 
-                duration: 0.6, 
-                delay: 0.4 + index * 0.1,
-                ease: "easeOut"
-              }}
-              viewport={{ once: true }}
             >
               {stat.value}
             </motion.p>
           </div>
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };

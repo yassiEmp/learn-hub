@@ -54,16 +54,15 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
       <motion.div 
         className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
         onClick={() => onCourseSelect(course)}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ once: true, margin: "-50px" }}
         whileHover={{ 
           scale: 1.01,
           y: -2,
           transition: { duration: 0.3, ease: "easeOut" }
         }}
         whileTap={{ scale: 0.99 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="p-6">
           <div className="flex items-start space-x-6">
@@ -71,13 +70,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             <div className="flex-shrink-0">
               <motion.div
                 className={`w-24 h-24 bg-gradient-to-br ${categoryColor} rounded-xl relative overflow-hidden border border-white/10`}
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ 
-                  scale: 1, 
-                  opacity: 1
-                }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                viewport={{ once: true }}
                 whileHover={{ 
                   scale: 1.05,
                   transition: { duration: 0.3, ease: "easeOut" }
@@ -153,9 +145,8 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
                     <motion.div 
                       className="bg-green-400 h-1.5 rounded-full" 
                       initial={{ width: 0 }}
-                      whileInView={{ width: `${course.progress}%` }}
+                      animate={{ width: `${course.progress}%` }}
                       transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-                      viewport={{ once: true }}
                     />
                   </div>
                 </div>
@@ -171,28 +162,20 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
     <motion.div 
       className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
       onClick={() => onCourseSelect(course)}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-50px" }}
       whileHover={{ 
         scale: 1.02,
         y: -5,
         transition: { duration: 0.3, ease: "easeOut" }
       }}
       whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="relative overflow-hidden h-48">
         {/* Gradient background */}
         <motion.div
           className={`w-full h-full bg-gradient-to-br ${categoryColor} relative`}
-          initial={{ scale: 1.1, opacity: 0 }}
-          whileInView={{ 
-            scale: 1, 
-            opacity: 1
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true }}
           whileHover={{ 
             scale: 1.05,
             transition: { duration: 0.6, ease: "easeOut" }
@@ -207,14 +190,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
           <div className="absolute inset-0 flex items-center justify-center">
             <motion.div
               className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center"
-              initial={{ scale: 0, rotate: -180, opacity: 0 }}
-              whileInView={{ 
-                scale: 1, 
-                rotate: 0, 
-                opacity: 1
-              }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              viewport={{ once: true }}
             >
               <CategoryIcon className="w-8 h-8 text-white" />
             </motion.div>
@@ -242,13 +220,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         {course.originalPrice && (
           <motion.div 
             className="absolute top-4 left-4 bg-red-500/20 text-red-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-red-500/20"
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ 
-              scale: 1, 
-              opacity: 1
-            }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
             transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-            viewport={{ once: true }}
           >
             Sale
           </motion.div>
@@ -256,13 +230,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         {course.isEnrolled && (
           <motion.div 
             className="absolute top-4 right-4 bg-green-500/20 text-green-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-green-500/20"
-            initial={{ scale: 0, opacity: 0 }}
-            whileInView={{ 
-              scale: 1, 
-              opacity: 1
-            }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
             transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
-            viewport={{ once: true }}
           >
             Enrolled
           </motion.div>
@@ -271,13 +241,9 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
       
       <motion.div 
         className="p-6"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ 
-          opacity: 1, 
-          y: 0
-        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-        viewport={{ once: true }}
       >
         <div className="mb-3">
           <motion.span 
@@ -342,9 +308,8 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               <motion.div 
                 className="bg-green-400 h-1.5 rounded-full" 
                 initial={{ width: 0 }}
-                whileInView={{ width: `${course.progress}%` }}
+                animate={{ width: `${course.progress}%` }}
                 transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-                viewport={{ once: true }}
               />
             </div>
           </div>
@@ -359,12 +324,11 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               <motion.span 
                 className="text-xl font-syne font-medium text-white"
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ 
+                animate={{ 
                   opacity: 1, 
-                  scale: 1
+                  scale: 1,
+                  transition: { duration: 0.4, delay: 0.4, ease: "easeOut" }
                 }}
-                transition={{ duration: 0.4, delay: 0.4, ease: "easeOut" }}
-                viewport={{ once: true }}
               >
                 ${course.price}
               </motion.span>
