@@ -177,7 +177,9 @@ html,body{
 .bolt-badge {
   animation: badgePulse 2s ease-in-out infinite;
 }
-
+.prose{
+  border: 1px solid black ;
+}
 /* Enhanced prose styles for the editor */
 .prose-enhanced {
   @apply prose prose-invert max-w-none;
