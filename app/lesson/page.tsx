@@ -1,5 +1,6 @@
 "use client"
 import { CourseEditor } from '@/components/CourseEditor'
+import { AuthGuard } from '@/components/AuthGuard'
 import React, { useState } from 'react'
 
 const Page = () => {
@@ -25,18 +26,18 @@ const Page = () => {
     <h2>Your First HTML Document</h2>
     <p>Let's create a simple HTML document to get started:</p>
     
-    <pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;My First Web Page&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;h1&gt;Hello, World!&lt;/h1&gt;
-    &lt;p&gt;This is my first web page.&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
+    <pre><code><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Web Page</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is my first web page.</p>
+</body>
+</html></code></pre>
     
     <p>This basic structure forms the foundation of every web page. Let's break down each part...</p>
   `)
@@ -106,13 +107,15 @@ const Page = () => {
   ]
 
   return (
-    <CourseEditor
-      content={content}
-      onChange={setContent}
-      courseTitle="Introduction to Web Development"
-      lessons={lessons}
-      className="h-screen"
-    />
+    <AuthGuard>
+      <CourseEditor
+        content={content}
+        onChange={setContent}
+        courseTitle="Introduction to Web Development"
+        lessons={lessons}
+        className="h-screen"
+      />
+    </AuthGuard>
   )
 }
 

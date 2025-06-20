@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, Menu, X } from 'lucide-react';
+import { Sparkles, Menu, X, LogOut } from 'lucide-react';
 import { cva } from 'class-variance-authority';
+import { useAuth } from '../hooks/useAuth';
+import { motion } from 'framer-motion';
 
 // Navbar container variants
 const navbarVariants = cva(
@@ -71,11 +73,17 @@ const actionButtonVariants = cva(
 
 // Navigation Items Component
 const NavItems = ({ currentPath }: { currentPath: string }) => {
+  const { isAuthenticated } = useAuth()
+  
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
-    { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-    { id: 'courses', label: 'Courses', path: '/courses' },
-    { id: 'exams', label: 'Learning', path: '/exams' },
+    ...(isAuthenticated ? [
+      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
+      { id: 'courses', label: 'Courses', path: '/courses' },
+      { id: 'exams', label: 'Learning', path: '/exams' },
+    ] : [
+      { id: 'courses', label: 'Explore', path: '/courses' },
+    ])
   ];
 
   return (
@@ -94,27 +102,64 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
 };
 
 // Action Buttons Component
-const ActionButtons = () => (
-  <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-    <Link href="/login" className={actionButtonVariants()}>
-      Login
-    </Link>
-    
-    <Link href="/signup" className={actionButtonVariants({ variant: "primary" })}>
-      Start Learning
-    </Link>
-  </div>
-);
+const ActionButtons = () => {
+  const { user, signOut, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
+        <div className="w-8 h-4 bg-white/10 rounded animate-pulse" />
+      </div>
+    )
+  }
+
+  if (user) {
+    return (
+      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
+        <div className="flex items-center space-x-3">
+          <span className="text-white/70 font-geist-mono text-sm">
+            {user.user_metadata?.full_name || user.email}
+          </span>
+          <motion.button
+            onClick={signOut}
+            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <LogOut className="w-4 h-4" />
+          </motion.button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="hidden md:flex items-center space-x-3 animate-fade-in">
+      <Link href="/login" className={actionButtonVariants()}>
+        Login
+      </Link>
+      
+      <Link href="/login" className={actionButtonVariants({ variant: "primary" })}>
+        Start Learning
+      </Link>
+    </div>
+  )
+}
 
 // Main Nav Component
 export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut, loading, isAuthenticated } = useAuth()
 
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
-    { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-    { id: 'courses', label: 'Explore', path: '/courses' },
-    { id: 'exams', label: 'exams', path: '/exams' },
+    ...(isAuthenticated ? [
+      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
+      { id: 'courses', label: 'Courses', path: '/courses' },
+      { id: 'exams', label: 'Learning', path: '/exams' },
+    ] : [
+      { id: 'courses', label: 'Explore', path: '/courses' },
+    ])
   ];
 
   return (
@@ -165,6 +210,34 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                 {item.label}
               </Link>
             ))}
+            
+            {/* Mobile Auth Actions */}
+            <div className="pt-2 border-t border-white/10 mt-2">
+              {user ? (
+                <div className="space-y-2">
+                  <div className="px-3 py-2 text-white/70 font-geist-mono text-xs">
+                    {user.user_metadata?.full_name || user.email}
+                  </div>
+                  <button
+                    onClick={() => {
+                      signOut()
+                      setIsMenuOpen(false)
+                    }}
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
