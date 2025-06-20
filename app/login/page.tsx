@@ -3,9 +3,16 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User } from 'lucide-react'
+import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info } from 'lucide-react'
 import Link from 'next/link'
 import FloatingParticle from '../../components/FloatingParticle'
+
+type MessageType = 'success' | 'error' | 'info'
+
+interface Message {
+  text: string
+  type: MessageType
+}
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -14,7 +21,7 @@ const LoginPage = () => {
   const [fullName, setFullName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [message, setMessage] = useState<Message | null>(null)
   
   const { signIn, signUp, user } = useAuth()
   const router = useRouter()
@@ -26,31 +33,120 @@ const LoginPage = () => {
     }
   }, [user, router])
 
+  const getErrorMessage = (error: any): string => {
+    const errorMessage = error?.message || error || 'An unexpected error occurred'
+    
+    // Handle common Supabase auth errors
+    switch (errorMessage) {
+      case 'Invalid login credentials':
+        return 'Invalid email or password. Please check your credentials and try again.'
+      case 'User already registered':
+        return 'An account with this email already exists. Please sign in instead.'
+      case 'Email not confirmed':
+        return 'Please check your email and click the confirmation link before signing in.'
+      case 'Password should be at least 6 characters':
+        return 'Password must be at least 6 characters long.'
+      case 'Unable to validate email address: invalid format':
+        return 'Please enter a valid email address.'
+      case 'Signup is disabled':
+        return 'Account registration is currently disabled. Please contact support.'
+      case 'Email rate limit exceeded':
+        return 'Too many emails sent. Please wait a few minutes before trying again.'
+      case 'Too many requests':
+        return 'Too many login attempts. Please wait a few minutes before trying again.'
+      default:
+        return errorMessage
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError('')
+    setMessage(null)
+
+    // Basic validation
+    if (!email || !password || (!isLogin && !fullName)) {
+      setMessage({
+        text: 'Please fill in all required fields.',
+        type: 'error'
+      })
+      setLoading(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setMessage({
+        text: 'Password must be at least 6 characters long.',
+        type: 'error'
+      })
+      setLoading(false)
+      return
+    }
 
     try {
       if (isLogin) {
         const { error } = await signIn(email, password)
         if (error) {
-          setError(error.message)
+          setMessage({
+            text: getErrorMessage(error),
+            type: 'error'
+          })
         } else {
-          router.push('/dashboard')
+          setMessage({
+            text: 'Successfully signed in! Redirecting...',
+            type: 'success'
+          })
+          setTimeout(() => {
+            router.push('/dashboard')
+          }, 1000)
         }
       } else {
-        const { error } = await signUp(email, password, fullName)
+        const { error, data } = await signUp(email, password, fullName)
         if (error) {
-          setError(error.message)
+          setMessage({
+            text: getErrorMessage(error),
+            type: 'error'
+          })
         } else {
-          setError('Check your email for the confirmation link!')
+          setMessage({
+            text: 'Account created successfully! Please check your email for the confirmation link.',
+            type: 'success'
+          })
+          // Clear form after successful signup
+          setEmail('')
+          setPassword('')
+          setFullName('')
         }
       }
-    } catch (err) {
-      setError('An unexpected error occurred')
+    } catch (err: any) {
+      setMessage({
+        text: getErrorMessage(err),
+        type: 'error'
+      })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const getMessageIcon = (type: MessageType) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle className="h-5 w-5" />
+      case 'error':
+        return <AlertCircle className="h-5 w-5" />
+      case 'info':
+        return <Info className="h-5 w-5" />
+    }
+  }
+
+  const getMessageStyles = (type: MessageType) => {
+    switch (type) {
+      case 'success':
+        return 'text-green-400 bg-green-400/10 border-green-400/20'
+      case 'error':
+        return 'text-red-400 bg-red-400/10 border-red-400/20'
+      case 'info':
+        return 'text-blue-400 bg-blue-400/10 border-blue-400/20'
     }
   }
 
@@ -173,6 +269,7 @@ const LoginPage = () => {
                     className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono"
                     placeholder="Enter your password"
                     required
+                    minLength={6}
                   />
                   <button
                     type="button"
@@ -186,16 +283,26 @@ const LoginPage = () => {
                     )}
                   </button>
                 </div>
+                {!isLogin && (
+                  <p className="mt-1 text-xs text-white/50 font-geist-mono">
+                    Password must be at least 6 characters long
+                  </p>
+                )}
               </motion.div>
 
-              {error && (
+              {message && (
                 <motion.div 
-                  className="text-red-400 text-sm font-geist-mono bg-red-400/10 border border-red-400/20 rounded-xl p-3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  className={`flex items-start space-x-3 text-sm font-geist-mono border rounded-xl p-3 ${getMessageStyles(message.type)}`}
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
-                  {error}
+                  <div className="flex-shrink-0 mt-0.5">
+                    {getMessageIcon(message.type)}
+                  </div>
+                  <div className="flex-1">
+                    {message.text}
+                  </div>
                 </motion.div>
               )}
 
@@ -203,8 +310,8 @@ const LoginPage = () => {
                 type="submit"
                 disabled={loading}
                 className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: loading ? 1 : 1.02 }}
+                whileTap={{ scale: loading ? 1 : 0.98 }}
                 variants={itemVariants}
               >
                 {loading ? (
@@ -227,7 +334,10 @@ const LoginPage = () => {
               <button
                 onClick={() => {
                   setIsLogin(!isLogin)
-                  setError('')
+                  setMessage(null)
+                  setEmail('')
+                  setPassword('')
+                  setFullName('')
                 }}
                 className="text-white/60 hover:text-white font-geist-mono text-sm transition-colors"
               >
@@ -237,6 +347,15 @@ const LoginPage = () => {
                 }
               </button>
             </motion.div>
+
+            {/* Additional help text */}
+            {isLogin && (
+              <motion.div className="mt-4 text-center" variants={itemVariants}>
+                <p className="text-white/40 font-geist-mono text-xs">
+                  Forgot your password? Contact support for assistance.
+                </p>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Back to home */}

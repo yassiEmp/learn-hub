@@ -12,9 +12,17 @@ export function useAuth() {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-      setLoading(false)
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('Error getting session:', error)
+        }
+        setUser(session?.user ?? null)
+      } catch (error) {
+        console.error('Error in getInitialSession:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     getInitialSession()
@@ -24,6 +32,16 @@ export function useAuth() {
       async (event, session) => {
         setUser(session?.user ?? null)
         setLoading(false)
+        
+        // Handle specific auth events
+        if (event === 'SIGNED_OUT') {
+          // Clear any cached data or perform cleanup
+          console.log('User signed out')
+        } else if (event === 'SIGNED_IN') {
+          console.log('User signed in')
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed')
+        }
       }
     )
 
@@ -31,32 +49,71 @@ export function useAuth() {
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { data, error }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      })
+      
+      if (error) {
+        // Enhanced error handling
+        console.error('Sign in error:', error)
+        return { data: null, error }
+      }
+      
+      return { data, error: null }
+    } catch (error) {
+      console.error('Unexpected sign in error:', error)
+      return { 
+        data: null, 
+        error: { message: 'An unexpected error occurred during sign in' } 
+      }
+    }
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: {
+          data: {
+            full_name: fullName.trim(),
+          }
         }
+      })
+      
+      if (error) {
+        console.error('Sign up error:', error)
+        return { data: null, error }
       }
-    })
-    return { data, error }
+      
+      return { data, error: null }
+    } catch (error) {
+      console.error('Unexpected sign up error:', error)
+      return { 
+        data: null, 
+        error: { message: 'An unexpected error occurred during sign up' } 
+      }
+    }
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (!error) {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('Sign out error:', error)
+        return { error }
+      }
+      
+      // Clear user state immediately
+      setUser(null)
       router.push('/login')
+      return { error: null }
+    } catch (error) {
+      console.error('Unexpected sign out error:', error)
+      return { error: { message: 'An unexpected error occurred during sign out' } }
     }
-    return { error }
   }
 
   const requireAuth = () => {
@@ -67,6 +124,24 @@ export function useAuth() {
     return true
   }
 
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      
+      if (error) {
+        console.error('Reset password error:', error)
+        return { error }
+      }
+      
+      return { error: null }
+    } catch (error) {
+      console.error('Unexpected reset password error:', error)
+      return { error: { message: 'An unexpected error occurred' } }
+    }
+  }
+
   return {
     user,
     loading,
@@ -74,6 +149,7 @@ export function useAuth() {
     signUp,
     signOut,
     requireAuth,
+    resetPassword,
     isAuthenticated: !!user
   }
 }
