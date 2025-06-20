@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import FloatingParticle from '../../components/FloatingParticle'
+import { SocialLoginButtons } from '../../components/SocialLoginButtons'
 
 type MessageType = 'success' | 'error' | 'info'
 
@@ -21,9 +22,10 @@ const LoginPage = () => {
   const [fullName, setFullName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<Message | null>(null)
   
-  const { signIn, signUp, user, isConfigured } = useAuth()
+  const { signIn, signUp, signInWithProvider, user, isConfigured } = useAuth()
   const router = useRouter()
 
   // Redirect if already authenticated
@@ -93,6 +95,28 @@ const LoginPage = () => {
         return 'Authentication service is not available. Please try again later.'
       default:
         return errorMessage
+    }
+  }
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    setSocialLoading(provider)
+    setMessage(null)
+
+    try {
+      const { error } = await signInWithProvider(provider)
+      if (error) {
+        setMessage({
+          text: getErrorMessage(error),
+          type: 'error'
+        })
+      }
+    } catch (err: any) {
+      setMessage({
+        text: getErrorMessage(err),
+        type: 'error'
+      })
+    } finally {
+      setSocialLoading(null)
     }
   }
 
@@ -250,6 +274,28 @@ const LoginPage = () => {
             className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8"
             variants={itemVariants}
           >
+            {/* Social Login Buttons */}
+            <motion.div variants={itemVariants}>
+              <SocialLoginButtons 
+                onGoogleLogin={() => handleSocialLogin('google')}
+                onFacebookLogin={() => handleSocialLogin('facebook')}
+                loading={socialLoading}
+                isLogin={isLogin}
+              />
+            </motion.div>
+
+            {/* Divider */}
+            <motion.div className="relative my-6" variants={itemVariants}>
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-black/40 text-white/50 font-geist-mono">
+                  or continue with email
+                </span>
+              </div>
+            </motion.div>
+
             <form className="space-y-6" onSubmit={handleSubmit}>
               {!isLogin && (
                 <motion.div variants={itemVariants}>
@@ -345,10 +391,10 @@ const LoginPage = () => {
 
               <motion.button
                 type="submit"
-                disabled={loading}
+                disabled={loading || socialLoading !== null}
                 className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                whileHover={{ scale: loading ? 1 : 1.02 }}
-                whileTap={{ scale: loading ? 1 : 0.98 }}
+                whileHover={{ scale: (loading || socialLoading !== null) ? 1 : 1.02 }}
+                whileTap={{ scale: (loading || socialLoading !== null) ? 1 : 0.98 }}
                 variants={itemVariants}
               >
                 {loading ? (

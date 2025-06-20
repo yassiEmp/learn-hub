@@ -121,6 +121,37 @@ export function useAuth() {
     }
   }, [isConfigured])
 
+  const signInWithProvider = useCallback(async (provider: 'google' | 'facebook') => {
+    if (!isConfigured) {
+      return { 
+        data: null, 
+        error: { message: 'Authentication service is not configured' } 
+      }
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        }
+      })
+      
+      if (error) {
+        console.error(`${provider} sign in error:`, error)
+        return { data: null, error }
+      }
+      
+      return { data, error: null }
+    } catch (error) {
+      console.error(`Unexpected ${provider} sign in error:`, error)
+      return { 
+        data: null, 
+        error: { message: `An unexpected error occurred during ${provider} sign in` } 
+      }
+    }
+  }, [isConfigured])
+
   const signOut = useCallback(async () => {
     if (!isConfigured) {
       setUser(null)
@@ -179,6 +210,7 @@ export function useAuth() {
     loading,
     signIn,
     signUp,
+    signInWithProvider,
     signOut,
     requireAuth,
     resetPassword,
