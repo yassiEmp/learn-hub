@@ -1,13 +1,13 @@
 "use client"
 import React from 'react'
-import { CreateExamEditor } from '@/components/CreateExamEditor'
+import { ExamEditor } from '@/components/ExamEditor'
 import Nav from '@/components/Header'
 
 const Page = () => {
   return (
     <>
       <Nav currentPath="/create-exam" />
-      <CreateExamEditor />
+      <ExamEditor />
     </>
   )
 }
