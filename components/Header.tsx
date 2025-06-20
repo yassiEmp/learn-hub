@@ -73,11 +73,11 @@ const actionButtonVariants = cva(
 
 // Navigation Items Component
 const NavItems = ({ currentPath }: { currentPath: string }) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isConfigured } = useAuth()
   
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
-    ...(isAuthenticated ? [
+    ...(isAuthenticated && isConfigured ? [
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
       { id: 'courses', label: 'Courses', path: '/courses' },
       { id: 'exams', label: 'Learning', path: '/exams' },
@@ -103,12 +103,20 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
 
 // Action Buttons Component
 const ActionButtons = () => {
-  const { user, signOut, loading } = useAuth()
+  const { user, signOut, loading, isConfigured } = useAuth()
 
   if (loading) {
     return (
       <div className="hidden md:flex items-center space-x-3 animate-fade-in">
         <div className="w-8 h-4 bg-white/10 rounded animate-pulse" />
+      </div>
+    )
+  }
+
+  if (!isConfigured) {
+    return (
+      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
+        <span className="text-white/50 font-geist-mono text-xs">Setup Required</span>
       </div>
     )
   }
@@ -149,11 +157,11 @@ const ActionButtons = () => {
 // Main Nav Component
 export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut, loading, isAuthenticated } = useAuth()
+  const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
 
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
-    ...(isAuthenticated ? [
+    ...(isAuthenticated && isConfigured ? [
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
       { id: 'courses', label: 'Courses', path: '/courses' },
       { id: 'exams', label: 'Learning', path: '/exams' },
@@ -213,7 +221,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
             
             {/* Mobile Auth Actions */}
             <div className="pt-2 border-t border-white/10 mt-2">
-              {user ? (
+              {user && isConfigured ? (
                 <div className="space-y-2">
                   <div className="px-3 py-2 text-white/70 font-geist-mono text-xs">
                     {user.user_metadata?.full_name || user.email}
@@ -228,7 +236,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                     Sign Out
                   </button>
                 </div>
-              ) : (
+              ) : isConfigured ? (
                 <Link
                   href="/login"
                   onClick={() => setIsMenuOpen(false)}
@@ -236,6 +244,10 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                 >
                   Login
                 </Link>
+              ) : (
+                <div className="px-3 py-2 text-white/50 font-geist-mono text-xs">
+                  Setup Required
+                </div>
               )}
             </div>
           </div>

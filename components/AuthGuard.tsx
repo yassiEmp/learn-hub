@@ -2,7 +2,8 @@
 import { useAuth } from '../hooks/useAuth'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -10,13 +11,13 @@ interface AuthGuardProps {
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children, fallback }) => {
-  const { user, loading, requireAuth } = useAuth()
+  const { user, loading, requireAuth, isConfigured } = useAuth()
 
   useEffect(() => {
-    if (!loading) {
+    if (!loading && isConfigured) {
       requireAuth()
     }
-  }, [loading, requireAuth])
+  }, [loading, requireAuth, isConfigured])
 
   if (loading) {
     return (
@@ -35,6 +36,36 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, fallback }) => {
             <Sparkles className="w-6 h-6 text-white" />
           </motion.div>
           <p className="text-white/60 font-geist-mono">Loading...</p>
+        </motion.div>
+      </div>
+    )
+  }
+
+  // Show configuration error if Supabase is not set up
+  if (!isConfigured) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <motion.div
+          className="max-w-md w-full bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="w-16 h-16 rounded-full bg-orange-400/20 flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-8 h-8 text-orange-400" />
+          </div>
+          <h2 className="text-2xl font-syne font-medium text-white mb-4">
+            Setup Required
+          </h2>
+          <p className="text-white/70 font-geist-mono mb-6 leading-relaxed">
+            Authentication is not configured. Please set up your Supabase credentials in the environment variables.
+          </p>
+          <Link 
+            href="/"
+            className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
+          >
+            <span>Go Home</span>
+          </Link>
         </motion.div>
       </div>
     )

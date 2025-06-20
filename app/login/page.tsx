@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import FloatingParticle from '../../components/FloatingParticle'
 
@@ -23,15 +23,50 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<Message | null>(null)
   
-  const { signIn, signUp, user } = useAuth()
+  const { signIn, signUp, user, isConfigured } = useAuth()
   const router = useRouter()
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
+    if (user && isConfigured) {
       router.push('/dashboard')
     }
-  }, [user, router])
+  }, [user, router, isConfigured])
+
+  // Show setup message if not configured
+  if (!isConfigured) {
+    return (
+      <div className="min-h-screen bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+        <FloatingParticle />
+        
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
+          <motion.div
+            className="max-w-md w-full bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="w-16 h-16 rounded-full bg-orange-400/20 flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="w-8 h-8 text-orange-400" />
+            </div>
+            <h2 className="text-2xl font-syne font-medium text-white mb-4">
+              Setup Required
+            </h2>
+            <p className="text-white/70 font-geist-mono mb-6 leading-relaxed">
+              Please configure your Supabase credentials to enable authentication.
+            </p>
+            <Link 
+              href="/"
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
+            >
+              <span>Go Home</span>
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
 
   const getErrorMessage = (error: any): string => {
     const errorMessage = error?.message || error || 'An unexpected error occurred'
@@ -54,6 +89,8 @@ const LoginPage = () => {
         return 'Too many emails sent. Please wait a few minutes before trying again.'
       case 'Too many requests':
         return 'Too many login attempts. Please wait a few minutes before trying again.'
+      case 'Authentication service is not configured':
+        return 'Authentication service is not available. Please try again later.'
       default:
         return errorMessage
     }

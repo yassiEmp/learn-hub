@@ -1,15 +1,26 @@
 "use client"
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isConfigured, setIsConfigured] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
+    // Check if Supabase is configured
+    const configured = isSupabaseConfigured()
+    setIsConfigured(configured)
+
+    if (!configured) {
+      console.warn('Supabase is not properly configured. Please check your environment variables.')
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -35,7 +46,6 @@ export function useAuth() {
         
         // Handle specific auth events
         if (event === 'SIGNED_OUT') {
-          // Clear any cached data or perform cleanup
           console.log('User signed out')
         } else if (event === 'SIGNED_IN') {
           console.log('User signed in')
@@ -48,7 +58,14 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
+    if (!isConfigured) {
+      return { 
+        data: null, 
+        error: { message: 'Authentication service is not configured' } 
+      }
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
@@ -56,7 +73,6 @@ export function useAuth() {
       })
       
       if (error) {
-        // Enhanced error handling
         console.error('Sign in error:', error)
         return { data: null, error }
       }
@@ -69,9 +85,16 @@ export function useAuth() {
         error: { message: 'An unexpected error occurred during sign in' } 
       }
     }
-  }
+  }, [isConfigured])
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = useCallback(async (email: string, password: string, fullName: string) => {
+    if (!isConfigured) {
+      return { 
+        data: null, 
+        error: { message: 'Authentication service is not configured' } 
+      }
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
@@ -96,9 +119,15 @@ export function useAuth() {
         error: { message: 'An unexpected error occurred during sign up' } 
       }
     }
-  }
+  }, [isConfigured])
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
+    if (!isConfigured) {
+      setUser(null)
+      router.push('/login')
+      return { error: null }
+    }
+
     try {
       const { error } = await supabase.auth.signOut()
       if (error) {
@@ -106,7 +135,6 @@ export function useAuth() {
         return { error }
       }
       
-      // Clear user state immediately
       setUser(null)
       router.push('/login')
       return { error: null }
@@ -114,17 +142,21 @@ export function useAuth() {
       console.error('Unexpected sign out error:', error)
       return { error: { message: 'An unexpected error occurred during sign out' } }
     }
-  }
+  }, [isConfigured, router])
 
-  const requireAuth = () => {
-    if (!loading && !user) {
+  const requireAuth = useCallback(() => {
+    if (!loading && !user && isConfigured) {
       router.push('/login')
       return false
     }
     return true
-  }
+  }, [loading, user, isConfigured, router])
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
+    if (!isConfigured) {
+      return { error: { message: 'Authentication service is not configured' } }
+    }
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
@@ -140,7 +172,7 @@ export function useAuth() {
       console.error('Unexpected reset password error:', error)
       return { error: { message: 'An unexpected error occurred' } }
     }
-  }
+  }, [isConfigured])
 
   return {
     user,
@@ -150,6 +182,7 @@ export function useAuth() {
     signOut,
     requireAuth,
     resetPassword,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    isConfigured
   }
 }
