@@ -42,7 +42,7 @@ export const QuestionTypeSelector: React.FC<QuestionTypeSelectorProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <type.icon className="w-5 h-5 mb-2" />
+            <type.icon  />
             <h4 className="font-geist-mono font-medium text-sm mb-1">{type.label}</h4>
             <p className="text-xs text-white/50">{type.description}</p>
           </motion.button>

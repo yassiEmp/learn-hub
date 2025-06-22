@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { recentActivities } from './data';
 
 interface RecentActivityProps {
-  variants: any;
+  variants: Variants;
 }
 
 export const RecentActivity: React.FC<RecentActivityProps> = ({ variants }) => {

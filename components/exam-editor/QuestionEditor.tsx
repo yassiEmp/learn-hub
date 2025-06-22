@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Circle, ToggleLeft, Edit3, FileText, X, Copy, Zap, Plus } from 'lucide-react';
-import { QuestionEditorProps } from './types';
+import { Question, QuestionEditorProps } from './types';
 import { cn } from '../../lib/utils';
 import { FlashCardEditor } from './FlashCardEditor';
 import { FillTextEditor } from './FillTextEditor';
@@ -111,9 +111,9 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
           </div>
         );
       case 'flash-card':
-        return <FlashCardEditor question={question} onUpdate={onUpdate} onDelete={onDelete} />;
+        return <FlashCardEditor question={question} questionIndex={questionIndex} onUpdate={onUpdate} onDelete={onDelete} />;
       case 'fill-text':
-        return <FillTextEditor question={question} onUpdate={onUpdate} onDelete={onDelete} />;
+        return <FillTextEditor question={question} questionIndex={questionIndex} onUpdate={onUpdate} onDelete={onDelete} />;
       case 'short-answer':
       case 'essay':
         return (

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { CourseCard } from '../CourseCard';
 import { Course } from '../../types/course';
@@ -6,7 +6,7 @@ import { Course } from '../../types/course';
 interface ContinueLearningProps {
   enrolledCourses: Course[];
   onCourseSelect: (course: Course) => void;
-  variants: any;
+  variants: Variants;
 }
 
 export const ContinueLearning: React.FC<ContinueLearningProps> = ({ 

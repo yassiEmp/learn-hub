@@ -1,6 +1,14 @@
-import { TrendingUp, Clock, Award, BookOpen, Play } from 'lucide-react';
-
-export const getStats = (enrolledCourses: any[], completedCourses: any[], totalHours: number) => [
+import { Course } from '@/types/course';
+import { TrendingUp, Clock, Award, BookOpen, Play, LucideProps } from 'lucide-react';
+import { ForwardRefExoticComponent, RefAttributes } from 'react';
+type TcourseArray = {
+  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+  title: string;
+  subtitle: string;
+  color: string;
+  iconColor: string;
+}[]
+export const getStats = (enrolledCourses: Course[], completedCourses: Course[], totalHours: number) => [
   {
     label: 'Courses Enrolled',
     value: enrolledCourses.length,
@@ -31,7 +39,7 @@ export const getStats = (enrolledCourses: any[], completedCourses: any[], totalH
   },
 ];
 
-export const recentActivities = [
+export const recentActivities:TcourseArray = [
   {
     icon: Award,
     title: 'Completed "Your First Component"',

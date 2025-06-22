@@ -1,4 +1,4 @@
-import { Brain, Zap, Target, Users, BookOpen, Trophy, Globe, Star } from 'lucide-react';
+import { Brain, Zap, Target, Users, BookOpen, Trophy, Star } from 'lucide-react';
 
 export const features = [
   {

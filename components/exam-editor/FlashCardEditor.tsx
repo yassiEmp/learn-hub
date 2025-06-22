@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { QuestionEditorProps } from './types';
-import { cn } from '../../lib/utils';
 
 export const FlashCardEditor: React.FC<QuestionEditorProps> = ({
   question,

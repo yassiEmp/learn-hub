@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion, easeOut } from 'framer-motion'
 
 interface SocialLoginButtonsProps {
   onGoogleLogin: () => void
@@ -47,7 +47,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.3, ease: "easeOut" }
+      transition: { duration: 0.3, ease: easeOut }
     }
   }
 
@@ -65,7 +65,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         {loading === 'google' ? (
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity, ease: (t) => t }}
             className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full"
           />
         ) : (
@@ -90,7 +90,7 @@ export const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         {loading === 'facebook' ? (
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity, ease: (t) => t }}
             className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full"
           />
         ) : (

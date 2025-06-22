@@ -80,7 +80,7 @@ export const SuccessStoriesSection = () => {
 
               {/* Quote */}
               <blockquote className="text-white/90 font-geist-mono text-base leading-relaxed mb-6 italic">
-                "{story.quote}"
+                &quot;{story.quote}&quot;
               </blockquote>
 
               {/* Achievement */}

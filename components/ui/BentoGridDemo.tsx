@@ -1,8 +1,6 @@
 import { BentoGrid, type BentoItem } from "./bento-grid";
 import {
     CheckCircle,
-    Clock,
-    Star,
     TrendingUp,
     Video,
     Globe,

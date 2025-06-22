@@ -159,6 +159,12 @@ export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
 
+  if(loading){
+    return <>
+      <div><p>loading</p></div>
+    </>
+  }
+
   const navItems = [
     { id: 'import', label: 'Create', path: '/import' },
     ...(isAuthenticated && isConfigured ? [

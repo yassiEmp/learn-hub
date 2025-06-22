@@ -7,6 +7,7 @@ import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, Alert
 import Link from 'next/link'
 import FloatingParticle from '../../components/FloatingParticle'
 import { SocialLoginButtons } from '../../components/SocialLoginButtons'
+import { AuthError } from '@supabase/supabase-js'
 
 type MessageType = 'success' | 'error' | 'info'
 
@@ -70,8 +71,8 @@ const LoginPage = () => {
     )
   }
 
-  const getErrorMessage = (error: any): string => {
-    const errorMessage = error?.message || error || 'An unexpected error occurred'
+  const getErrorMessage = (error: AuthError | { message: string }): string => {
+    const errorMessage = error?.message || 'An unexpected error occurred'
     
     // Handle common Supabase auth errors
     switch (errorMessage) {
@@ -110,9 +111,9 @@ const LoginPage = () => {
           type: 'error'
         })
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessage({
-        text: getErrorMessage(err),
+        text: getErrorMessage(err as AuthError),
         type: 'error'
       })
     } finally {
@@ -162,7 +163,7 @@ const LoginPage = () => {
           }, 1000)
         }
       } else {
-        const { error, data } = await signUp(email, password, fullName)
+        const { error } = await signUp(email, password, fullName)
         if (error) {
           setMessage({
             text: getErrorMessage(error),
@@ -179,9 +180,9 @@ const LoginPage = () => {
           setFullName('')
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessage({
-        text: getErrorMessage(err),
+        text: getErrorMessage(err as AuthError),
         type: 'error'
       })
     } finally {

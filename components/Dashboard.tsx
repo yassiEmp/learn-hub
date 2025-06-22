@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import { motion , Variants } from 'framer-motion';
 import { courses } from '../data/courses';
 import { Course } from '../types/course';
 import { Header } from './dashboard/Header';

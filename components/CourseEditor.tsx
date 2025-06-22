@@ -6,7 +6,6 @@ import { cn } from '../lib/utils';
 import { 
   ChevronRight, 
   Book, 
-  FileText, 
   Bold, 
   Italic, 
   Heading2, 
@@ -16,7 +15,6 @@ import {
   Clock,
   ArrowLeft,
   Settings,
-  MoreVertical
 } from 'lucide-react';
 import FloatingParticle from './FloatingParticle';
 

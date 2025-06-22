@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, easeInOut } from "framer-motion";
 import { ShaderBackground } from '../ui/ShaderBackground';
 import Title from '../../features/import/components/Title';
 import InputSection from '../../features/import/components/InputSection';
@@ -9,7 +9,7 @@ const containerVariants = {
     opacity: 1,
     transition: {
       duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: easeInOut,
       staggerChildren: 0.2,
       delayChildren: 0.1
     }
@@ -28,7 +28,7 @@ const itemVariants = {
     scale: 1,
     transition: {
       duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94]
+      ease: easeInOut
     }
   }
 };

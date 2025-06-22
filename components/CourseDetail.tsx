@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
-import { CourseEditor } from './CourseEditor';
 
 interface CourseDetailProps {
   course: Course;
@@ -46,7 +45,7 @@ const getCategoryColor = (category: string) => {
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
   const [activeTab, setActiveTab] = useState('lesson');
-  const [courseContent, setCourseContent] = useState(course.content || '');
+  // const [courseContent, setCourseContent] = useState(course.content || '');
   const CategoryIcon = getCategoryIcon(course.category);
   const categoryColor = getCategoryColor(course.category);
 
@@ -221,7 +220,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 {activeTab === 'overview' && (
                   <div className="space-y-8">
                     <div>
-                      <h2 className="text-2xl font-syne font-medium text-white mb-6">What you'll learn</h2>
+                      <h2 className="text-2xl font-syne font-medium text-white mb-6">What you&apos;ll learn</h2>
                       <div className="grid md:grid-cols-2 gap-4">
                         {course.tags.map((tag, index) => (
                           <motion.div 
@@ -260,7 +259,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                       <h2 className="text-2xl font-syne font-medium text-white mb-4">Description</h2>
                       <p className="text-white/70 leading-relaxed font-geist-mono">
                         {course.description} This comprehensive course is designed to take you from beginner to advanced level,
-                        with hands-on projects and real-world examples. You'll learn industry best practices and build a
+                        with hands-on projects and real-world examples. You&apos;ll learn industry best practices and build a
                         portfolio of projects that will help you stand out in the job market.
                       </p>
                     </div>

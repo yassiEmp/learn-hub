@@ -1,7 +1,6 @@
 import React from 'react';
 import { ExamStats } from './ExamStats';
 import { ExamSettings } from './ExamSettings';
-import { ExamSection as ExamSectionType } from './types';
 
 interface ExamOverviewSidebarProps {
   totalQuestions: number;

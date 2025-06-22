@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface ShaderBackgroundProps {
   className?: string;
@@ -218,7 +218,7 @@ void main() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [fragmentShaderSource,vertexShaderSource]);
 
   useEffect(() => {
     const handleResize = () => {

@@ -219,7 +219,7 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
               }
             }}
           >
-            {filteredCourses.map((course, index) => (
+            {filteredCourses.map((course) => (
               <motion.div
                 key={course.id}
                 variants={{

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 interface AnimatedTextCycleProps {
   words: string[];
@@ -16,7 +16,7 @@ export default React.memo(function AnimatedTextCycle({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dimensions, setDimensions] = useState({ width: "auto", height: "auto" });
   const measureRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout>(null);
 
   // Memoized dimension calculation
   const updateDimensions = useCallback(() => {
@@ -32,7 +32,7 @@ export default React.memo(function AnimatedTextCycle({
         });
       }
     }
-  }, [currentIndex, className]);
+  }, [currentIndex]);
 
   useEffect(() => {
     updateDimensions();
@@ -56,7 +56,7 @@ export default React.memo(function AnimatedTextCycle({
   }, [interval, words.length]);
 
   // Optimized container animation with reduced motion
-  const containerVariants = {
+  const containerVariants : Variants = {
     hidden: { 
       y: -10,
       opacity: 0,

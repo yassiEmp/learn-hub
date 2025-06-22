@@ -1,4 +1,5 @@
 "use client"
+import Image from 'next/image'
 import React from 'react'
 
 const Bagde = () => {
@@ -11,7 +12,9 @@ const Bagde = () => {
       rel="noopener noreferrer" 
       className="block transition-all duration-300 hover:shadow-2xl"
     >
-      <img 
+      <Image
+        width={50}
+        height={50}
         src="https://storage.bolt.army/logotext_poweredby_360w.png" 
         alt="Powered by Bolt.new badge" 
         className="h-8 md:h-10 w-auto shadow-lg opacity-90 hover:opacity-100 bolt-badge bolt-badge-intro"

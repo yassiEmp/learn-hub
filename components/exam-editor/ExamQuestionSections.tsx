@@ -32,8 +32,8 @@ export const ExamQuestionSections: React.FC<ExamQuestionSectionsProps> = ({
           onToggle={() => onToggleSection(section.id)}
           onTitleChange={(title) => onSectionTitleChange(section.id, title)}
           onAddQuestion={() => onAddQuestion(section.id)}
-          onUpdateQuestion={onUpdateQuestion}
-          onDeleteQuestion={onDeleteQuestion}
+          onUpdateQuestion={(questionId, updates) => onUpdateQuestion(section.id, questionId, updates)}
+          onDeleteQuestion={(questionId) => onDeleteQuestion(section.id, questionId)}
         />
       ))}
 

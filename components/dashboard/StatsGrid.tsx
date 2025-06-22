@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
+import { LucideProps } from 'lucide-react';
 
 interface Stat {
   label: string;
   value: number | string;
-  icon: any;
+  icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
   color: string;
   iconColor: string;
 }

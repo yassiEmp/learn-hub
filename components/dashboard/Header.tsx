@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
 interface HeaderProps {
-  variants: any;
+  variants: Variants;
 }
 
 export const Header: React.FC<HeaderProps> = ({ variants }) => {

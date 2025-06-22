@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { 
   Sparkles, 
   BookOpen, 
   Users, 
   Trophy, 
-  Zap, 
   ArrowRight, 
-  Play,
-  Star,
   Globe,
   Brain,
   Target,

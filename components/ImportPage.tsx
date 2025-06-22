@@ -1,6 +1,5 @@
 "use client"
 import React from 'react'
-import { motion } from "framer-motion"
 import Nav from './Header';
 import { HeroSection } from './import-page/HeroSection';
 import { FeaturesSection } from './import-page/FeaturesSection';
