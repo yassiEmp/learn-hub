@@ -2,6 +2,7 @@ import React from 'react';
 import { Star, Clock, Users, Play, BookOpen, Code, Palette, Database, Smartphone, Settings } from 'lucide-react';
 import { Course } from '../types/course';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface CourseCardProps {
   course: Course;
@@ -273,9 +274,11 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             transition: { duration: 0.2, ease: "easeOut" }
           }}
         >
-          <img
+          <Image
             src={course.instructorAvatar}
             alt={course.instructor}
+            width={24}
+            height={24}
             className="w-6 h-6 rounded-full mr-2 border border-white/20"
           />
           <span className="text-white/70 text-sm font-geist-mono">{course.instructor}</span>
