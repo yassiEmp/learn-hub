@@ -18,6 +18,7 @@ export async function DELETE(request: NextRequest) {
     }
     return new Response("Account deleted successfully.", { status: 200 });
   } catch (err) {
+    console.log("errors in /api/user/route.ts  while deleting a user " , err )
     return new Response("Error deleting account.", { status: 500 });
   }
 } 
