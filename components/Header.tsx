@@ -81,6 +81,7 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
       { id: 'courses', label: 'Courses', path: '/courses' },
       { id: 'exams', label: 'Learning', path: '/exams' },
+      { id: 'account', label: 'Account', path: '/account' },
     ] : [
       { id: 'courses', label: 'Explore', path: '/courses' },
     ])
@@ -171,6 +172,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
       { id: 'courses', label: 'Courses', path: '/courses' },
       { id: 'exams', label: 'Learning', path: '/exams' },
+      { id: 'account', label: 'Account', path: '/account' },
     ] : [
       { id: 'courses', label: 'Explore', path: '/courses' },
     ])
