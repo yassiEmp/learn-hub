@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
-import Image from 'next/image';
 
 interface CourseDetailProps {
   course: Course;
@@ -178,11 +177,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
-                <Image
+                <img
                   src={course.instructorAvatar}
                   alt={course.instructor}
-                  width={48}
-                  height={48}
                   className="w-12 h-12 rounded-full border-2 border-white/20"
                 />
                 <div>
@@ -313,11 +310,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 {activeTab === 'instructor' && (
                   <div className="space-y-6">
                     <div className="flex items-start space-x-6">
-                      <Image
+                      <img
                         src={course.instructorAvatar}
                         alt={course.instructor}
-                        width={96}
-                        height={96}
                         className="w-24 h-24 rounded-full border-2 border-white/20"
                       />
                       <div className="flex-1">
