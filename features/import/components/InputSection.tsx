@@ -19,15 +19,6 @@ const InputSection: React.FC = () => {
 
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const response = await fetch("/api/import", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name: inputValue })
-        });
-        const result = await response.text();
-        console.log(result);
         console.log('Course creation submitted:', inputValue);
     }, [inputValue]);
 
