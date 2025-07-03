@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { Textarea } from '../../../components/ui/Textarea';
-import { ArrowRight, BookOpen, Plus, Video, Image, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Plus, Video, Image } from 'lucide-react';
 import { motion , Variants } from 'framer-motion';
 import { cn } from '../../../lib/utils';
 
 const placeholderPhrases = [
-    "Learn Python programming from scratch",
-    "Master digital marketing strategies",
-    "Build mobile apps with React Native",
-    "Understand machine learning basics",
-    "Create stunning UI/UX designs",
+    "Learning Python programming from scratch",
+    "Mastering digital marketing strategies",
+    "Building mobile apps with React Native",
+    "Understanding machine learning basics",
+    "Creating stunning UI/UX designs",
 ];
 
 const InputSection: React.FC = () => {
@@ -19,6 +19,17 @@ const InputSection: React.FC = () => {
 
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        const response = await fetch("http://localhost:3000/api/v1/course",{
+            method: "POST",
+            body: JSON.stringify({
+                text: inputValue,
+                style: "chunk"
+            })
+        })
+          
+        const data = await response.json()
+        console.log(data)
+
         console.log('Course creation submitted:', inputValue);
     }, [inputValue]);
 
