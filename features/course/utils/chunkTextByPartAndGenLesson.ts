@@ -1,80 +1,81 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { tool } from "@langchain/core/tools";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { z } from "zod";
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import {  HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 
-// Define the lesson schema
+// === 1. Define Zod schema for tool input ===
 const zLesson = z.object({
   title: z.string().describe("The title of the lesson"),
   content: z.string().describe("The full lesson content"),
 });
 
-// Simulated lesson creation logic
-async function createLesson({ title, content }: { title: string; content: string }) {
-  console.log("📘 New Lesson Created:");
-  console.log("Title:", title);
-  console.log("Content:", content);
-  return "Lesson created successfully.";
-}
-
-// Wrap lesson creation as a LangChain tool
+// === 2. Define the lesson creation tool ===
 const createLessonTool = tool(
-  async ({ title, content }: { title: string; content: string }) => {
-    return await createLesson({ title, content });
+  async ({ title , content }: z.infer<typeof zLesson>) => {
+    const now = new Date().toISOString();
+    console.log("📘 Lesson created at:", now, "| Title:", title, "\n\n Content:", content);
+    return "Lesson created successfully.";
   },
   {
     name: "createLesson",
-    description: "Use this to create a lesson from a title and its content.",
+    description: "Create a lesson from a title and its content",
     schema: zLesson,
   }
 );
 
-// Main function with async on-the-fly tool execution
-export default async function chunkTextByPartAndGenLesson(text: string) {
+// === 3. Main agent loop ===
+export async function chunkTextRealtime(text: string) {
   const llm = new ChatGoogleGenerativeAI({
-    temperature: 0,
     model: "gemini-2.5-flash",
     apiKey: process.env.GOOGLE_API_KEY,
+    temperature: 0,
   });
 
-  // Create agent with tool
-  const agent = createReactAgent({
-    llm,
-    tools: [createLessonTool],
-  });
+  const tools = [createLessonTool];
+  const messages = [
+    new SystemMessage(`You are a lesson generator.
+You must:
+1. Read the provided text.
+2. Identify one lesson at a time.
+3. As soon as you are ready, call the "createLesson" tool.
+4. After the tool returns a result, continue with the next lesson.
+Never plan multiple lessons at once.
+`),
+    new HumanMessage(`Here is the course text:\n\n${text}`),
+  ];
 
-  // Create message stream
-  const stream = await agent._streamIterator({
-    messages: [
-      new SystemMessage(
-        `You are a professional course splitter. 
-You will receive a block of raw text and are expected to:
-1. Read and analyze the full text.
-2. Generate 1 to 10 appropriate lesson titles.
-3. For each title, call the "createLesson" tool with a lesson built from the relevant part of the input.
-4. Wait for confirmation before continuing.
-5. Do not generate duplicate titles.
-Do not summarize — generate real lessons.`
-      ),
-      new HumanMessage(`Begin immediately.\n\nText: ${text}`),
-    ],
-  });
+  while (true) {
+    const response = await llm.invoke(messages, { tools });
 
-  // Step through the stream as the agent processes tool calls
-  for await (const step of stream) {
-    if (step?.toolCalls?.length) {
-      console.log(
-        "🛠 Tool call(s):",
-        step.toolCalls.map((c: { name: string }) => c.name)
-      );
-    } else if (step?.output) {
-      console.log("✅ Agent finished:", step.output);
+    messages.push(response);
+
+    // Handle tool calls if any
+    if (response.tool_calls && response.tool_calls.length > 0) {
+      for (const call of response.tool_calls) {
+        const tool = tools.find(t => t.name === call.name);
+        if (!tool) continue;
+
+        const result = await tool.func(call.args as z.infer<typeof zLesson>);
+
+        messages.push(
+          new ToolMessage({
+            tool_call_id: call.id || "1",
+            content: result,
+          })
+        );
+      }
+    } else {
+      // No more tool calls = agent is done
+      if (response.content) {
+        console.log("✅ Agent output:", response.content);
+      }
+      break;
     }
   }
 
-  return "All lessons processed.";
+  return "✅ All lessons processed.";
 }
+
 
 // const llmWithTools = llm.bindTools([
 //   tool(createLesson,{

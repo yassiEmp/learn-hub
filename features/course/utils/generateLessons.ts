@@ -1,4 +1,4 @@
-import chunkTextByPartAndGenLesson from "./chunkTextByPartAndGenLesson"
+import chunkReferenceAgent from "./chunkReference"
 
 export default async function generateLessons (text: string , style: "markdown"|"aiGen"|"chunk") {
     switch (style) {
@@ -9,7 +9,7 @@ export default async function generateLessons (text: string , style: "markdown"|
         //     generateLessonForTopics(text)
         //     break
         case "chunk":
-            const lessons = await chunkTextByPartAndGenLesson(text)
+            const lessons = await chunkReferenceAgent(text)
             return lessons
     }
 }
