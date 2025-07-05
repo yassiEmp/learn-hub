@@ -1,11 +1,12 @@
 "use client"
 import { useEffect, useState, useCallback } from 'react'
-import { User } from '@supabase/supabase-js'
+import { Session, User } from '@supabase/supabase-js'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [isConfigured, setIsConfigured] = useState(false)
   const router = useRouter()
@@ -29,6 +30,7 @@ export function useAuth() {
           console.error('Error getting session:', error)
         }
         setUser(session?.user ?? null)
+        setSession(session)
       } catch (error) {
         console.error('Error in getInitialSession:', error)
       } finally {
@@ -42,6 +44,7 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null)
+        setSession(session)
         setLoading(false)
         
         // Handle specific auth events
@@ -207,6 +210,7 @@ export function useAuth() {
 
   return {
     user,
+    session,
     loading,
     signIn,
     signUp,

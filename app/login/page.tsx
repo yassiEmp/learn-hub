@@ -297,7 +297,7 @@ const LoginPage = () => {
               </div>
             </motion.div>
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6 sm:p-2" onSubmit={handleSubmit}>
               {!isLogin && (
                 <motion.div variants={itemVariants}>
                   <label className="block text-sm font-geist-mono text-white/70 mb-2">

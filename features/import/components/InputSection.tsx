@@ -4,6 +4,7 @@ import { Textarea } from '../../../components/ui/Textarea';
 import { ArrowRight, BookOpen, Plus, Video, Image } from 'lucide-react';
 import { motion , Variants } from 'framer-motion';
 import { cn } from '../../../lib/utils';
+import { useAuth } from '@/hooks/useAuth';
 
 const placeholderPhrases = [
     "Learning Python programming from scratch",
@@ -16,14 +17,24 @@ const placeholderPhrases = [
 const InputSection: React.FC = () => {
     const [inputValue, setInputValue] = useState("");
     const [placeholderText, setPlaceholderText] = useState("");
-
+    const { session } = useAuth();
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         const response = await fetch("http://localhost:3000/api/v1/course",{
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${session?.access_token}`
+            },
             body: JSON.stringify({
                 text: inputValue,
-                style: "chunk"
+                style: "chunk",
+                title: "default",
+                description: "default",
+                category: "default",
+                level: "default",
+                price: 0,
+                tags: ["default"]
             })
         })
           
@@ -31,7 +42,7 @@ const InputSection: React.FC = () => {
         console.log(data)
 
         console.log('Course creation submitted:', inputValue);
-    }, [inputValue]);
+    }, [inputValue, session]);
 
     // Optimized typing effect
     useEffect(() => {
@@ -117,7 +128,7 @@ const InputSection: React.FC = () => {
 
     return (
         <motion.form 
-            className="w-full px-4 sm:px-6" 
+            className="w-full px-4 sm:p-6 min-h-fit" 
             onSubmit={handleSubmit}
             variants={containerVariants}
             initial="hidden"
