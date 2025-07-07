@@ -95,26 +95,26 @@ export default async function chunkReferenceAgent(text: string): Promise<{
     tools: [createLessonFromChunks, generateCourseMetadata],
   });
 
-  const refList = TEXT_CHUNKS.map((_, i) => `Chunk ${i}`).join("\n");
+  const refList = TEXT_CHUNKS.map((chunk, i) => `Chunk ${i}: ${chunk.slice(0, 100)}...`).join("\n");
 
   const messages = [
     new SystemMessage(`You are a professional course planner and content strategist.
-Given a list of indexed content chunks, do the following:
+Given a list of indexed content chunks, you MUST follow these steps in order:
 
-1. FIRST: Analyze the content and generate a compelling course title and description using the "generateCourseMetadata" tool.
+1. FIRST: Analyze the content chunks and generate a compelling course title and description using the "generateCourseMetadata" tool.
+   - Look at the content previews to understand the topic
+   - Create a catchy, professional title that reflects the main subject
+   - Write a 1-2 sentence description explaining what students will learn
 
 2. THEN: Plan and create lessons using 1 or more chunk indices.
-- Call the "createLessonFromChunks" tool for each lesson.
-- Create 3-5 lessons total, depending on the content length.
-- Never include raw content. Just use chunk references.
-- Make lesson titles engaging and descriptive.
+   - Call the "createLessonFromChunks" tool for each lesson
+   - Create 3-5 lessons total, depending on the content length
+   - Never include raw content. Just use chunk references
+   - Make lesson titles engaging and descriptive
 
-Guidelines:
-- Course title should be catchy, professional, and reflect the main topic
-- Description should be 1-2 sentences explaining what students will learn
-- Lessons should follow a logical progression
-- Each lesson should cover a distinct topic or concept`),
-    new HumanMessage(`Here are the available content chunks:
+IMPORTANT: You MUST call generateCourseMetadata FIRST before creating any lessons.
+The course title and description are essential for the course structure.`),
+    new HumanMessage(`Here are the available content chunks with previews:
 ${refList}`),
   ];
 
@@ -130,14 +130,26 @@ ${refList}`),
     }
 
     console.log("✅ All lessons generated using references.");
+    console.log("📊 Final Results:");
+    console.log("- Course Metadata:", COURSE_METADATA);
+    console.log("- Lessons Count:", GENERATED_LESSONS.length);
     
-    // Return course metadata and lessons
-    const title = COURSE_METADATA ? COURSE_METADATA.title : "Generated Course";
-    const description = COURSE_METADATA ? COURSE_METADATA.description : "A comprehensive course based on the provided content.";
+    // Return course metadata and lessons with explicit type handling
+    let finalTitle = "Generated Course";
+    let finalDescription = "A comprehensive course based on the provided content.";
+    
+    if (COURSE_METADATA) {
+      const metadata = COURSE_METADATA as { title: string; description: string };
+      finalTitle = metadata.title;
+      finalDescription = metadata.description;
+    }
+    
+    console.log("🎯 Final Course Title:", finalTitle);
+    console.log("📝 Final Course Description:", finalDescription);
     
     return {
-      title,
-      description,
+      title: finalTitle,
+      description: finalDescription,
       lessons: GENERATED_LESSONS
     };
   } catch (error) {
