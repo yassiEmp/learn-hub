@@ -1,6 +1,10 @@
-import chunkReferenceAgent from "./chunkReference"
+// ============================================================================
+// Enhanced Course Generation System
+// ============================================================================
 
-// Helper function to generate a title from content
+import { enhancedChunkAI } from "./chunkAI";
+
+// Helper function to generate a title from content (fallback)
 async function generateTitleFromContent(content: string): Promise<{ title: string; description: string }> {
   try {
     // Simple title generation based on content analysis
@@ -87,20 +91,59 @@ export default async function generateLessons(text: string, style: "markdown" | 
       };
       
     case "chunk":
-      // Use the chunk reference agent for advanced lesson generation
-      const chunkResult = await chunkReferenceAgent(text);
-      return {
-        title: chunkResult.title,
-        description: chunkResult.description,
-        lessons: chunkResult.lessons.map((lesson, index) => ({
-          title: lesson.title,
-          content: lesson.content,
-          duration: "20 min",
-          videoUrl: "",
-          isCompleted: false,
-          isCurrent: index === 0 // First lesson is current
-        }))
-      };
+      // Use the enhanced chunk AI system for advanced lesson generation
+      try {
+        console.log('🚀 Using Enhanced Chunk AI for course generation...');
+        const result = await enhancedChunkAI.processText(text);
+        
+        if (!result.success) {
+          console.warn('Enhanced Chunk AI failed, falling back to basic generation:', result.errors);
+          // Fallback to basic generation
+          const fallbackMetadata = await generateTitleFromContent(text);
+          return {
+            title: fallbackMetadata.title,
+            description: fallbackMetadata.description,
+            lessons: [{
+              title: "Introduction",
+              content: text,
+              duration: "25 min",
+              videoUrl: "",
+              isCompleted: false,
+              isCurrent: false
+            }]
+          };
+        }
+        
+        console.log(`✅ Enhanced Chunk AI generated ${result.course.lessons.length} lessons`);
+        return {
+          title: result.course.title,
+          description: result.course.description,
+          lessons: result.course.lessons.map((lesson, index) => ({
+            title: lesson.title,
+            content: lesson.content,
+            duration: lesson.duration,
+            videoUrl: "",
+            isCompleted: false,
+            isCurrent: index === 0 // First lesson is current
+          }))
+        };
+      } catch (error) {
+        console.error('Enhanced Chunk AI error:', error);
+        // Fallback to basic generation
+        const fallbackMetadata = await generateTitleFromContent(text);
+        return {
+          title: fallbackMetadata.title,
+          description: fallbackMetadata.description,
+          lessons: [{
+            title: "Introduction",
+            content: text,
+            duration: "25 min",
+            videoUrl: "",
+            isCompleted: false,
+            isCurrent: false
+          }]
+        };
+      }
       
     default:
       // Fallback for unknown styles

@@ -12,6 +12,7 @@
 9. [Security Guidelines](#security-guidelines)
 10. [Performance Guidelines](#performance-guidelines)
 11. [Documentation Standards](#documentation-standards)
+12. [Microservices & API Communication](#microservices--api-communication)
 
 ## General Principles
 
@@ -407,6 +408,60 @@ NODE_ENV=development
 - [ ] Performance impact is considered
 - [ ] Tests cover new functionality
 - [ ] Documentation is clear and complete
+
+## AI/LLM Integration
+
+- Always validate and sanitize AI-generated content before saving or displaying.
+- Log all AI service requests and responses for debugging and auditing.
+- Use environment variables for all API keys and secrets.
+- Document prompt engineering strategies and keep prompts versioned.
+- Prefer stateless, idempotent API calls to external AI services.
+- Handle AI service errors gracefully and provide user feedback.
+- Limit and monitor usage to control costs and prevent abuse.
+
+## Microservices & API Communication
+
+- Use RESTful conventions for all internal and external service APIs.
+- Document all service endpoints and expected payloads.
+- Use OpenAPI/Swagger for service API documentation.
+- Handle network errors and timeouts with retries and exponential backoff.
+- Secure all inter-service communication with authentication and HTTPS.
+- Version all service APIs and document breaking changes.
+
+## Feature Flags & Experimental Features
+
+- Use feature flags for all experimental or beta features.
+- Document the process for enabling/disabling features.
+- Ensure all feature flags are removed or promoted to stable after validation.
+- Use environment variables or a feature management service for flag control.
+
+## Batch Processing & Background Jobs
+
+- Use job queues (e.g., Redis, Celery) for heavy or long-running tasks.
+- Track job status and provide user feedback on progress.
+- Log all job executions and errors for monitoring.
+- Implement retry logic and dead-letter queues for failed jobs.
+
+## Content Import & Structuring
+
+- Validate all imported files for type, size, and content.
+- Sanitize and normalize imported text before processing.
+- Store original and structured content for traceability.
+- Provide users with a preview and editing interface before finalizing import.
+- Log all import actions for auditing.
+
+## Security for AI & File Uploads
+
+- Scan all uploaded files for malware and prohibited content.
+- Limit file types and sizes to prevent abuse.
+- Never expose raw AI prompts or completions to end users.
+- Use signed URLs or secure storage for all uploaded files.
+
+## Documentation for New Features
+
+- Update the main roadmap and planning docs with all new features and sprints.
+- Document all new API endpoints, database migrations, and UI components.
+- Add usage examples for new features in the README or a dedicated guide.
 
 ---
 

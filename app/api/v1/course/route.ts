@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
 
         // 5. Create course in database using generated or provided metadata
         const courseData = {
-            title: title || generatedCourse.title, // Use provided title or generated one
-            description: description || generatedCourse.description, // Use provided description or generated one
+            title: generatedCourse.title || title , // Use provided title or generated one
+            description: generatedCourse.description || description , // Use provided description or generated one
             content: text,
             owner_id: user.id,
             lessons: generatedCourse.lessons,

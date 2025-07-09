@@ -100,6 +100,13 @@ If you can't find the information you need in the documentation:
 - [Environment Setup](../SETUP.md)
 - [Troubleshooting Guide](../TROUBLESHOOTING.md)
 
+## Recent Progress / Changelog
+
+- Improved text cleaning in the chunk AI preprocessor (preserves important info)
+- Enhanced chunk AI system for lesson generation (semantic chunking, orchestration)
+- Representative content extraction for LLM title/description generation
+- Added TODOs for analytics/database logging and improved error handling
+
 ---
 
 **Last Updated**: December 2024  
