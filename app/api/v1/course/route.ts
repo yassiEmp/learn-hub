@@ -1,4 +1,4 @@
-import generateLessons from "@/features/course/utils/generateLessons";
+import generateCourseAndLessons from "@/features/course/utils/generateLessons";
 import { catchErr } from "@/utils/utils";
 import { verifyAuth, supabaseAdmin } from "@/utils/supabase/server";
 import { successResponse, authErrorResponse, errorResponse, serverErrorResponse } from "@/utils/api-helpers";
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 4. Generate lessons and course metadata from the text
-        const generatedCourse = await generateLessons(text, style);
+        const generatedCourse = await generateCourseAndLessons(text, style);
 
         // 5. Create course in database using generated or provided metadata
         const courseData = {

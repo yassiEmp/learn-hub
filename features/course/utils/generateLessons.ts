@@ -30,7 +30,7 @@ async function generateTitleFromContent(content: string): Promise<{ title: strin
   }
 }
 
-export default async function generateLessons(text: string, style: "markdown" | "aiGen" | "chunk"): Promise<{
+export default async function generateCourseAndLessons(text: string, style: "markdown" | "aiGen" | "chunk"): Promise<{
   title: string;
   description: string;
   lessons: Array<{
@@ -96,6 +96,7 @@ export default async function generateLessons(text: string, style: "markdown" | 
         console.log('🚀 Using Enhanced Chunk AI for course generation...');
         const result = await enhancedChunkAI.processText(text);
         
+        // fallback to basic generation if the enhanced chunk AI fails
         if (!result.success) {
           console.warn('Enhanced Chunk AI failed, falling back to basic generation:', result.errors);
           // Fallback to basic generation

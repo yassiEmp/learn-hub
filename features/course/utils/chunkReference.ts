@@ -11,7 +11,7 @@ const zLessonPlan = z.object({
   chunkIndices: z.array(z.number()).describe("List of indices pointing to chunks to use for this lesson")
 });
 
-const zCourseTitle = z.object({
+const zCourse = z.object({
   title: z.string().describe("A compelling course title based on the content"),
   description: z.string().describe("A brief description of the course")
 });
@@ -54,7 +54,7 @@ const createLessonFromChunks = tool(
 
 // === 5. Tool to generate course title and description ===
 const generateCourseMetadata = tool(
-  async ({ title, description }: z.infer<typeof zCourseTitle>) => {
+  async ({ title, description }: z.infer<typeof zCourse>) => {
     COURSE_METADATA = { title, description };
     
     console.log("\n🎯 Course Metadata Generated");
@@ -66,7 +66,7 @@ const generateCourseMetadata = tool(
   {
     name: "generateCourseMetadata",
     description: "Generate a compelling course title and description based on the content.",
-    schema: zCourseTitle
+    schema: zCourse
   }
 );
 

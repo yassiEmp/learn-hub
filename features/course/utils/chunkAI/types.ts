@@ -17,6 +17,14 @@ export interface Sentence {
   complexity: 'simple' | 'moderate' | 'complex';
 }
 
+export interface courseMetadata {
+  title: string,
+  description: string,
+  category: string,
+  level: 'beginner' | 'intermediate' | 'advanced',
+  tags: string[] 
+}
+
 export interface SemanticChunk {
   id: string;
   sentences: Sentence[];

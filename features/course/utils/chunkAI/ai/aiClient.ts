@@ -3,12 +3,70 @@
 // ============================================================================
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { AIResponse, AIPrompt } from '../types';
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { StructuredOutputParser } from "@langchain/core/output_parsers";
+import { z } from "zod";
+// @ts-expect-error: No types for jsonrepair
+import { parse as parseJSON } from "jsonrepair";
+
+// 1. Define schema
+const courseMetadataSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  category: z.string(),
+  level: z.enum(["beginner", "intermediate", "advanced"]),
+  tags: z.array(z.string())
+});
+
+type CourseMetadata = z.infer<typeof courseMetadataSchema>;
+
+// 2. Create parser
+const parser = StructuredOutputParser.fromZodSchema(courseMetadataSchema);
+
+// 3. Create prompt
+const prompt = ChatPromptTemplate.fromMessages([
+  ["system", "You are a metadata-extraction assistant."],
+  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${parser.getFormatInstructions()}\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"]\n}\n\nNow process this input:\n{input}\n`]
+]);
+
+// 4. Instantiate model (reuse this.llm if possible)
+// ... existing code ...
+
+// 5. Create pipeline chain with parser at the end
+const chain = prompt.pipe(new ChatGoogleGenerativeAI({
+  model: "gemini-2.0-flash",
+  temperature: 0.2,
+  maxOutputTokens: 10000
+})).pipe(parser);
+
+// 6. Function to safely parse + repair + validate
+async function extractMetadata(courseText: string): Promise<CourseMetadata> {
+  // Best practice: chain returns parsed object directly (see LangChain.js docs)
+  try {
+    return await chain.invoke({ input: courseText });
+  } catch {
+    // If parsing fails, try to repair and validate
+    try {
+      // Fallback: run without parser, repair, then validate
+      const modelOnlyChain = prompt.pipe(new ChatGoogleGenerativeAI({
+        model: "gemini-2.0-flash",
+        temperature: 0.2,
+        maxOutputTokens: 10000
+      }));
+      const rawOutputChunk = await modelOnlyChain.invoke({ input: courseText });
+      const rawOutput = rawOutputChunk.content;
+      const repaired = parseJSON(rawOutput);
+      return courseMetadataSchema.parse(repaired);
+    } catch {
+      throw new Error("Failed to repair and validate output.");
+    }
+  }
+}
 
 export class AIClient {
   private llm: ChatGoogleGenerativeAI;
   private retryAttempts: number;
-  private cache: Map<string, AIResponse>;
+  private cache: Map<string, { metadata?: { timestamp?: number } }>; // Use a more specific type
 
   constructor(config: {
     apiKey: string;
@@ -31,7 +89,7 @@ export class AIClient {
   /**
    * Sends a prompt to the AI and returns the response
    */
-  async sendPrompt(prompt: AIPrompt): Promise<AIResponse> {
+  async sendPrompt(prompt: Record<string, unknown>): Promise<unknown> {
     const cacheKey = this.generateCacheKey(prompt);
     
     // Check cache first
@@ -47,13 +105,14 @@ export class AIClient {
 
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
+        // Cast prompt.system and prompt.user to string for BaseMessageLike compatibility
         const response = await this.llm.invoke([
-          { role: "system", content: prompt.system },
-          { role: "user", content: prompt.user }
+          { role: "system", content: String(prompt.system) },
+          { role: "user", content: String(prompt.user) }
         ]);
 
         const duration = Date.now() - startTime;
-        const aiResponse: AIResponse = {
+        const aiResponse = {
           success: true,
           data: response.content,
           metadata: {
@@ -137,47 +196,17 @@ export class AIClient {
   }
 
   /**
-   * Generates a course title and description
+   * Generates course metadata (title, description, category, level, tags) from text
    */
-  async generateCourseMetadata(content: string): Promise<AIResponse> {
-    // Use improved context extraction
-    const representativeContent = this.extractRepresentativeContent(content, 2000);
-    const prompt: AIPrompt = {
-      system: `You are an expert course creator and educator. Your task is to analyze content and generate compelling course titles and descriptions.
-
-Guidelines:
-- Create engaging, professional titles that capture the essence of the content
-- Write clear, concise descriptions (1-2 sentences) that explain what students will learn
-- Focus on the main topics and learning outcomes
-- Use action-oriented language
-- Keep titles under 60 characters
-- Make descriptions informative but not overwhelming
-
-Return your response in this exact JSON format:
-{
-  "title": "Course Title Here",
-  "description": "Course description here explaining what students will learn."
-}`,
-      user: `Analyze this content and generate a course title and description:
-
-      here are the content:
-- All Markdown-style headings (e.g., #, ##).
-- A sample from the start and end of the content.
-- The first sentence of each paragraph (up to a limit).
-${representativeContent}
-
-Focus on the main topics and create an engaging course title and description.`,
-      temperature: 0.4
-    };
-
-    return this.sendPrompt(prompt);
-  }
+  async generateCourseMetadata(content: string): Promise<CourseMetadata> {
+  return extractMetadata(content);
+}
 
   /**
    * Generates a lesson title from chunk content
    */
-  async generateLessonTitle(chunkContent: string, lessonNumber: number): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async generateLessonTitle(chunkContent: string, lessonNumber: number): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating lesson titles. Generate engaging, descriptive titles for educational content.
 
 Guidelines:
@@ -203,8 +232,8 @@ Create a clear, engaging title that captures the main topic of this lesson.`,
   /**
    * Enhances lesson content with better narrative flow
    */
-  async enhanceLessonContent(content: string): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async enhanceLessonContent(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educational content writer. Your task is to enhance lesson content to improve readability and learning effectiveness.
 
 Guidelines:
@@ -231,8 +260,8 @@ Focus on improving narrative flow, adding clear explanations, and making the con
   /**
    * Generates key learning points from lesson content
    */
-  async generateKeyPoints(content: string): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async generateKeyPoints(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator extracting key learning points from educational content.
 
 Guidelines:
@@ -259,8 +288,8 @@ Focus on the most important concepts and learning outcomes.`,
   /**
    * Generates a lesson summary
    */
-  async generateLessonSummary(content: string): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async generateLessonSummary(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating lesson summaries. Create concise, informative summaries that capture the main points.
 
 Guidelines:
@@ -285,8 +314,8 @@ Focus on the key concepts and main takeaways that students should remember.`,
   /**
    * Generates learning objectives for a lesson
    */
-  async generateLearningObjectives(content: string): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async generateLearningObjectives(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating learning objectives. Generate clear, measurable learning objectives for educational content.
 
 Guidelines:
@@ -316,8 +345,8 @@ Focus on what students will be able to do or understand after completing this le
   async generateLessonTransition(
     previousLesson: string, 
     currentLesson: string
-  ): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  ): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating smooth transitions between lessons. Generate brief, engaging transitions that connect lessons logically.
 
 Guidelines:
@@ -344,8 +373,8 @@ Generate a brief, engaging transition that connects these lessons logically.`,
   /**
    * Generates exercises or practice questions
    */
-  async generateExercises(content: string, difficulty: 'beginner' | 'intermediate' | 'advanced'): Promise<AIResponse> {
-    const prompt: AIPrompt = {
+  async generateExercises(content: string, difficulty: 'beginner' | 'intermediate' | 'advanced'): Promise<unknown> { // Changed from AIResponse to unknown
+    const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating practice exercises. Generate relevant exercises that help students apply what they've learned.
 
 Guidelines:
@@ -389,7 +418,7 @@ Create exercises that help students apply the key concepts from this lesson.`,
   /**
    * Generates a cache key for a prompt
    */
-  private generateCacheKey(prompt: AIPrompt): string {
+  private generateCacheKey(prompt: Record<string, unknown>): string { // Changed from AIPrompt to unknown
     const content = `${prompt.system}:${prompt.user}:${prompt.temperature || 0}:${prompt.maxOutputTokens || 0}`;
     return Buffer.from(content).toString('base64').substring(0, 32);
   }
