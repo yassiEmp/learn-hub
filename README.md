@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+> **Note:** All project tasks and schedules are now tracked centrally in [docs/planning/TASKS.md](docs/planning/TASKS.md). When you schedule a feature or change in a planning file, add its tasks and schedule to this file, with a link back to the original context.
+
 ## Getting Started
 
 First, run the development server:

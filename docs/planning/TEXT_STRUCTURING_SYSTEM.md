@@ -90,12 +90,7 @@ This project aims to build an **industry-grade pipeline** that automates this tr
 
 ## 📈 Roadmap
 
-- [x] Define use cases and target input types
-- [x] Prototype small-scale version with OpenAI + clustering
-- [ ] Build full pipeline with modular architecture
-- [ ] Add real-time or batch processing capability
-- [ ] Integrate human editor feedback flow
-- [ ] Benchmark performance and scalability
+<!-- All planning and feature checklists have been moved to [TASKS.md](../planning/TASKS.md) for centralized tracking. Please refer there for up-to-date progress and task management. -->
 
 ---
 

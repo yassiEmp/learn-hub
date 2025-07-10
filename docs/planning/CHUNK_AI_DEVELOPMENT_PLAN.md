@@ -1,7 +1,7 @@
 # 🧠 Chunk AI Development Plan
 
 ## 📋 Overview
-This document outlines the development plan for enhancing the chunk AI feature in Learn Hub, transforming it from a basic text splitter into a sophisticated content structuring system.
+This document outlines the development plan for enhancing the chunk AI feature in Learn Hub, transforming it from a basic text splitter into a sophisticated content structuring , course and lesson generation system.
 
 ## 🎯 Current Issues & Goals
 

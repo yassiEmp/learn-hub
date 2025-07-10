@@ -2,6 +2,8 @@ NB: the mvp part musb be designed so that they will integrate well with the upco
 
 # ✅ **MVP Goals**
 
+<!-- All MVP tasks and checklists have been moved to [TASKS.md](../planning/TASKS.md) for centralized tracking. Please refer there for up-to-date progress and task management. -->
+
 The MVP should:
 
 1. Accept user educational content (PDF, text, video)
@@ -118,37 +120,7 @@ The MVP should:
 
 # 🛣️ **PHASED MVP ROADMAP**
 
----
-
-## ✅ Phase 1: Core Pipeline
-
-- [ ]  User signup/login
-- [ ]  Upload PDF
-- [ ]  Extract + display raw text
-- [ ]  Generate lesson chunks
-
-## ✅ Phase 2: Course System
-
-- [ ]  Store lessons inside course
-- [ ]  UI: Course viewer → Lesson reader
-
-## ✅ Phase 3: Question & Exam
-
-- [ ]  Generate 5–10 MCQs/lesson via LLM
-- [ ]  Build quiz player UI
-- [ ]  Auto-grade answers
-- [ ]  Show feedback
-
-## ✅ Phase 4: Dashboard
-
-- [ ]  Track completed lessons
-- [ ]  Score per exam
-- [ ]  Suggested review
-
-## ✅ Phase 5: Sharing (Optional)
-
-- [ ]  Share lesson via public link
-- [ ]  (Optional) Course marketplace placeholder
+<!-- All MVP tasks and checklists have been moved to [TASKS.md](../planning/TASKS.md) for centralized tracking. -->
 
 ---
 

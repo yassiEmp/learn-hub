@@ -463,6 +463,10 @@ NODE_ENV=development
 - Document all new API endpoints, database migrations, and UI components.
 - Add usage examples for new features in the README or a dedicated guide.
 
+## 📋 Task Tracking Guideline
+
+Whenever you schedule a feature or change in a dedicated planning file, ensure that all related tasks and schedules are also added to [TASKS.md](../planning/TASKS.md) for centralized tracking and progress monitoring. Include a link back to the original context for reference.
+
 ---
 
 **Remember**: These guidelines are living documents. Update them as the project evolves and new patterns emerge. 
