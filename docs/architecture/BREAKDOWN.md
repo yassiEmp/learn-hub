@@ -44,8 +44,7 @@
 
 ## 3. **Content Extraction & Lesson Creation**
 
-> Converts uploaded content into structured learning objects (lessons). Designed to plug in other AI models later.
-> 
+> Converts uploaded content into structured learning objects (lessons) using a standalone, workflow-driven lesson generation service. The course service sends all raw text and options (workflow, metadata, etc.) to the lesson generation service, which splits and enriches the content, returning full lesson objects. The course service then stores and links these lessons to the course.
 
 ### Entities:
 
@@ -55,16 +54,17 @@
 ### Processing Pipeline:
 
 - Text extraction (PDF/YouTube)
-- Chunking via heuristic/LLM
-- Titles via AI (later: summarization/metadata tags)
-- **Lesson creation via POST /course**: The course endpoint splits or forwards text, and the lesson endpoint is responsible for stylization and lesson creation.
+- Course service sends raw text and options to lesson generation service
+- Lesson generation service splits, enriches, and returns lesson objects
+- Course service stores lessons and links them to the course
+
+> See [aiLessonGen.md](../architecture/aiLessonGen.md) for workflow-driven interface details.
 
 ---
 
 ## 4. **Course System (Core Learning Container)**
 
-> Allows grouping of lessons. Can later be used for classes, markets, etc.
-> 
+> Allows grouping of lessons. The course service orchestrates lesson generation and persistence, but does not itself split or stylize lesson content.
 
 ### Entities:
 
@@ -73,17 +73,15 @@
 
 ### Endpoints:
 
-- `POST /course` (with `creationStyle: 'markdown stylized' | 'chunk' | 'AiGen'`)
-    - **markdown stylized**: Receives markdown text, forwards it to the lesson endpoint, which stylizes and creates the lesson, then links it to the course.
-    - **chunk**: Splits raw text into smaller chunks, calls the lesson endpoint for each chunk (lesson endpoint creates simple lessons), then links them to the course.
-    - **AiGen**: Calls AI/GenCourse endpoint, which returns a well-structured course and lessons to be added to the database.
+- `POST /course` (with `workflow: 'cheap' | 'premium' | 'hybrid'`)
+    - The course service sends all raw content and workflow to the lesson generation service, receives full lesson objects, and stores/links them to the course.
 
 ### Future extensions:
 
 - `CourseClass`, `CourseRating`, `MarketplaceListing`
 - `visibility: 'private' | 'public' | 'shared'`
 
-> Note: The course endpoint does not stylize or process lesson content itself; all lesson creation and stylization is handled by the lesson endpoint.
+> Note: The course service is just an orchestrator. All lesson splitting, enrichment, and creation logic lives in the lesson generation service.
 
 ---
 
