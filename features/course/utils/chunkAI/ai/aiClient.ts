@@ -6,8 +6,8 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
-// @ts-expect-error: No types for jsonrepair
-import { parse as parseJSON } from "jsonrepair";
+import { jsonrepair as parseJSON } from "jsonrepair";
+import 'dotenv/config';
 
 // 1. Define schema
 const courseMetadataSchema = z.object({
@@ -24,9 +24,11 @@ type CourseMetadata = z.infer<typeof courseMetadataSchema>;
 const parser = StructuredOutputParser.fromZodSchema(courseMetadataSchema);
 
 // 3. Create prompt
+// NOTE: All literal curly braces must be escaped as '{{' and '}}' for LangChain templates
+const formatInstructions = parser.getFormatInstructions().replace(/\{/g, '{{').replace(/\}/g, '}}');
 const prompt = ChatPromptTemplate.fromMessages([
   ["system", "You are a metadata-extraction assistant."],
-  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${parser.getFormatInstructions()}\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"]\n}\n\nNow process this input:\n{input}\n`]
+  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${formatInstructions}\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{{{{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"]\n}}}}\n\nNow process this input:\n{input}\n`]
 ]);
 
 // 4. Instantiate model (reuse this.llm if possible)
@@ -42,9 +44,17 @@ const chain = prompt.pipe(new ChatGoogleGenerativeAI({
 // 6. Function to safely parse + repair + validate
 async function extractMetadata(courseText: string): Promise<CourseMetadata> {
   // Best practice: chain returns parsed object directly (see LangChain.js docs)
+  let rawOutput: unknown = null;
   try {
-    return await chain.invoke({ input: courseText });
-  } catch {
+    rawOutput = await chain.invoke({ input: courseText });
+    console.log("[extractMetadata] Raw output from chain.invoke:", rawOutput);
+    // The output parser in the chain ensures this is CourseMetadata
+    return rawOutput as CourseMetadata;
+  } catch (parseErr) {
+    console.error("[extractMetadata] Error during initial parse:", parseErr);
+    if (rawOutput) {
+      console.error("[extractMetadata] Raw output that caused error:", rawOutput);
+    }
     // If parsing fails, try to repair and validate
     try {
       // Fallback: run without parser, repair, then validate
@@ -54,9 +64,16 @@ async function extractMetadata(courseText: string): Promise<CourseMetadata> {
         maxOutputTokens: 10000
       }));
       const rawOutputChunk = await modelOnlyChain.invoke({ input: courseText });
-      const rawOutput = rawOutputChunk.content;
-      const repaired = parseJSON(rawOutput);
-      return courseMetadataSchema.parse(repaired);
+      const rawOutputText = rawOutputChunk.content as string;
+      console.error("[extractMetadata] Raw model output before repair:", rawOutputText);
+      try {
+        const repaired = parseJSON(rawOutputText);
+        return courseMetadataSchema.parse(repaired);
+      } catch (repairErr) {
+        console.error("[extractMetadata] Repair/validation failed:", repairErr);
+        console.error("[extractMetadata] Raw output that failed repair:", rawOutputText);
+        throw new Error("Failed to repair and validate output.");
+      }
     } catch {
       throw new Error("Failed to repair and validate output.");
     }
@@ -200,7 +217,7 @@ export class AIClient {
    */
   async generateCourseMetadata(content: string): Promise<CourseMetadata> {
   return extractMetadata(content);
-}
+  }
 
   /**
    * Generates a lesson title from chunk content
