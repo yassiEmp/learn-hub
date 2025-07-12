@@ -56,16 +56,6 @@ export const HeroSection = () => {
             className="space-y-6"
             variants={itemVariants}
           >
-            {/* Badge */}
-            <motion.span
-              className="px-4 py-2 text-sm font-geist-mono text-white bg-white/15 backdrop-blur-md rounded-full border border-white/30 inline-block shadow-lg"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              AI Course Creator
-            </motion.span>
-
             <Title />
 
             <motion.p

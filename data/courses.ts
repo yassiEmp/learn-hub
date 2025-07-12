@@ -3,6 +3,7 @@ import { Course } from '../types/course';
 export const courses: Course[] = [
   {
     id: '1',
+    owner_id: 'mock-user-1',
     title: 'Complete React Development Bootcamp',
     description: 'Master React from basics to advanced concepts including hooks, context, routing, and state management. Build real-world projects and deploy them to production.',
     instructor: 'Sarah Johnson',
@@ -29,6 +30,7 @@ export const courses: Course[] = [
   },
   {
     id: '2',
+    owner_id: 'mock-user-2',
     title: 'Python for Data Science',
     description: 'Learn Python programming specifically for data science applications. Cover pandas, numpy, matplotlib, and machine learning basics.',
     instructor: 'Dr. Michael Chen',
@@ -53,6 +55,7 @@ export const courses: Course[] = [
   },
   {
     id: '3',
+    owner_id: 'mock-user-3',
     title: 'UI/UX Design Fundamentals',
     description: 'Master the principles of user interface and user experience design. Learn design thinking, prototyping, and create stunning digital experiences.',
     instructor: 'Emma Rodriguez',
@@ -73,6 +76,7 @@ export const courses: Course[] = [
   },
   {
     id: '4',
+    owner_id: 'mock-user-4',
     title: 'Advanced JavaScript & Node.js',
     description: 'Deep dive into advanced JavaScript concepts and server-side development with Node.js. Build scalable backend applications.',
     instructor: 'Alex Thompson',

@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+> **Note:** All project tasks and schedules are now tracked centrally in [docs/planning/TASKS.md](docs/planning/TASKS.md). When you schedule a feature or change in a planning file, add its tasks and schedule to this file, with a link back to the original context.
+
 ## Getting Started
 
 First, run the development server:
@@ -34,3 +36,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Recent Changes
+
+- Improved text cleaning in the chunk AI preprocessor (preserves emails, numbers, dates, etc.)
+- Enhanced chunk AI system for lesson generation (semantic chunking, better orchestration)
+- Representative content extraction for LLM title/description generation
+- TODOs added for analytics/database logging and improved error handling
