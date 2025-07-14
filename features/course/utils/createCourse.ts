@@ -1,8 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' }); // This must be first!
-
-import { aiClient } from "@/features/course/utils/chunkAI/ai/aiClient";
 import { supabase } from "@/lib/supabase";
+import { aiClient } from "./chunkAI/ai/aiClient";
 
 console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log('SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);

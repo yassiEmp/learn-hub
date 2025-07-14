@@ -1,5 +1,3 @@
-import 'dotenv/config'; // This must be the first line!
-
 import { createClient } from '@supabase/supabase-js'
 
 // Provide fallback values to prevent crashes during development

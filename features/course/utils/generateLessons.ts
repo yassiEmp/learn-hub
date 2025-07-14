@@ -2,7 +2,7 @@
 // Enhanced Course Generation System
 // ============================================================================
 
-import { enhancedChunkAI } from "./chunkAI";
+import { enhancedChunkAI } from "../shared/utils/chunkAI";
 
 // Helper function to generate a title from content (fallback)
 async function generateTitleFromContent(content: string): Promise<{ title: string; description: string }> {

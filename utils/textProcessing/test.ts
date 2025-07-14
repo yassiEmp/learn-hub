@@ -2,7 +2,7 @@
 // Enhanced Chunk AI System - Test File
 // ============================================================================
 
-import { enhancedChunkAI } from '../../../shared/utils/chunkAI';
+import { enhancedChunkAI } from './index';
 
 // Sample text for testing
 const sampleText = `

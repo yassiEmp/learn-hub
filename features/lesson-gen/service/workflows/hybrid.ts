@@ -1,8 +1,8 @@
 import { LessonInput, Lesson } from '../types';
-import { preprocessText } from '../../../course/utils/chunkAI/preprocessor/textCleaner';
-import { splitIntoSentences, filterSentences } from '../../../course/utils/chunkAI/preprocessor/sentenceSplitter';
-import { chunkText } from '../../../course/utils/chunkAI/chunking/semanticChunker';
-import { aiClient } from '../../../course/utils/chunkAI/ai/aiClient';
+import { preprocessText } from '@/utils/textProcessing/preprocessor/textCleaner';
+import { splitIntoSentences, filterSentences } from '@/utils/textProcessing/preprocessor/sentenceSplitter';
+import { chunkText } from '@/utils/textProcessing/chunking/semanticChunker';
+import { aiClient } from '@/utils/ai/aiClient';
 
 export async function generateLessonsHybrid(input: LessonInput): Promise<Lesson[]> {
   // 1. Preprocess and clean the text

@@ -8,7 +8,6 @@ import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
 import { jsonrepair as parseJSON } from "jsonrepair";
 
-
 // 1. Define schema
 const courseMetadataSchema = z.object({
   title: z.string(),

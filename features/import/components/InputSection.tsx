@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Button } from '../../../components/ui/Button';
-import { Textarea } from '../../../components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/Textarea';
 import { ArrowRight, BookOpen, Plus, Video, Image } from 'lucide-react';
 import { motion , Variants } from 'framer-motion';
-import { cn } from '../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 
 const placeholderPhrases = [
