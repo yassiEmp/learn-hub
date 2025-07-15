@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
-import Bagde from "@/components/Bagde";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -24,7 +23,6 @@ export default function RootLayout({
         className={`${syne.className} antialiased w-full h-full overflow-x-hidden`}
       >
         {children}
-        <Bagde />
       </body>
     </html>
   );

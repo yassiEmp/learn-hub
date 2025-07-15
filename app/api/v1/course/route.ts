@@ -1,4 +1,3 @@
-// import generateCourseAndLessons from "@/features/course/utils/generateLessons";
 import { catchErr } from "@/utils/utils";
 import { verifyAuth, createServerClient, getTokenFromRequest } from "@/utils/supabase/server";
 import { successResponse, authErrorResponse, errorResponse, serverErrorResponse } from "@/utils/api-helpers";
@@ -16,11 +15,11 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Parse and validate request body
-        const [err, body] = await catchErr(req.json());
-
-        if (err || !body) {
+        const result = await catchErr(req.json());
+        if (result.err || !result.res) {
             return errorResponse('The request body must be a valid JSON');
         }
+        const body = result.res;
 
         const { text, style }: CreateCourseRequest & { text: string } = body;
 
@@ -35,10 +34,12 @@ export async function POST(req: NextRequest) {
         // }
 
         // 1. Generate course metadata using AI
-        const metadata = await aiClient.generateCourseMetadata(text);
-        const { title, description, category, level, tags } = metadata;
-
-        console.log( "title: ",title, " description: ",description, " category: ",category, " level: ",level , " tags: ", tags )
+        const { err, res } = await aiClient.generateCourseMetadata(text);
+        if (err || !res) {
+            return errorResponse(String(err), 500);
+        }
+        
+        const { title, description, category, level, tags , lessonTitles } = res;
 
         // 5. Create course in database using generated or provided metadata
         const courseData = {
@@ -72,8 +73,29 @@ export async function POST(req: NextRequest) {
             return serverErrorResponse('Failed to create course');
         }
 
-        // // 4. Generate lessons and course metadata from the text
-        // const generateLesson = await generateLessons(text, style);
+        // 4. Call the lesson generation API to generate lessons from the course text
+        //    (We do not block on this; fire-and-forget, or you can await if you want to use the result)
+        const result1 = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/v1/lessons`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                content: text,
+                workflow: "premium", // or use a value from the request if available
+                lessonTitles,
+                metadata: {
+                    title,
+                    description,
+                    category,
+                    level,
+                    tags
+                }
+            })
+        });
+
+        console.log(await result1.json())
 
         // 6. Return success response
         return successResponse<CourseResponse>(

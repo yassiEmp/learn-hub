@@ -2,7 +2,31 @@
 // Enhanced Course Generation System
 // ============================================================================
 
-import { enhancedChunkAI } from "../shared/utils/chunkAI";
+import { enhancedChunkAI } from "@/features/course/utils/chunkAI"; // adjust path as needed
+
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
+type Lesson = {
+  title: string;
+  content: string;
+  duration: string;
+  videoUrl: string;
+  isCompleted: boolean;
+  isCurrent: boolean;
+};
+
+// Add a type for enhancedChunkAI lesson if not imported
+interface EnhancedChunkLesson {
+  title: string;
+  content: string;
+  duration: string;
+}
+
+type CourseResult = {
+  title: string;
+  description: string;
+  lessons: Lesson[];
+};
 
 // Helper function to generate a title from content (fallback)
 async function generateTitleFromContent(content: string): Promise<{ title: string; description: string }> {
@@ -30,42 +54,34 @@ async function generateTitleFromContent(content: string): Promise<{ title: strin
   }
 }
 
-export default async function generateCourseAndLessons(text: string, style: "markdown" | "aiGen" | "chunk"): Promise<{
-  title: string;
-  description: string;
-  lessons: Array<{
-    title: string;
-    content: string;
-    duration: string;
-    videoUrl: string;
-    isCompleted: boolean;
-    isCurrent: boolean;
-  }>;
-}> {
+export default async function generateCourseAndLessons(
+  text: string,
+  style: "markdown" | "aiGen" | "chunk"
+): Promise<Result<CourseResult>> {
   switch (style) {
-    case "aiGen":
-      // For AI generated style, create a single comprehensive lesson
+    case "aiGen": {
       const aiGenMetadata = await generateTitleFromContent(text);
       return {
-        title: aiGenMetadata.title,
-        description: aiGenMetadata.description,
-        lessons: [{
-          title: "AI Generated Course",
-          content: text,
-          duration: "30 min",
-          videoUrl: "",
-          isCompleted: false,
-          isCurrent: false
-        }]
+        err: null,
+        res: {
+          title: aiGenMetadata.title,
+          description: aiGenMetadata.description,
+          lessons: [{
+            title: "AI Generated Course",
+            content: text,
+            duration: "30 min",
+            videoUrl: "",
+            isCompleted: false,
+            isCurrent: false
+          }]
+        }
       };
-      
-    case "markdown":
-      // For markdown style, split by headers and create lessons
-      const markdownLessons = text.split(/#{1,6}\s+/).filter(Boolean).map((section, index) => {
+    }
+    case "markdown": {
+      const markdownLessons: Lesson[] = text.split(/#{1,6}\s+/).filter(Boolean).map((section: string, index: number): Lesson => {
         const lines = section.trim().split('\n');
         const title = lines[0] || `Lesson ${index + 1}`;
         const content = lines.slice(1).join('\n').trim();
-        
         return {
           title: title.length > 50 ? title.substring(0, 50) + "..." : title,
           content: content || section,
@@ -75,64 +91,76 @@ export default async function generateCourseAndLessons(text: string, style: "mar
           isCurrent: false
         };
       });
-      
       const markdownMetadata = await generateTitleFromContent(text);
       return {
-        title: markdownMetadata.title,
-        description: markdownMetadata.description,
-        lessons: markdownLessons.length > 0 ? markdownLessons : [{
-          title: "Introduction",
-          content: text,
-          duration: "20 min",
-          videoUrl: "",
-          isCompleted: false,
-          isCurrent: false
-        }]
+        err: null,
+        res: {
+          title: markdownMetadata.title,
+          description: markdownMetadata.description,
+          lessons: markdownLessons.length > 0 ? markdownLessons : [{
+            title: "Introduction",
+            content: text,
+            duration: "20 min",
+            videoUrl: "",
+            isCompleted: false,
+            isCurrent: false
+          }]
+        }
       };
-      
-    case "chunk":
-      // Use the enhanced chunk AI system for advanced lesson generation
+    }
+    case "chunk": {
       try {
         console.log('🚀 Using Enhanced Chunk AI for course generation...');
         const result = await enhancedChunkAI.processText(text);
-        
-        // fallback to basic generation if the enhanced chunk AI fails
         if (!result.success) {
           console.warn('Enhanced Chunk AI failed, falling back to basic generation:', result.errors);
-          // Fallback to basic generation
           const fallbackMetadata = await generateTitleFromContent(text);
           return {
-            title: fallbackMetadata.title,
-            description: fallbackMetadata.description,
-            lessons: [{
-              title: "Introduction",
-              content: text,
-              duration: "25 min",
-              videoUrl: "",
-              isCompleted: false,
-              isCurrent: false
-            }]
+            err: null,
+            res: {
+              title: fallbackMetadata.title,
+              description: fallbackMetadata.description,
+              lessons: [{
+                title: "Introduction",
+                content: text,
+                duration: "25 min",
+                videoUrl: "",
+                isCompleted: false,
+                isCurrent: false
+              }]
+            }
           };
         }
-        
         console.log(`✅ Enhanced Chunk AI generated ${result.course.lessons.length} lessons`);
         return {
-          title: result.course.title,
-          description: result.course.description,
-          lessons: result.course.lessons.map((lesson, index) => ({
-            title: lesson.title,
-            content: lesson.content,
-            duration: lesson.duration,
-            videoUrl: "",
-            isCompleted: false,
-            isCurrent: index === 0 // First lesson is current
-          }))
+          err: null,
+          res: {
+            title: result.course.title,
+            description: result.course.description,
+            lessons: result.course.lessons.map((lesson: EnhancedChunkLesson, index: number): Lesson => ({
+              title: lesson.title,
+              content: lesson.content,
+              duration: lesson.duration,
+              videoUrl: "",
+              isCompleted: false,
+              isCurrent: index === 0
+            }))
+          }
         };
       } catch (error) {
         console.error('Enhanced Chunk AI error:', error);
         // Fallback to basic generation
-        const fallbackMetadata = await generateTitleFromContent(text);
         return {
+          err: error,
+          res: null
+        };
+      }
+    }
+    default: {
+      const fallbackMetadata = await generateTitleFromContent(text);
+      return {
+        err: null,
+        res: {
           title: fallbackMetadata.title,
           description: fallbackMetadata.description,
           lessons: [{
@@ -143,23 +171,8 @@ export default async function generateCourseAndLessons(text: string, style: "mar
             isCompleted: false,
             isCurrent: false
           }]
-        };
-      }
-      
-    default:
-      // Fallback for unknown styles
-      const fallbackMetadata = await generateTitleFromContent(text);
-      return {
-        title: fallbackMetadata.title,
-        description: fallbackMetadata.description,
-        lessons: [{
-          title: "Introduction",
-          content: text,
-          duration: "25 min",
-          videoUrl: "",
-          isCompleted: false,
-          isCurrent: false
-        }]
+        }
       };
+    }
   }
 }

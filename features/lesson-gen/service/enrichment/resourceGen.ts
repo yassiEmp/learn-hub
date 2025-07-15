@@ -1,5 +1,7 @@
-export async function suggestResources(content: string): Promise<string[]> {
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
+export async function suggestResources(content: string): Promise<Result<string[]>> {
   // TODO: Implement resource suggestion logic
   console.log(content)
-  return ['Stub resource'];
+  return { err: null, res: ['Stub resource'] };
 } 

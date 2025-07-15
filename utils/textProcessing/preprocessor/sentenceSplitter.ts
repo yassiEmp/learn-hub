@@ -13,7 +13,8 @@ export function splitIntoSentences(text: string): Sentence[] {
   }
 
   const sentences: Sentence[] = [];
-  const rawSentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+  // Split on periods, exclamation marks, question marks, semicolons, or colons
+  const rawSentences = text.split(/(?<=[.!?;:])\s+/).filter(Boolean);
   
   rawSentences.forEach((sentenceText, index) => {
     const cleaned = sentenceText.trim();
@@ -185,7 +186,7 @@ export function filterSentences(sentences: Sentence[]): Sentence[] {
     if (/^[\d\s\-_.,!?;:()[\]{}"'`~@#$%^&*+=|\\/<>]*$/.test(sentence.text)) return false;
     
     // Remove sentences that are too long (likely run-ons)
-    if (sentence.wordCount > 50) return false;
+    if (sentence.wordCount > 80) return false;
     
     return true;
   });

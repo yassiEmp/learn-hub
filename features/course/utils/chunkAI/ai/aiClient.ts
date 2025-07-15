@@ -15,10 +15,12 @@ const courseMetadataSchema = z.object({
   description: z.string(),
   category: z.string(),
   level: z.enum(["beginner", "intermediate", "advanced"]),
-  tags: z.array(z.string())
+  tags: z.array(z.string()),
+  lessonTitles: z.array(z.string()) // <-- Added lessonTitles
 });
 
 type CourseMetadata = z.infer<typeof courseMetadataSchema>;
+export type { CourseMetadata };
 
 // 2. Create parser
 const parser = StructuredOutputParser.fromZodSchema(courseMetadataSchema);
@@ -28,7 +30,7 @@ const parser = StructuredOutputParser.fromZodSchema(courseMetadataSchema);
 const formatInstructions = parser.getFormatInstructions().replace(/\{/g, '{{').replace(/\}/g, '}}');
 const prompt = ChatPromptTemplate.fromMessages([
   ["system", "You are a metadata-extraction assistant."],
-  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${formatInstructions}\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{{{{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"]\n}}}}\n\nNow process this input:\n{input}\n`]
+  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${formatInstructions}\n\nInclude an array of lessonTitles: suggest 1-8 engaging lesson titles that would make up the course, based on the input.\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{{{{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"],\n  \"lessonTitles\": [\n    \"Introduction to React\",\n    \"JSX and Rendering Elements\",\n    \"Components and Props\",\n    \"State and Lifecycle\",\n    \"Hooks Overview\",\n    \"Routing with React Router\"\n  ]\n}}}}\n\nNow process this input:\n{input}\n`]
 ]);
 
 // 4. Instantiate model (reuse this.llm if possible)
@@ -42,14 +44,14 @@ const chain = prompt.pipe(new ChatGoogleGenerativeAI({
 })).pipe(parser);
 
 // 6. Function to safely parse + repair + validate
-async function extractMetadata(courseText: string): Promise<CourseMetadata> {
+async function extractMetadata(courseText: string): Promise<Result<CourseMetadata>> {
   // Best practice: chain returns parsed object directly (see LangChain.js docs)
   let rawOutput: unknown = null;
   try {
     rawOutput = await chain.invoke({ input: courseText });
     console.log("[extractMetadata] Raw output from chain.invoke:", rawOutput);
     // The output parser in the chain ensures this is CourseMetadata
-    return rawOutput as CourseMetadata;
+    return { err: null, res: rawOutput as CourseMetadata };
   } catch (parseErr) {
     console.error("[extractMetadata] Error during initial parse:", parseErr);
     if (rawOutput) {
@@ -68,17 +70,19 @@ async function extractMetadata(courseText: string): Promise<CourseMetadata> {
       console.error("[extractMetadata] Raw model output before repair:", rawOutputText);
       try {
         const repaired = parseJSON(rawOutputText);
-        return courseMetadataSchema.parse(repaired);
+        return { err: null, res: courseMetadataSchema.parse(repaired) };
       } catch (repairErr) {
         console.error("[extractMetadata] Repair/validation failed:", repairErr);
         console.error("[extractMetadata] Raw output that failed repair:", rawOutputText);
-        throw new Error("Failed to repair and validate output.");
+        return { err: repairErr, res: null };
       }
-    } catch {
-      throw new Error("Failed to repair and validate output.");
+    } catch (err) {
+      return { err, res: null };
     }
   }
 }
+
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
 
 export class AIClient {
   private llm: ChatGoogleGenerativeAI;
@@ -106,14 +110,14 @@ export class AIClient {
   /**
    * Sends a prompt to the AI and returns the response
    */
-  async sendPrompt(prompt: Record<string, unknown>): Promise<unknown> {
+  async sendPrompt<T = unknown>(prompt: Record<string, unknown>): Promise<Result<T>> {
     const cacheKey = this.generateCacheKey(prompt);
     
     // Check cache first
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey)!;
       if (cached.metadata && typeof cached.metadata.timestamp === 'number' && Date.now() - cached.metadata.timestamp < 3600000) { // 1 hour cache
-        return cached;
+        return { err: null, res: cached as T };
       }
     }
 
@@ -143,7 +147,7 @@ export class AIClient {
         // Cache the response
         this.cache.set(cacheKey, aiResponse);
         
-        return aiResponse;
+        return { err: null, res: aiResponse.data as T };
 
       } catch (error) {
         lastError = error as Error;
@@ -156,16 +160,7 @@ export class AIClient {
       }
     }
 
-    return {
-      success: false,
-      error: lastError?.message || 'AI request failed after all retry attempts',
-      metadata: {
-        model: this.llm.model,
-        tokens: 0,
-        duration: Date.now() - startTime,
-        timestamp: Date.now()
-      }
-    };
+    return { err: lastError, res: null };
   }
 
   /**
@@ -215,14 +210,14 @@ export class AIClient {
   /**
    * Generates course metadata (title, description, category, level, tags) from text
    */
-  async generateCourseMetadata(content: string): Promise<CourseMetadata> {
+  async generateCourseMetadata(content: string): Promise<Result<CourseMetadata>> {
   return extractMetadata(content);
   }
 
   /**
    * Generates a lesson title from chunk content
    */
-  async generateLessonTitle(chunkContent: string, lessonNumber: number): Promise<unknown> { // Changed from AIResponse to unknown
+  async generateLessonTitle(chunkContent: string, lessonNumber: number): Promise<Result<string>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating lesson titles. Generate engaging, descriptive titles for educational content.
 
@@ -243,13 +238,13 @@ Create a clear, engaging title that captures the main topic of this lesson.`,
       temperature: 0.3
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string>(prompt);
   }
 
   /**
    * Enhances lesson content with better narrative flow
    */
-  async enhanceLessonContent(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+  async enhanceLessonContent(content: string): Promise<Result<string>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educational content writer. Your task is to enhance lesson content to improve readability and learning effectiveness.
 
@@ -271,13 +266,13 @@ Focus on improving narrative flow, adding clear explanations, and making the con
       temperature: 0.2
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string>(prompt);
   }
 
   /**
    * Generates key learning points from lesson content
    */
-  async generateKeyPoints(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+  async generateKeyPoints(content: string): Promise<Result<string[]>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator extracting key learning points from educational content.
 
@@ -299,13 +294,13 @@ Focus on the most important concepts and learning outcomes.`,
       temperature: 0.2
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string[]>(prompt);
   }
 
   /**
    * Generates a lesson summary
    */
-  async generateLessonSummary(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+  async generateLessonSummary(content: string): Promise<Result<string>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating lesson summaries. Create concise, informative summaries that capture the main points.
 
@@ -325,13 +320,13 @@ Focus on the key concepts and main takeaways that students should remember.`,
       temperature: 0.2
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string>(prompt);
   }
 
   /**
    * Generates learning objectives for a lesson
    */
-  async generateLearningObjectives(content: string): Promise<unknown> { // Changed from AIResponse to unknown
+  async generateLearningObjectives(content: string): Promise<Result<string[]>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating learning objectives. Generate clear, measurable learning objectives for educational content.
 
@@ -353,7 +348,7 @@ Focus on what students will be able to do or understand after completing this le
       temperature: 0.3
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string[]>(prompt);
   }
 
   /**
@@ -362,7 +357,7 @@ Focus on what students will be able to do or understand after completing this le
   async generateLessonTransition(
     previousLesson: string, 
     currentLesson: string
-  ): Promise<unknown> { // Changed from AIResponse to unknown
+  ): Promise<Result<string>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating smooth transitions between lessons. Generate brief, engaging transitions that connect lessons logically.
 
@@ -384,13 +379,13 @@ Generate a brief, engaging transition that connects these lessons logically.`,
       temperature: 0.4
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string>(prompt);
   }
 
   /**
    * Generates exercises or practice questions
    */
-  async generateExercises(content: string, difficulty: 'beginner' | 'intermediate' | 'advanced'): Promise<unknown> { // Changed from AIResponse to unknown
+  async generateExercises(content: string, difficulty: 'beginner' | 'intermediate' | 'advanced'): Promise<Result<string[]>> { // Changed from AIResponse to unknown
     const prompt: Record<string, unknown> = { // Changed from AIPrompt to unknown
       system: `You are an expert educator creating practice exercises. Generate relevant exercises that help students apply what they've learned.
 
@@ -412,7 +407,7 @@ Create exercises that help students apply the key concepts from this lesson.`,
       temperature: 0.4
     };
 
-    return this.sendPrompt(prompt);
+    return this.sendPrompt<string[]>(prompt);
   }
 
   /**

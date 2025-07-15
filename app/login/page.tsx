@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react'
-import { motion , Variants } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
@@ -25,7 +25,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<Message | null>(null)
-  
+
   const { signIn, signUp, signInWithProvider, user, isConfigured } = useAuth()
   const router = useRouter()
 
@@ -41,8 +41,10 @@ const LoginPage = () => {
     return (
       <div className="min-h-screen bg-black relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+              <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
         <FloatingParticle />
-        
+      </div>
+
         <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
           <motion.div
             className="max-w-md w-full bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center"
@@ -59,7 +61,7 @@ const LoginPage = () => {
             <p className="text-white/70 font-geist-mono mb-6 leading-relaxed">
               Please configure your Supabase credentials to enable authentication.
             </p>
-            <Link 
+            <Link
               href="/"
               className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
             >
@@ -73,7 +75,7 @@ const LoginPage = () => {
 
   const getErrorMessage = (error: AuthError | { message: string }): string => {
     const errorMessage = error?.message || 'An unexpected error occurred'
-    
+
     // Handle common Supabase auth errors
     switch (errorMessage) {
       case 'Invalid login credentials':
@@ -237,13 +239,13 @@ const LoginPage = () => {
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-      
-      <FloatingParticle />
-
+      <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
       {/* Large background glow */}
       <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 bg-white/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <motion.div 
+      <motion.div
         className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8"
         variants={containerVariants}
         initial="hidden"
@@ -258,26 +260,26 @@ const LoginPage = () => {
               </div>
               <span className="text-xl font-syne font-medium text-white">LearnHub</span>
             </Link>
-            
+
             <h2 className="text-3xl md:text-4xl font-syne font-medium text-white mb-2">
               {isLogin ? 'Welcome back' : 'Create account'}
             </h2>
             <p className="text-white/60 font-geist-mono">
-              {isLogin 
-                ? 'Sign in to continue your learning journey' 
+              {isLogin
+                ? 'Sign in to continue your learning journey'
                 : 'Start your learning journey today'
               }
             </p>
           </motion.div>
 
           {/* Form */}
-          <motion.div 
+          <motion.div
             className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8"
             variants={itemVariants}
           >
             {/* Social Login Buttons */}
             <motion.div variants={itemVariants}>
-              <SocialLoginButtons 
+              <SocialLoginButtons
                 onGoogleLogin={() => handleSocialLogin('google')}
                 onFacebookLogin={() => handleSocialLogin('facebook')}
                 loading={socialLoading}
@@ -375,7 +377,7 @@ const LoginPage = () => {
               </motion.div>
 
               {message && (
-                <motion.div 
+                <motion.div
                   className={`flex items-start space-x-3 text-sm font-geist-mono border rounded-xl p-3 ${getMessageStyles(message.type)}`}
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -425,8 +427,8 @@ const LoginPage = () => {
                 }}
                 className="text-white/60 hover:text-white font-geist-mono text-sm transition-colors"
               >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
+                {isLogin
+                  ? "Don't have an account? Sign up"
                   : "Already have an account? Sign in"
                 }
               </button>
@@ -444,7 +446,7 @@ const LoginPage = () => {
 
           {/* Back to home */}
           <motion.div className="text-center" variants={itemVariants}>
-            <Link 
+            <Link
               href="/"
               className="text-white/50 hover:text-white/70 font-geist-mono text-sm transition-colors"
             >

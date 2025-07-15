@@ -3,6 +3,7 @@ export type LessonWorkflow = 'cheap' | 'premium' | 'hybrid';
 export interface LessonInput {
   content: string;
   workflow: LessonWorkflow;
+  lessonTitles: string[];
   metadata?: {
     subject?: string;
     language?: string;
@@ -21,8 +22,10 @@ export interface Lesson {
   resources?: string[];
 }
 
-export async function generateLessons(input: LessonInput): Promise<Lesson[]> {
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
+export async function generateLessons(input: LessonInput): Promise<Result<Lesson[]>> {
   // Implementation will be provided in service/index.ts
   console.log(input)
-  throw new Error('Not implemented');
+  return { err: new Error('Not implemented'), res: null };
 } 

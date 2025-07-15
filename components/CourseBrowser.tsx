@@ -70,7 +70,9 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
       
-      <FloatingParticle />
+            <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
 
       <motion.div 
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12"

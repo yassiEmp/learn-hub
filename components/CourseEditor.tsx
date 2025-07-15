@@ -58,7 +58,9 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
       
      
-      <FloatingParticle />
+            <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
 
       <div className={cn("relative z-10 flex h-screen", className)}>
         {/* Header */}

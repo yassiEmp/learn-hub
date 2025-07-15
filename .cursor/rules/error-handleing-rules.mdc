@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+// Error Handling Rules for Learn Hub
+
+// 1. All async functions (especially those interacting with external services or LLMs) must NEVER throw errors.
+//    - Instead, they must always return an object of the form: { err, res }.
+//    - Example TypeScript type:
+//        export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
+// 2. If the operation is successful, set err to null and res to the result.
+//    - If the operation fails, set err to the error (Error object or string) and res to null.
+
+// 3. Consumers of these functions MUST always check the err field before using res.
+//    - Example:
+//        const { err, res } = await doSomething();
+//        if (err) { /* handle error */ } else { /* use res */ }
+
+// 4. This pattern must be used for all async flows, including API calls, LLM invocations, and database operations.
+
+// 5. Avoid unhandled promise rejections by never allowing errors to escape async functions.
+
+// 6. This convention makes error handling explicit, consistent, and easy to reason about across the codebase.

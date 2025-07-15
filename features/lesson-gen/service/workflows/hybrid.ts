@@ -2,7 +2,11 @@ import { LessonInput, Lesson } from '../types';
 import { preprocessText } from '@/utils/textProcessing/preprocessor/textCleaner';
 import { splitIntoSentences, filterSentences } from '@/utils/textProcessing/preprocessor/sentenceSplitter';
 import { chunkText } from '@/utils/textProcessing/chunking/semanticChunker';
-import { aiClient } from '@/utils/ai/aiClient';
+import {
+  generateLessonSummary,
+  generateLearningObjectives,
+  generateExercises
+} from '@/features/lesson-gen/ai/lessonAI';
 
 export async function generateLessonsHybrid(input: LessonInput): Promise<Lesson[]> {
   // 1. Preprocess and clean the text
@@ -25,37 +29,28 @@ export async function generateLessonsHybrid(input: LessonInput): Promise<Lesson[
     const chunkContent = chunk.sentences.map(s => s.text).join(' ');
 
     // Title is local
-    let title = chunk.topic ? `Lesson ${i + 1}: ${chunk.topic}` : `Lesson ${i + 1}`;
+    const title = chunk.topic ? `Lesson ${i + 1}: ${chunk.topic}` : `Lesson ${i + 1}`;
 
     // Content is local
-    let content = chunkContent;
+    const content = chunkContent;
 
     // LLM summary
     let summary = chunk.summary;
-    const summaryResponse = await aiClient.generateLessonSummary(content);
-    if (summaryResponse && (summaryResponse as any).success && (summaryResponse as any).data) {
-      summary = (summaryResponse as any).data as string;
-    }
+    try {
+      summary = await generateLessonSummary(content);
+    } catch {}
 
     // LLM objectives
     let objectives: string[] = [`Understand ${chunk.topic}`];
-    const objectivesResponse = await aiClient.generateLearningObjectives(content);
-    if (objectivesResponse && (objectivesResponse as any).success && (objectivesResponse as any).data) {
-      try {
-        const parsed = JSON.parse((objectivesResponse as any).data as string);
-        if (Array.isArray(parsed)) objectives = parsed;
-      } catch {}
-    }
+    try {
+      objectives = await generateLearningObjectives(content);
+    } catch {}
 
     // LLM exercises
     let exercises: string[] = [];
-    const exercisesResponse = await aiClient.generateExercises(content, chunk.complexity);
-    if (exercisesResponse && (exercisesResponse as any).success && (exercisesResponse as any).data) {
-      try {
-        const parsed = JSON.parse((exercisesResponse as any).data as string);
-        if (Array.isArray(parsed)) exercises = parsed;
-      } catch {}
-    }
+    try {
+      exercises = await generateExercises(content, chunk.complexity);
+    } catch {}
 
     lessons.push({
       title,
@@ -68,4 +63,4 @@ export async function generateLessonsHybrid(input: LessonInput): Promise<Lesson[
   }
 
   return lessons;
-} 
+}

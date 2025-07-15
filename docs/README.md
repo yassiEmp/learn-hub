@@ -77,3 +77,30 @@ components/
 - **Testable:** Each feature can be tested in isolation.
 
 For more details, see `.eslintrc.js` and the `/components/ui/` folder. 
+
+### 🔹 Error Handling Convention
+
+All async functions in this codebase (especially those that interact with external services or LLMs) **never throw errors**. Instead, they always return an object of the form `{ err, res }`:
+
+```ts
+// Example: Error-as-value pattern
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
+export async function doSomething(): Promise<Result<SomeType>> {
+  try {
+    // ... logic ...
+    return { err: null, res: result };
+  } catch (err) {
+    return { err, res: null };
+  }
+}
+```
+
+- If successful, `err` is `null` and `res` is set.
+- If failed, `err` contains the error (usually an Error or string), and `res` is `null`.
+- Consumers must always check the `err` field before using `res`.
+
+**Why?**
+- This makes error handling explicit and consistent across the codebase.
+- It avoids unhandled promise rejections and makes async flows easier to reason about.
+- It is especially useful for API and LLM logic, where errors are common and should be handled gracefully. 
