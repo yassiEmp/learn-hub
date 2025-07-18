@@ -4,6 +4,7 @@ export interface LessonInput {
   content: string;
   workflow: LessonWorkflow;
   lessonTitles: string[];
+  language: string,
   metadata?: {
     subject?: string;
     language?: string;

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
             return errorResponse(String(err), 500);
         }
         
-        const { title, description, category, level, tags , lessonTitles } = res;
+        const { title, description, category, level, tags , lessonTitles, durationMinutes, language } = res;
 
         // 5. Create course in database using generated or provided metadata
         const courseData = {
@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
             level: level || 'Beginner',
             price: 0,
             tags: tags || [],
+            duration_minutes: durationMinutes,
+            language: language || 'en',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
 
         // 4. Call the lesson generation API to generate lessons from the course text
         //    (We do not block on this; fire-and-forget, or you can await if you want to use the result)
-        const result1 = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/v1/lessons`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/v1/lessons`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,6 +87,8 @@ export async function POST(req: NextRequest) {
                 content: text,
                 workflow: "premium", // or use a value from the request if available
                 lessonTitles,
+                courseId: course.id,
+                language,
                 metadata: {
                     title,
                     description,
@@ -94,8 +98,6 @@ export async function POST(req: NextRequest) {
                 }
             })
         });
-
-        console.log(await result1.json())
 
         // 6. Return success response
         return successResponse<CourseResponse>(

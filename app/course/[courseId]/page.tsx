@@ -1,14 +1,21 @@
 "use client"
 import React from 'react';
-import { CourseDetail } from '../../../components/CourseDetail';
-import { courses } from '../../../data/courses';
+import { useParams } from 'next/navigation';
+import { CourseDetail } from '@/features/course/components/CourseDetail';
+import { useCourse } from '@/features/course/hooks/useCourse';
+import Loading from './loading';
 
 const Page = () => {
-  return (
-    <CourseDetail 
-        course={courses[1]}
-    />
-  )
-}
+  const params = useParams();
+  const courseIdRaw = params.courseId;
+  const courseId = String(courseIdRaw) ;
+  const { course, loading, error } = useCourse(courseId);
 
-export default Page
+  if (!courseId) return <div className="text-red-500 p-8">Invalid course ID.</div>;
+  if (loading || 1 ) return <Loading />;
+  if (error || !course) return <div className="text-red-500 p-8">{error || 'Course not found.'}</div>;
+
+  return <CourseDetail course={course} />;
+};
+
+export default Page;

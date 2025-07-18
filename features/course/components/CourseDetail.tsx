@@ -1,6 +1,7 @@
+"use client"
 import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
-import { Course } from '../types/course';
+import { Course } from '../../../types/course';
 import { motion , Variants } from 'framer-motion';
 
 interface CourseDetailProps {
@@ -42,6 +43,16 @@ const getCategoryColor = (category: string) => {
       return 'from-indigo-400/20 to-blue-400/20';
   }
 };
+
+// Helper to format duration from minutes to a human-readable string
+function formatDuration(minutes?: number, fallback?: string): string {
+  if (typeof minutes !== 'number' || isNaN(minutes)) {
+    return fallback || '';
+  }
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60 * 24) return `${(minutes / 60).toFixed(1).replace(/\.0$/, '')} hour${minutes >= 120 ? 's' : ''}`;
+  return `${(minutes / 60 / 24).toFixed(1).replace(/\.0$/, '')} day${minutes >= 60 * 48 ? 's' : ''}`;
+}
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
   const [activeTab, setActiveTab] = useState('lesson');
@@ -163,7 +174,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Clock className="w-5 h-5" />
-                  <span>{course.duration}</span>
+                  <span>{formatDuration(course.durationMinutes, course.duration)}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Users className="w-5 h-5" />
@@ -236,7 +247,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                         ))}
                       </div>
                     </div>
-                    
+{/*                    rethink about this later the requirement later  
                     <div>
                       <h2 className="text-2xl font-syne font-medium text-white mb-4">Course Requirements</h2>
                       <ul className="space-y-3 text-white/70 font-geist-mono">
@@ -253,7 +264,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                           <span>Willingness to learn and practice</span>
                         </li>
                       </ul>
-                    </div>
+                    </div> */}
                     
                     <div>
                       <h2 className="text-2xl font-syne font-medium text-white mb-4">Description</h2>

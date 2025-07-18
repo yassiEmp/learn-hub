@@ -6,6 +6,7 @@ export interface Course {
   instructorAvatar: string;
   thumbnail: string;
   duration: string;
+  durationMinutes?: number;
   lessonsCount: number;
   studentsCount: number;
   rating: number;

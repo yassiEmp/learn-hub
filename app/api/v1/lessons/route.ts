@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return errorResponse('The request body must be a valid JSON');
   }
   const body = result.res;
-  const { content , lessonTitles , courseId, documentId } = body;
+  const { content , lessonTitles , courseId, documentId , language } = body;
   if (!content || !lessonTitles) {
     return errorResponse('Missing required fields: content and lessonTitles are missing');
   }
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   // 4. Generate and insert lessons one by one
   const workflow = "premium";
   const lessons: Lesson[] = [];
-  for await (const { err, res: lesson } of generateLessons({ content, workflow , lessonTitles })) {
+  for await (const { err, res: lesson } of generateLessons({ content, workflow , lessonTitles , language })) {
     if (err || !lesson) continue;
     const { title, content: lessonContent, summary, objectives, resources } = lesson;
     const { error: dbError, data } = await supabase

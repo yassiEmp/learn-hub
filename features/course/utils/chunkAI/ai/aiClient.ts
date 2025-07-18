@@ -16,7 +16,9 @@ const courseMetadataSchema = z.object({
   category: z.string(),
   level: z.enum(["beginner", "intermediate", "advanced"]),
   tags: z.array(z.string()),
-  lessonTitles: z.array(z.string()) // <-- Added lessonTitles
+  lessonTitles: z.array(z.string()),
+  durationMinutes: z.number().int().positive(), // duration in minutes
+  language: z.string().min(2).max(10) // BCP-47 language code, e.g., 'en', 'fr'
 });
 
 type CourseMetadata = z.infer<typeof courseMetadataSchema>;
@@ -28,9 +30,17 @@ const parser = StructuredOutputParser.fromZodSchema(courseMetadataSchema);
 // 3. Create prompt
 // NOTE: All literal curly braces must be escaped as '{{' and '}}' for LangChain templates
 const formatInstructions = parser.getFormatInstructions().replace(/\{/g, '{{').replace(/\}/g, '}}');
+const tagInstructions = `
+- The "tags" array must include 3-7 concise, specific concepts or technologies taught in the course.
+- Tags will be used in the phrase: "Master <tag> fundamentals and advanced concepts"
+- Therefore, each tag must be:
+    * A single technology, framework, library, or major concept (e.g., "React", "JSX", "Routing")
+    * No generic terms like "Frontend", "Beginner-friendly", or "Web Development"
+    * No plurals unless it's a common name (e.g., "Hooks")
+- Do NOT include the word "fundamentals" or "advanced" in tags.`;
 const prompt = ChatPromptTemplate.fromMessages([
   ["system", "You are a metadata-extraction assistant."],
-  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${formatInstructions}\n\nInclude an array of lessonTitles: suggest 1-8 engaging lesson titles that would make up the course, based on the input.\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{{{{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"Frontend\", \"JSX\", \"Hooks\", \"Routing\"],\n  \"lessonTitles\": [\n    \"Introduction to React\",\n    \"JSX and Rendering Elements\",\n    \"Components and Props\",\n    \"State and Lifecycle\",\n    \"Hooks Overview\",\n    \"Routing with React Router\"\n  ]\n}}}}\n\nNow process this input:\n{input}\n`]
+  ["human", `\nExtract structured metadata from the following course description. \nReturn **only** a valid JSON object with these fields (no explanations, no markdown):\n\n${formatInstructions}\n\n${tagInstructions}\n\nInclude an array of lessonTitles: suggest engaging lesson titles that would make up the course, based on the input.\n\nAlso, estimate and include a 'durationMinutes' field (a positive integer, e.g., 180 for 3 hours) in the output JSON, representing the total time in minutes a student would need to complete the course.\nThe 'language' field must be a BCP-47 language code (e.g., 'en' for English, 'fr' for French, 'es' for Spanish). Detect or infer the language of the course content.\n\nExample:\nInput:\n\"Master React from scratch. This course covers JSX, components, hooks, and React Router. Perfect for beginners.\"\nOutput:\n{{{{\n  \"title\": \"React for Beginners\",\n  \"description\": \"Learn React from the ground up including JSX, components, hooks, and routing.\",\n  \"category\": \"Web Development\",\n  \"level\": \"beginner\",\n  \"tags\": [\"React\", \"JSX\", \"Hooks\", \"Routing\", \"Components\"],\n  \"lessonTitles\": [\n    \"Introduction to React\",\n    \"JSX and Rendering Elements\",\n    \"Components and Props\",\n    \"State and Lifecycle\",\n    \"Hooks Overview\",\n    \"Routing with React Router\"\n  ],\n  \"durationMinutes\": 180,\n  \"language\": \"en\"\n}}}}\n\nNow process this input:\n{input}\n`]
 ]);
 
 // 4. Instantiate model (reuse this.llm if possible)

@@ -1,23 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
 
-// Create admin client for server-side operations
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 // Create client with user token for authenticated requests
 export const createServerClient = (token: string) => {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      global: {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false }
     }
   )
 }

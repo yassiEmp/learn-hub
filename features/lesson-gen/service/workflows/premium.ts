@@ -16,15 +16,16 @@ const LessonSchema = z.object({
 
 // AI Model
 const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-pro",
+  model: "gemini-2.0-flash",
   apiKey: process.env.GOOGLE_API_KEY!,
-  temperature: 0.4
+  temperature: 0.4,
+  maxOutputTokens: 100000
 });
 
 // Bind the schema to the model for structured output
 const llmWithStructure = llm.withStructuredOutput(LessonSchema);
 
-
+const CONCURRENCY_LIMIT = 2; // or 3, etc.
 
 export async function* generateLessonsPremium(
   input: LessonInput
@@ -35,24 +36,30 @@ export async function* generateLessonsPremium(
     return;
   }
 
-  const tasks = lessonTitles.map(async (title) => {
-    try {
-      // Prompt template for single lesson generation
-      const prompt = ChatPromptTemplate.fromMessages([
-        ["system", "You are an expert educator. Generate a lesson based on the given content and title.\nReturn JSON with:\n- title: string\n- content: string\n- summary: string (optional)\n- objectives: string[] (optional)\n- resources: string[] (optional)"],
-        ["human", "Content: {content}\n\nTitle: {title}"]
-      ]);
-      // Format the prompt for this lesson
-      const promptValue = await prompt.invoke({ content, title });
-      // Call the model with structured output
-      const lesson = await llmWithStructure.invoke(promptValue);
-      return { err: null, res: lesson };
-    } catch (error) {
-      return { err: error, res: null };
+  for (let i = 0; i < lessonTitles.length; i += CONCURRENCY_LIMIT) {
+    const batch = lessonTitles.slice(i, i + CONCURRENCY_LIMIT);
+    const results = await Promise.all(batch.map(async (title) => {
+      try {
+        const language = input.language || 'en';
+        const prompt = ChatPromptTemplate.fromMessages([
+          ["system", `You are an expert educator. Generate a lesson based on the given Text and title. All output must be in the following language: ${language}.
+Return JSON with:
+- title: string // the given title 
+- content: string // a consise and explicative content for the lesson that help to learn and master the Text understand the nuances the way to think about it  
+- summary: string (optional) // a sumary of the lesson
+- objectives: string[] (optional) // the objectives of the lesson 
+- resources: string[] (optional)`],
+          ["human", "Title: {title} \n\n Content: {content}"]
+        ]);
+        const promptValue = await prompt.invoke({ content, title });
+        const lesson = await llmWithStructure.invoke(promptValue);
+        return { err: null, res: lesson };
+      } catch (error) {
+        return { err: error as Error, res: null };
+      }
+    }));
+    for (const result of results) {
+      yield result;
     }
-  });
-  const results = await Promise.all(tasks);
-  for (const result of results) {
-    yield result;
   }
 }
