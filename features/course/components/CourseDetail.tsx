@@ -4,6 +4,7 @@ import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code,
 import { Course } from '../../../types/course';
 import { motion , Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface CourseDetailProps {
   course: Course;
@@ -56,6 +57,7 @@ function formatDuration(minutes?: number, fallback?: string): string {
 }
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('lesson');
   // const [courseContent, setCourseContent] = useState(course.content || '');
   const CategoryIcon = getCategoryIcon(course.category);
@@ -436,6 +438,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                       className="w-full bg-white text-black py-4 px-6 rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      onClick={() => router.push(`/course/${course.id}`)}
                     >
                       Enroll Now
                     </motion.button>

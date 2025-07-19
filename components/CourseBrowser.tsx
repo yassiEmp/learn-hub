@@ -1,63 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Search, Filter, Grid, List } from 'lucide-react';
 import { CourseCard } from './CourseCard';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
 import FloatingParticle from './FloatingParticle';
-import { courseApi } from '../utils/api-client';
 import { useRouter } from 'next/navigation';
+import { useCourses } from '../features/course/hooks/useCourses';
 
-interface CourseBrowserProps {
-  // onCourseSelect: (course: Course) => void; // Not needed, we navigate
-}
-
-export const CourseBrowser: React.FC<CourseBrowserProps> = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [categories, setCategories] = useState<string[]>(['All']);
+export const CourseBrowser: React.FC = () => {
+  const { courses, categories, loading, error } = useCourses();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    setLoading(true);
-    courseApi.getAll()
-      .then((data) => {
-        setCourses(data.map((c) => ({
-          ...c,
-          instructor: c.instructor ?? 'Unknown',
-          instructorAvatar: c.instructorAvatar ?? '',
-          thumbnail: c.thumbnail ?? '',
-          duration: c.duration ?? '',
-          durationMinutes: c.duration_minutes ?? null,
-          lessonsCount: c.lessons ? c.lessons.length : 0,
-          studentsCount: c.studentsCount ?? 1,
-          rating: c.rating ?? 5,
-          price: c.price ?? 0,
-          originalPrice: c.originalPrice ?? 0,
-          category: c.category ?? 'General',
-          level: (c.level?.charAt(0).toUpperCase() + c.level?.slice(1)) as Course['level'] || 'Beginner',
-          tags: c.tags ?? [],
-          content: c.content ?? '',
-          lessons: c.lessons ?? [],
-          isEnrolled: c.isEnrolled ?? false,
-          progress: c.progress ?? 0,
-          owner_id: c.owner_id,
-          created_at: c.created_at,
-          updated_at: c.updated_at,
-        })));
-        const cats = Array.from(new Set(data.map(c => c.category || 'Uncategorized')));
-        setCategories(['All', ...cats]);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err?.toString() || 'Failed to load courses');
-        setLoading(false);
-      });
-  }, []);
 
   const filteredCourses = courses
     .filter(course => {

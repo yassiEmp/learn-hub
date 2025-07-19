@@ -266,20 +266,15 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
           {course.description}
         </p>
         
-        <motion.div 
-          className="flex items-center mb-4"
-          whileHover={{ 
-            x: 2,
-            transition: { duration: 0.2, ease: "easeOut" }
-          }}
-        >
+        <div className="flex items-center gap-2 mt-2">
           <img
             src={course.instructorAvatar}
             alt={course.instructor}
-            className="w-6 h-6 rounded-full mr-2 border border-white/20"
+            className="w-8 h-8 rounded-full object-cover border border-white/20"
+            onError={e => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(course.instructor || 'Unknown')}&background=random`; }}
           />
-          <span className="text-white/70 text-sm font-geist-mono">{course.instructor}</span>
-        </motion.div>
+          <span className="text-xs text-white/70">{course.instructor}</span>
+        </div>
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3 text-xs text-white/50 font-geist-mono">
