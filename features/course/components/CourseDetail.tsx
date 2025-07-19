@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
 import { Course } from '../../../types/course';
 import { motion , Variants } from 'framer-motion';
+import Link from 'next/link';
 
 interface CourseDetailProps {
   course: Course;
@@ -130,6 +131,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
         animate="visible"
       >
         {/* Back Button */}
+        <Link href="/courses">
         <motion.button
           className="flex items-center text-white/60 hover:text-white mb-8 group transition-all duration-300"
           variants={itemVariants}
@@ -139,6 +141,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
           <ArrowLeft className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
           <span className="font-geist-mono text-sm">Back to courses</span>
         </motion.button>
+        </Link>
         
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
