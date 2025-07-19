@@ -24,7 +24,7 @@ export async function createCourse({
   if(err||!res){
     return {err: "error while generating course metadata at ./createCourse.ts" , res: null }
   }
-  const { title, description, category, level, tags, duration } = res;
+  const { title, description, category, level, tags, durationMinutes } = res;
 
   // 2. Insert course into the database
   const { data: course, error } = await supabase
@@ -39,7 +39,7 @@ export async function createCourse({
         level,
         price: price ?? 0,
         tags,
-        duration: duration ?? '',
+        duration: durationMinutes ?? '',
         rating: 5,
         studentsCount: 1,
         originalPrice: 0,

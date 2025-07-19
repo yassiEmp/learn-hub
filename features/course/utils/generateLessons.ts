@@ -112,8 +112,8 @@ export default async function generateCourseAndLessons(
       try {
         console.log('🚀 Using Enhanced Chunk AI for course generation...');
         const result = await enhancedChunkAI.processText(text);
-        if (!result.success) {
-          console.warn('Enhanced Chunk AI failed, falling back to basic generation:', result.errors);
+        if (result.err || !result.res) {
+          console.warn('Enhanced Chunk AI failed, falling back to basic generation:', result.err);
           const fallbackMetadata = await generateTitleFromContent(text);
           return {
             err: null,
@@ -131,13 +131,13 @@ export default async function generateCourseAndLessons(
             }
           };
         }
-        console.log(`✅ Enhanced Chunk AI generated ${result.course.lessons.length} lessons`);
+        console.log(`✅ Enhanced Chunk AI generated ${result.res.course.lessons.length} lessons`);
         return {
           err: null,
           res: {
-            title: result.course.title,
-            description: result.course.description,
-            lessons: result.course.lessons.map((lesson: EnhancedChunkLesson, index: number): Lesson => ({
+            title: result.res.course.title,
+            description: result.res.course.description,
+            lessons: result.res.course.lessons.map((lesson: EnhancedChunkLesson, index: number): Lesson => ({
               title: lesson.title,
               content: lesson.content,
               duration: lesson.duration,

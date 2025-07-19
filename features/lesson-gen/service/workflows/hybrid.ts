@@ -36,21 +36,18 @@ export async function generateLessonsHybrid(input: LessonInput): Promise<Lesson[
 
     // LLM summary
     let summary = chunk.summary;
-    try {
-      summary = await generateLessonSummary(content);
-    } catch {}
+    const summaryResult = await generateLessonSummary(content);
+    summary = summaryResult.res ?? summary;
 
     // LLM objectives
     let objectives: string[] = [`Understand ${chunk.topic}`];
-    try {
-      objectives = await generateLearningObjectives(content);
-    } catch {}
+    const objectivesResult = await generateLearningObjectives(content);
+    objectives = objectivesResult.res ?? objectives;
 
     // LLM exercises
     let exercises: string[] = [];
-    try {
-      exercises = await generateExercises(content, chunk.complexity);
-    } catch {}
+    const exercisesResult = await generateExercises(content, chunk.complexity);
+    exercises = exercisesResult.res ?? exercises;
 
     lessons.push({
       title,
