@@ -1,43 +1,46 @@
 import React, { useState } from 'react';
 import { Search, Filter, Grid, List } from 'lucide-react';
-import { courses, categories } from '../data/courses';
 import { CourseCard } from './CourseCard';
 import { Course } from '../types/course';
 import { motion , Variants } from 'framer-motion';
 import FloatingParticle from './FloatingParticle';
+import { useRouter } from 'next/navigation';
+import { useCourses } from '../features/course/hooks/useCourses';
 
-interface CourseBrowserProps {
-  onCourseSelect: (course: Course) => void;
-}
-
-export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) => {
+export const CourseBrowser: React.FC = () => {
+  const { courses, categories, loading, error } = useCourses();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const router = useRouter();
 
   const filteredCourses = courses
     .filter(course => {
       const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
       const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           course.instructor.toLowerCase().includes(searchTerm.toLowerCase());
+                           course.instructor?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
       switch (sortBy) {
         case 'popular':
-          return b.studentsCount - a.studentsCount;
+          return (b.studentsCount || 0) - (a.studentsCount || 0);
         case 'rating':
-          return b.rating - a.rating;
+          return (b.rating || 0) - (a.rating || 0);
         case 'price-low':
-          return a.price - b.price;
+          return (a.price || 0) - (b.price || 0);
         case 'price-high':
-          return b.price - a.price;
+          return (b.price || 0) - (a.price || 0);
         default:
           return 0;
       }
     });
+
+  const handleCourseSelect = (course: Course) => {
+    router.push(`/course/${course.id}/detail`);
+  };
 
   const containerVariants : Variants= {
     hidden: { opacity: 0 },
@@ -65,13 +68,16 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
     }
   };
 
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading courses...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
+
   return (
     <div className="min-h-screen bg-black relative">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-      
-      <FloatingParticle />
-
+      <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
       <motion.div 
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12"
         variants={containerVariants}
@@ -90,7 +96,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
             Explore our curated collection of premium courses designed to accelerate your learning journey.
           </p>
         </motion.div>
-
         {/* Search and Filters */}
         <motion.div 
           className="mb-12"
@@ -112,7 +117,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
                   whileFocus={{ scale: 1.01 }}
                 />
               </div>
-
               {/* Sort and View Mode */}
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
@@ -128,7 +132,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
                     <option value="price-high">Price: High to Low</option>
                   </select>
                 </div>
-                
                 <div className="flex items-center space-x-1 bg-white/5 rounded-xl p-1">
                   <button
                     onClick={() => setViewMode('grid')}
@@ -149,7 +152,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
                 </div>
               </div>
             </div>
-
             {/* Category Filter */}
             <motion.div 
               className="mt-6 flex flex-wrap gap-2"
@@ -190,7 +192,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
             </motion.div>
           </div>
         </motion.div>
-
         {/* Results */}
         <motion.div className="mb-8" variants={itemVariants}>
           <p className="text-white/50 font-geist-mono text-sm">
@@ -199,7 +200,6 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
             {searchTerm && ` for "${searchTerm}"`}
           </p>
         </motion.div>
-
         {/* Course Grid */}
         {filteredCourses.length > 0 ? (
           <motion.div 
@@ -230,10 +230,12 @@ export const CourseBrowser: React.FC<CourseBrowserProps> = ({ onCourseSelect }) 
                     transition: { duration: 0.5 }
                   }
                 }}
+                onClick={() => handleCourseSelect(course)}
+                className="cursor-pointer"
               >
                 <CourseCard
                   course={course}
-                  onCourseSelect={onCourseSelect}
+                  onCourseSelect={handleCourseSelect}
                   viewMode={viewMode}
                 />
               </motion.div>

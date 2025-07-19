@@ -70,12 +70,14 @@ const generateCourseMetadata = tool(
   }
 );
 
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
 // === 6. Main function ===
-export default async function chunkReferenceAgent(text: string): Promise<{
+export default async function chunkReferenceAgent(text: string): Promise<Result<{
   title: string;
   description: string;
   lessons: Array<{ title: string; content: string }>;
-}> {
+}>> {
   // Reset state
   TEXT_CHUNKS = [];
   GENERATED_LESSONS = [];
@@ -148,21 +150,20 @@ ${refList}`),
     console.log("📝 Final Course Description:", finalDescription);
     
     return {
-      title: finalTitle,
-      description: finalDescription,
-      lessons: GENERATED_LESSONS
+      err: null,
+      res: {
+        title: finalTitle,
+        description: finalDescription,
+        lessons: GENERATED_LESSONS
+      }
     };
   } catch (error) {
     console.error("Error in chunkReferenceAgent:", error);
     
     // Fallback: create a simple course from the text
     return {
-      title: "Introduction Course",
-      description: "A comprehensive introduction to the topic.",
-      lessons: [{
-        title: "Introduction",
-        content: text.slice(0, 1000) + (text.length > 1000 ? "..." : "")
-      }]
+      err: error,
+      res: null
     };
   }
 }

@@ -1,7 +1,10 @@
+"use client"
 import React, { useState } from 'react';
 import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code, Palette, Database, Smartphone, Settings, Award, Globe } from 'lucide-react';
-import { Course } from '../types/course';
+import { Course } from '../../../types/course';
 import { motion , Variants } from 'framer-motion';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface CourseDetailProps {
   course: Course;
@@ -43,7 +46,18 @@ const getCategoryColor = (category: string) => {
   }
 };
 
+// Helper to format duration from minutes to a human-readable string
+function formatDuration(minutes?: number, fallback?: string): string {
+  if (typeof minutes !== 'number' || isNaN(minutes)) {
+    return fallback || '';
+  }
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60 * 24) return `${(minutes / 60).toFixed(1).replace(/\.0$/, '')} hour${minutes >= 120 ? 's' : ''}`;
+  return `${(minutes / 60 / 24).toFixed(1).replace(/\.0$/, '')} day${minutes >= 60 * 48 ? 's' : ''}`;
+}
+
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('lesson');
   // const [courseContent, setCourseContent] = useState(course.content || '');
   const CategoryIcon = getCategoryIcon(course.category);
@@ -119,6 +133,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
         animate="visible"
       >
         {/* Back Button */}
+        <Link href="/courses">
         <motion.button
           className="flex items-center text-white/60 hover:text-white mb-8 group transition-all duration-300"
           variants={itemVariants}
@@ -128,6 +143,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
           <ArrowLeft className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
           <span className="font-geist-mono text-sm">Back to courses</span>
         </motion.button>
+        </Link>
         
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
@@ -163,7 +179,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Clock className="w-5 h-5" />
-                  <span>{course.duration}</span>
+                  <span>{formatDuration(course.durationMinutes, course.duration)}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Users className="w-5 h-5" />
@@ -236,7 +252,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                         ))}
                       </div>
                     </div>
-                    
+{/*                    rethink about this later the requirement later  
                     <div>
                       <h2 className="text-2xl font-syne font-medium text-white mb-4">Course Requirements</h2>
                       <ul className="space-y-3 text-white/70 font-geist-mono">
@@ -253,7 +269,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                           <span>Willingness to learn and practice</span>
                         </li>
                       </ul>
-                    </div>
+                    </div> */}
                     
                     <div>
                       <h2 className="text-2xl font-syne font-medium text-white mb-4">Description</h2>
@@ -422,6 +438,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                       className="w-full bg-white text-black py-4 px-6 rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
+                      onClick={() => router.push(`/course/${course.id}`)}
                     >
                       Enroll Now
                     </motion.button>

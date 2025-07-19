@@ -76,11 +76,11 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
   const { isAuthenticated, isConfigured } = useAuth()
   
   const navItems = [
-    { id: 'import', label: 'Create', path: '/import' },
+    { id: 'import', label: 'Create', path: '/create' },
     ...(isAuthenticated && isConfigured ? [
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
       { id: 'courses', label: 'Courses', path: '/courses' },
-      { id: 'exams', label: 'Learning', path: '/exams' },
+      { id: 'exams', label: 'exams', path: '/exams' },
       { id: 'account', label: 'Account', path: '/account' },
     ] : [
       { id: 'courses', label: 'Explore', path: '/courses' },

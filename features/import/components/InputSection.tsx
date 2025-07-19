@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Button } from '../../../components/ui/Button';
-import { Textarea } from '../../../components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/Textarea';
 import { ArrowRight, BookOpen, Plus, Video, Image } from 'lucide-react';
 import { motion , Variants } from 'framer-motion';
-import { cn } from '../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 const placeholderPhrases = [
     "Learning Python programming from scratch",
@@ -18,6 +19,7 @@ const InputSection: React.FC = () => {
     const [inputValue, setInputValue] = useState("");
     const [placeholderText, setPlaceholderText] = useState("");
     const { session } = useAuth();
+    const router = useRouter();
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         const response = await fetch("http://localhost:3000/api/v1/course",{
@@ -41,8 +43,13 @@ const InputSection: React.FC = () => {
         const data = await response.json()
         console.log(data)
 
+        // Redirect to course page if id is present
+        if (data?.data?.id) {
+            router.push(`/course/${data.data.id}/detail`);
+        }
+
         console.log('Course creation submitted:', inputValue);
-    }, [inputValue, session]);
+    }, [inputValue, session, router]);
 
     // Optimized typing effect
     useEffect(() => {

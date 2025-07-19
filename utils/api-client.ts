@@ -18,11 +18,13 @@ const getAuthHeaders = async () => {
   };
 };
 
+export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
+
 // Generic API request helper
 const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<T> => {
+): Promise<Result<T>> => {
   try {
     const headers = await getAuthHeaders();
     
@@ -37,13 +39,13 @@ const apiRequest = async <T>(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      return { err: data.error || `HTTP error! status: ${response.status}`, res: null };
     }
 
-    return data;
+    return { err: null, res: data };
   } catch (error) {
     console.error(`API request failed for ${endpoint}:`, error);
-    throw error;
+    return { err: error, res: null };
   }
 };
 
@@ -54,21 +56,36 @@ export const courseApi = {
     return apiRequest<{ success: true; data: CourseResponse; message: string }>('/course', {
       method: 'POST',
       body: JSON.stringify(courseData),
-    }).then(response => response.data);
+    }).then(response => {
+      if (response.err || !response.res) {
+        throw response.err || new Error('No response data');
+      }
+      return response.res.data;
+    });
   },
 
   // Get all courses for the authenticated user
   getAll: async (): Promise<CourseResponse[]> => {
     return apiRequest<{ success: true; data: CourseResponse[]; message: string }>('/course', {
       method: 'GET',
-    }).then(response => response.data);
+    }).then(response => {
+      if (response.err || !response.res) {
+        throw response.err || new Error('No response data');
+      }
+      return response.res.data;
+    });
   },
 
   // Get a specific course by ID
   getById: async (courseId: string): Promise<CourseResponse> => {
     return apiRequest<{ success: true; data: CourseResponse; message: string }>(`/course/${courseId}`, {
       method: 'GET',
-    }).then(response => response.data);
+    }).then(response => {
+      if (response.err || !response.res) {
+        throw response.err || new Error('No response data');
+      }
+      return response.res.data;
+    });
   },
 
   // Update a course
@@ -76,14 +93,24 @@ export const courseApi = {
     return apiRequest<{ success: true; data: CourseResponse; message: string }>(`/course/${courseId}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
-    }).then(response => response.data);
+    }).then(response => {
+      if (response.err || !response.res) {
+        throw response.err || new Error('No response data');
+      }
+      return response.res.data;
+    });
   },
 
   // Delete a course
   delete: async (courseId: string): Promise<void> => {
     return apiRequest<{ success: true; message: string }>(`/course/${courseId}`, {
       method: 'DELETE',
-    }).then(() => undefined);
+    }).then(response => {
+      if (response.err) {
+        throw response.err;
+      }
+      return undefined;
+    });
   },
 };
 
@@ -93,7 +120,12 @@ export const userApi = {
   deleteAccount: async (): Promise<void> => {
     return apiRequest<{ success: true; message: string }>('/user', {
       method: 'DELETE',
-    }).then(() => undefined);
+    }).then(response => {
+      if (response.err) {
+        throw response.err;
+      }
+      return undefined;
+    });
   },
 };
 

@@ -8,10 +8,10 @@ import {
   Lesson, 
   SemanticChunk
 } from './types';
+import { AIClient, Result, CourseMetadata } from './ai/aiClient';
 import { preprocessText } from './preprocessor/textCleaner';
 import { splitIntoSentences, filterSentences } from './preprocessor/sentenceSplitter';
 import { chunkText } from './chunking/semanticChunker';
-import { aiClient } from './ai/aiClient';
 
 /**
  * Default processing options
@@ -40,22 +40,23 @@ export class EnhancedChunkAI {
   /**
    * Main processing function - transforms text into course content
    */
-  async processText(text: string): Promise<ProcessingResult> {
+  async processText(text: string): Promise<Result<ProcessingResult>> {
     const startTime = Date.now();
     const errors: string[] = [];
     let aiCalls = 0;
+    const aiClient = new AIClient({ apiKey: process.env.GOOGLE_API_KEY! });
 
     try {
       console.log('🚀 Starting Enhanced Chunk AI processing...');
       
       // Step 1: Preprocess text
       console.log('📝 Step 1: Preprocessing text...');
-      const { cleaned, analysis, metadata } = preprocessText(text);
+      const { cleaned } = preprocessText(text);
 
       // log the analysis and metadata 
       // TODO: remove console.log and add this to analitics or a database
-      console.log('🔍 Analysis:', analysis);
-      console.log('📊 Metadata:', metadata);
+      console.log('🔍 Analysis:', {});
+      console.log('📊 Metadata:', {});
 
       if (cleaned.length < 50) {
         throw new Error('Text is too short to process effectively');
@@ -90,19 +91,14 @@ export class EnhancedChunkAI {
       const metadataResponse = await aiClient.generateCourseMetadata(courseContent);
       aiCalls++;
       
-      let courseTitle = 'Generated Course';
-      let courseDescription = 'A comprehensive course based on the provided content.';
-      
-      if (metadataResponse.success && metadataResponse.data) {
-        try {
-          const metadata = JSON.parse(metadataResponse.data as string);
-          courseTitle = metadata.title || courseTitle;
-          courseDescription = metadata.description || courseDescription;
-        } catch (parseError) {
-          console.warn('Failed to parse course metadata:', parseError);
-        }
+      if (metadataResponse.err || !metadataResponse.res) {
+        errors.push(metadataResponse.err instanceof Error ? metadataResponse.err.message : String(metadataResponse.err));
+        return { err: metadataResponse.err, res: null };
       }
-
+      const courseMetadata = metadataResponse.res as CourseMetadata;
+      const courseTitle = courseMetadata.title || 'Generated Course';
+      const courseDescription = courseMetadata.description || 'A comprehensive course based on the provided content.';
+      
       // Step 5: Generate lessons from chunks
       console.log('📚 Step 5: Generating lessons...');
       const lessons = await this.generateLessonsFromChunks(chunkingResult.chunks);
@@ -113,12 +109,10 @@ export class EnhancedChunkAI {
       const finalLessons = this.options.enableProgression ? 
         this.createLessonProgression(lessons) : lessons;
 
-      const processingTime = Date.now() - startTime;
-
       console.log('✅ Enhanced Chunk AI processing completed successfully!');
-      console.log(`📊 Results: ${finalLessons.length} lessons, ${processingTime}ms processing time`);
+      console.log(`📊 Results: ${finalLessons.length} lessons, ${Date.now() - startTime}ms processing time`);
 
-      return {
+      return { err: null, res: {
         success: true,
         course: {
           title: courseTitle,
@@ -126,37 +120,21 @@ export class EnhancedChunkAI {
           lessons: finalLessons
         },
         metadata: {
-          processingTime,
+          processingTime: Date.now() - startTime,
           chunkCount: chunkingResult.chunks.length,
           lessonCount: finalLessons.length,
           enhancementApplied: this.options.enableEnhancement,
           aiCalls
         }
-      };
+      }};
 
-    } catch (error) {
-      const processingTime = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       errors.push(errorMessage);
       
-      console.error('❌ Enhanced Chunk AI processing failed:', error);
+      console.error('❌ Enhanced Chunk AI processing failed:', err);
       
-      return {
-        success: false,
-        course: {
-          title: 'Error - Course Generation Failed',
-          description: 'Failed to generate course content.',
-          lessons: []
-        },
-        metadata: {
-          processingTime,
-          chunkCount: 0,
-          lessonCount: 0,
-          enhancementApplied: false,
-          aiCalls
-        },
-        errors
-      };
+      return { err, res: null };
     }
   }
 
@@ -201,74 +179,53 @@ export class EnhancedChunkAI {
     const chunkContent = chunk.sentences.map(s => s.text).join(' ');
     
     // Generate lesson title
+    const aiClient = new AIClient({ apiKey: process.env.GOOGLE_API_KEY! });
     const titleResponse = await aiClient.generateLessonTitle(chunkContent, lessonNumber);
     let title = `Lesson ${lessonNumber}: ${chunk.topic}`;
     
-    if (titleResponse.success && titleResponse.data) {
-      title = titleResponse.data as string;
+    if (!titleResponse.err && titleResponse.res) {
+      title = titleResponse.res;
     }
 
     // Generate lesson content (enhanced if enabled)
     let content = chunkContent;
     if (this.options.enableEnhancement) {
       const enhancedResponse = await aiClient.enhanceLessonContent(chunkContent);
-      if (enhancedResponse.success && enhancedResponse.data) {
-        content = enhancedResponse.data as string;
+      if (!enhancedResponse.err && enhancedResponse.res) {
+        content = enhancedResponse.res;
       }
     }
 
     // Generate key points
-    const keyPointsResponse = await aiClient.generateKeyPoints(content);
+    const keyPointsResponse = await aiClient.generateKeyPoints(chunkContent);
     let keyPoints = chunk.keywords.slice(0, 3);
     
-    if (keyPointsResponse.success && keyPointsResponse.data) {
-      try {
-        const parsed = JSON.parse(keyPointsResponse.data as string);
-        if (Array.isArray(parsed)) {
-          keyPoints = parsed;
-        }
-      } catch (parseError) {
-        console.warn('Failed to parse key points:', parseError);
-      }
+    if (!keyPointsResponse.err && keyPointsResponse.res) {
+      keyPoints = keyPointsResponse.res;
     }
 
     // Generate summary
-    const summaryResponse = await aiClient.generateLessonSummary(content);
+    const summaryResponse = await aiClient.generateLessonSummary(chunkContent);
     let summary = chunk.summary;
     
-    if (summaryResponse.success && summaryResponse.data) {
-      summary = summaryResponse.data as string;
+    if (!summaryResponse.err && summaryResponse.res) {
+      summary = summaryResponse.res;
     }
 
     // Generate learning objectives
-    const objectivesResponse = await aiClient.generateLearningObjectives(content);
+    const objectivesResponse = await aiClient.generateLearningObjectives(chunkContent);
     let learningObjectives = [`Understand ${chunk.topic}`];
     
-    if (objectivesResponse.success && objectivesResponse.data) {
-      try {
-        const parsed = JSON.parse(objectivesResponse.data as string);
-        if (Array.isArray(parsed)) {
-          learningObjectives = parsed;
-        }
-      } catch (parseError) {
-        console.warn('Failed to parse learning objectives:', parseError);
-      }
+    if (!objectivesResponse.err && objectivesResponse.res) {
+      learningObjectives = objectivesResponse.res;
     }
 
     // Generate exercises
-    const exercisesResponse = await aiClient.generateExercises(content, chunk.complexity);
+    const exercisesResponse = await aiClient.generateExercises(chunkContent, 'intermediate');
     let exercises: string[] = [];
     
-    if (exercisesResponse.success && exercisesResponse.data) {
-      try {
-        const parsed = JSON.parse(exercisesResponse.data as string);
-        if (Array.isArray(parsed)) {
-          exercises = parsed;
-        }
-      } catch (parseError) {
-        console.warn('Failed to parse exercises:', parseError);
-        // TODO: Improve error handling here (log to analytics/db, consider fallback strategies)
-      }
+    if (!exercisesResponse.err && exercisesResponse.res) {
+      exercises = exercisesResponse.res;
     }
 
     return {
@@ -373,6 +330,7 @@ export class EnhancedChunkAI {
    * Clears AI cache
    */
   clearCache(): void {
+    const aiClient = new AIClient({ apiKey: process.env.GOOGLE_API_KEY! });
     aiClient.clearCache();
   }
 
@@ -380,6 +338,7 @@ export class EnhancedChunkAI {
    * Gets processing statistics
    */
   getStats(): { cacheSize: number; cacheHitRate: number } {
+    const aiClient = new AIClient({ apiKey: process.env.GOOGLE_API_KEY! });
     const cacheStats = aiClient.getCacheStats();
     return {
       cacheSize: cacheStats.size,
@@ -395,7 +354,7 @@ export const enhancedChunkAI = new EnhancedChunkAI();
 export default async function generateLessons(
   text: string, 
   style: "markdown" | "aiGen" | "chunk"
-): Promise<{
+): Promise<Result<{
   title: string;
   description: string;
   lessons: Array<{
@@ -406,27 +365,26 @@ export default async function generateLessons(
     isCompleted: boolean;
     isCurrent: boolean;
   }>;
-}> {
+}>> {
   if (style !== "chunk") {
-    // Fallback to original implementation for other styles
-    const { preprocessText } = await import('./preprocessor/textCleaner');
+    // Use fallback preprocessText stub
     const { cleaned } = preprocessText(text);
     
     // Simple title generation
-    const words = cleaned.toLowerCase().split(/\s+/);
+    const words: string[] = cleaned.toLowerCase().split(/\s+/);
     const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
     const significantWords = words
-      .filter(word => word.length > 3 && !commonWords.has(word))
+      .filter((word: string) => word.length > 3 && !commonWords.has(word))
       .slice(0, 5);
     
     const title = significantWords.length > 0 
-      ? significantWords.join(' ').replace(/\b\w/g, l => l.toUpperCase())
+      ? significantWords.join(' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
       : 'Generated Course';
     
     const description = `Learn about ${significantWords.slice(0, 3).join(', ')} through this comprehensive course.`;
     
     if (style === "aiGen") {
-      return {
+      return { err: null, res: {
         title,
         description,
         lessons: [{
@@ -437,16 +395,16 @@ export default async function generateLessons(
           isCompleted: false,
           isCurrent: false
         }]
-      };
+      }};
     } else { // markdown
-      const markdownLessons = cleaned.split(/#{1,6}\s+/).filter(Boolean).map((section, index) => {
+      const markdownLessons = cleaned.split(/#{1,6}\s+/).filter(Boolean).map((section: string, index: number) => {
         const lines = section.trim().split('\n');
         const lessonTitle = lines[0] || `Lesson ${index + 1}`;
-        const lessonContent = lines.slice(1).join('\n').trim();
+        const content = lines.slice(1).join('\n').trim();
         
         return {
           title: lessonTitle.length > 50 ? lessonTitle.substring(0, 50) + "..." : lessonTitle,
-          content: lessonContent || section,
+          content: content || section,
           duration: "15 min",
           videoUrl: "",
           isCompleted: false,
@@ -454,7 +412,7 @@ export default async function generateLessons(
         };
       });
       
-      return {
+      return { err: null, res: {
         title,
         description,
         lessons: markdownLessons.length > 0 ? markdownLessons : [{
@@ -465,27 +423,36 @@ export default async function generateLessons(
           isCompleted: false,
           isCurrent: false
         }]
-      };
+      }};
     }
   }
 
   // Use enhanced chunk AI for chunk style
-  const result = await enhancedChunkAI.processText(text);
-  
-  if (!result.success) {
-    throw new Error(`Failed to generate lessons: ${result.errors?.join(', ')}`);
+  try {
+    const ai = new EnhancedChunkAI();
+    const result = await ai.processText(text);
+    if (result.err || !result.res) return { err: result.err, res: null };
+    // Map ProcessingResult to the expected structure
+    const course = result.res.course;
+    if (!course || !course.title || !course.description || !course.lessons) {
+      return { err: new Error('Invalid course structure from AI'), res: null };
+    }
+    return {
+      err: null,
+      res: {
+        title: course.title,
+        description: course.description,
+        lessons: course.lessons.map((lesson: Lesson, index: number) => ({
+          title: lesson.title,
+          content: lesson.content,
+          duration: lesson.duration,
+          videoUrl: '',
+          isCompleted: false,
+          isCurrent: index === 0
+        }))
+      }
+    };
+  } catch (err) {
+    return { err, res: null };
   }
-
-  return {
-    title: result.course.title,
-    description: result.course.description,
-    lessons: result.course.lessons.map((lesson, index) => ({
-      title: lesson.title,
-      content: lesson.content,
-      duration: lesson.duration,
-      videoUrl: "",
-      isCompleted: false,
-      isCurrent: index === 0
-    }))
-  };
 } 

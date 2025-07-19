@@ -6,6 +6,7 @@ export interface Course {
   instructorAvatar: string;
   thumbnail: string;
   duration: string;
+  durationMinutes?: number;
   lessonsCount: number;
   studentsCount: number;
   rating: number;
@@ -29,6 +30,10 @@ export interface Lesson {
   title: string;
   duration: string;
   videoUrl: string;
+  content?: string;
+  summary?: string;
+  objectives?: string[];
+  resources?: string[];
   isCompleted?: boolean;
   isCurrent?: boolean;
 }

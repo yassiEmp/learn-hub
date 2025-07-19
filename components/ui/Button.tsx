@@ -26,7 +26,6 @@ export const Button: React.FC<ButtonProps> = ({
     md: 'px-4 py-2 text-base',
     lg: 'px-6 py-3 text-lg'
   };
-
   return (
     <button 
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}

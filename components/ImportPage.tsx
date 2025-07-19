@@ -12,7 +12,7 @@ const ImportPage = () => {
   return (
     <div className='w-full h-full bg-black'>
       {/* Full Width Header for Import Page */}
-      <Nav currentPath="/import" />
+      <Nav currentPath="/create" />
       
       {/* Hero Section */}
       <HeroSection />
@@ -22,7 +22,9 @@ const ImportPage = () => {
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
 
-       <FloatingParticle />
+             <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
 
         {/* Large background glow */}
         <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 bg-white/5 blur-[120px] rounded-full pointer-events-none" />

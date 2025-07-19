@@ -268,7 +268,9 @@ export const OnboardingLayout: React.FC = () => {
           className="absolute inset-0"
         />
         
-       <FloatingParticle />
+             <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+        <FloatingParticle />
+      </div>
       </motion.div>
 
       {/* Fixed Header */}

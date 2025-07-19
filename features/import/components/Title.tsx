@@ -1,5 +1,5 @@
 import React from 'react';
-import AnimatedTextCycle from '../../../components/ui/AnimatedTextCycle';
+import AnimatedTextCycle from '@/components/ui/AnimatedTextCycle';
 import { motion , Variants } from 'framer-motion';
 
 const headingPhrases = [

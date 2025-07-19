@@ -7,7 +7,7 @@ const Page = () => {
   return (
     <>
       <Nav currentPath="/exams" />
-      <CourseBrowser onCourseSelect={()=>{}} />
+      <CourseBrowser />
     </>
   )
 }
