@@ -50,11 +50,16 @@ export function useCourse(courseId: string): UseCourseResult {
         .from('Lesson')
         .select('*')
         .eq('courseId', courseId);
+      console.log(lessonsData)
       const lessons: Lesson[] = (lessonsData as Lesson[] || []).map((l) => ({
         id: l.id?.toString() ?? '',
         title: l.title,
         duration: l.duration || '',
         videoUrl: l.videoUrl || '',
+        content: l.content || '',
+        summary: l.summary || '',
+        objectives: l.objectives || [],
+        resources: l.resources || [],
         isCompleted: false,
         isCurrent: false,
       }));

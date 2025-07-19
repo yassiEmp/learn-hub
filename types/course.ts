@@ -30,6 +30,10 @@ export interface Lesson {
   title: string;
   duration: string;
   videoUrl: string;
+  content?: string;
+  summary?: string;
+  objectives?: string[];
+  resources?: string[];
   isCompleted?: boolean;
   isCurrent?: boolean;
 }

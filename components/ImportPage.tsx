@@ -12,7 +12,7 @@ const ImportPage = () => {
   return (
     <div className='w-full h-full bg-black'>
       {/* Full Width Header for Import Page */}
-      <Nav currentPath="/import" />
+      <Nav currentPath="/create" />
       
       {/* Hero Section */}
       <HeroSection />

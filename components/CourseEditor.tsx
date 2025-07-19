@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { 
-  ChevronRight, 
-  Book, 
-  Bold, 
-  Italic, 
-  Heading2, 
+import {
+  ChevronRight,
+  Book,
+  Bold,
+  Italic,
+  Heading2,
   Code,
   Play,
   CheckCircle,
@@ -17,12 +17,14 @@ import {
   Settings,
 } from 'lucide-react';
 import FloatingParticle from './FloatingParticle';
+import Link from 'next/link';
 
 interface CourseEditorProps {
   content: string;
   onChange: (content: string) => void;
   className?: string;
   courseTitle?: string;
+  setCurrentLesson: (index: number) => void;
   lessons?: Array<{
     id: string;
     title: string;
@@ -32,15 +34,16 @@ interface CourseEditorProps {
   }>;
 }
 
-export const CourseEditor: React.FC<CourseEditorProps> = ({ 
-  content, 
-  onChange, 
+export const CourseEditor: React.FC<CourseEditorProps> = ({
+  content,
+  onChange,
   className,
   courseTitle = "Untitled Course",
-  lessons = []
+  lessons = [],
+  setCurrentLesson,
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
+
   const editor = useEditor({
     extensions: [StarterKit],
     content,
@@ -49,6 +52,13 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
     },
   });
 
+  // Update editor content when the content prop changes (e.g., when switching lessons)
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content || '', false);
+    }
+  }, [content, editor]);
+
   const activeLesson = lessons.find(lesson => lesson.isActive);
   const completedLessons = lessons.filter(lesson => lesson.isCompleted).length;
 
@@ -56,15 +66,15 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-      
-     
-            <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+
+
+      <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
         <FloatingParticle />
       </div>
 
       <div className={cn("relative z-10 flex h-screen", className)}>
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,17 +83,21 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <motion.button
-                  className="flex items-center text-white/60 hover:text-white group transition-all duration-300"
-                  whileHover={{ x: -5 }}
-                  transition={{ duration: 0.2 }}
+                <Link
+                  href={"/courses"}
                 >
-                  <ArrowLeft className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                  <span className="font-geist-mono text-sm">Back to course</span>
-                </motion.button>
-                
+                  <motion.button
+                    className="flex items-center text-white/60 hover:text-white group transition-all duration-300"
+                    whileHover={{ x: -5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ArrowLeft className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                    <span className="font-geist-mono text-sm">Back to course</span>
+                  </motion.button>
+                </Link>
+
                 <div className="h-6 w-px bg-white/20" />
-                
+
                 <div>
                   <h1 className="text-lg font-syne font-medium text-white">{courseTitle}</h1>
                   {activeLesson && (
@@ -91,7 +105,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 <div className="text-white/50 font-geist-mono text-sm">
                   {completedLessons} of {lessons.length} completed
@@ -109,7 +123,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
         </motion.div>
 
         {/* Sidebar */}
-        <motion.div 
+        <motion.div
           className={cn(
             "bg-black/40 backdrop-blur-md border-r border-white/10 transition-all duration-300 mt-20",
             sidebarCollapsed ? "w-16" : "w-80"
@@ -123,7 +137,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
               <div className="p-6 border-b border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <motion.div 
+                    <motion.div
                       className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400/20 to-cyan-400/20 border border-white/10 flex items-center justify-center"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.2 }}
@@ -144,28 +158,29 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 {/* Progress bar */}
                 <div className="w-full bg-white/10 rounded-full h-2">
-                  <motion.div 
-                    className="bg-gradient-to-r from-blue-400 to-cyan-400 h-2 rounded-full" 
+                  <motion.div
+                    className="bg-gradient-to-r from-blue-400 to-cyan-400 h-2 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${(completedLessons / lessons.length) * 100}%` }}
                     transition={{ duration: 1, delay: 0.5 }}
                   />
                 </div>
               </div>
-              
+
               <nav className="p-4 space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-hide">
                 {lessons.map((lesson, index) => (
                   <motion.button
                     key={lesson.id}
                     className={cn(
                       "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm transition-all duration-300 group",
-                      lesson.isActive 
-                        ? "bg-white/10 text-white border border-white/20 shadow-lg" 
+                      lesson.isActive
+                        ? "bg-white/10 text-white border border-white/20 shadow-lg"
                         : "text-white/70 hover:bg-white/5 hover:text-white"
                     )}
+                    onClick={() => { setCurrentLesson(index) }}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -203,7 +218,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
               </nav>
             </>
           )}
-          
+
           {sidebarCollapsed && (
             <div className="p-4">
               <button
@@ -217,7 +232,7 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
         </motion.div>
 
         {/* Editor */}
-        <motion.div 
+        <motion.div
           className="flex-1 bg-black/20 backdrop-blur-sm mt-20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -237,8 +252,8 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
                   onClick={tool.action}
                   className={cn(
                     "p-2 rounded-lg transition-all duration-200",
-                    tool.isActive() 
-                      ? 'bg-white/10 text-white border border-white/20' 
+                    tool.isActive()
+                      ? 'bg-white/10 text-white border border-white/20'
                       : 'text-white/60 hover:bg-white/5 hover:text-white'
                   )}
                   whileHover={{ scale: 1.05 }}
@@ -249,13 +264,13 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
                 </motion.button>
               ))}
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-white/50 font-geist-mono text-sm">Auto-saved</span>
               <div className="w-2 h-2 rounded-full bg-green-400" />
             </div>
           </div>
-          
+
           {/* Editor Content */}
           <div className="p-8 h-full overflow-y-auto scrollbar-hide">
             <motion.div
@@ -263,8 +278,8 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <EditorContent 
-                editor={editor} 
+              <EditorContent
+                editor={editor}
                 className="prose prose-invert max-w-none font-geist-mono 
                   prose-headings:text-white prose-headings:font-syne prose-headings:font-medium
                   prose-p:text-white/90 prose-p:leading-relaxed prose-p:text-base
