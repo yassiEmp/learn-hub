@@ -19,6 +19,7 @@ const InputSection: React.FC = () => {
     const [inputValue, setInputValue] = useState("");
     const [placeholderText, setPlaceholderText] = useState("");
     const { session } = useAuth();
+    console.log(session)
     const router = useRouter();
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -30,7 +31,7 @@ const InputSection: React.FC = () => {
             },
             body: JSON.stringify({
                 text: inputValue,
-                style: "chunk",
+                style: "premium",
                 title: "default",
                 description: "default",
                 category: "default",

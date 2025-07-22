@@ -2,6 +2,7 @@ import { motion, easeInOut } from "framer-motion";
 import { ShaderBackground } from '../ui/ShaderBackground';
 import Title from '../../features/import/components/Title';
 import InputSection from '../../features/import/components/InputSection';
+import InputWithImagesUpload from "@/features/import/components/InputWithImagesUpload";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,8 +35,10 @@ const itemVariants = {
 };
 
 export const HeroSection = () => {
+
   return (
     <div className="relative min-h-screen overflow-hidden">
+      
       {/* WebGL Shader Background - Only for header */}
       <div className="absolute inset-0 z-0">
         <ShaderBackground />
@@ -73,7 +76,8 @@ export const HeroSection = () => {
             className="w-full"
             variants={itemVariants}
           >
-            <InputSection />
+            {/* <InputSection /> */}
+            <InputWithImagesUpload />
           </motion.div>
         </div>
       </motion.div>
