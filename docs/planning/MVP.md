@@ -6,7 +6,7 @@ NB: the mvp part musb be designed so that they will integrate well with the upco
 
 The MVP should:
 
-1. Accept user educational content (PDF, text, video)
+1. Accept user educational content (PDF, text, image)
 2. Generate structured **lessons** from content
 3. Generate **questions** from lessons
 4. Allow users to **take an exam**

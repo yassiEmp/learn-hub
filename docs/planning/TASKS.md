@@ -3,6 +3,14 @@
 All planning checklists are tracked here for easy progress monitoring. Each task links back to its context in the original planning document.
 
 ---
+## Day planning : adding the image support to the course generation ui and infrastructure
+### Phase 1: Core Pipeline
+- [ ] Implement client-side image compression and upload (no persistence)
+- [ ] Update course creation endpoint to accept images and text (multipart/form-data)
+- [ ] Integrate in-memory OCR processing (Tesseract.js) in the course endpoint
+- [ ] Merge OCR text with user input for course generation
+- [ ] Update UI to show OCR progress/results and allow editing before course creation
+- [ ] Update image upload flow to allow up to 50 images per upload
 
 ## From [MVP.md](../planning/MVP.md)
 
