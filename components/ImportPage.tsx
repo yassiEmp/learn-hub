@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
-import Nav from './Header';
-import { HeroSection } from './import-page/HeroSection';
+import Nav from '@/components/hearderApp';
+import { HeroSection } from './import-page/HeroSection-dark';
 import { FeaturesSection } from './import-page/FeaturesSection';
 import { StatsSection } from './import-page/StatsSection';
 import { SuccessStoriesSection } from './import-page/SuccessStoriesSection';

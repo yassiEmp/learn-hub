@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    remotePatterns: [new URL('https://storage.bolt.army/**'),new URL('https://sexample.com/**'),new URL('https://images.pexels.com/**')],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'storage.bolt.army', pathname: '/**' },
+      { protocol: 'https', hostname: 'sexample.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.pexels.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'ik.imagekit.io', pathname: '/**' },
+    ],
   },
 };
 

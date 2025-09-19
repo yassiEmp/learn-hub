@@ -1,266 +1,113 @@
-"use client"
+'use client'
+import Link from 'next/link'
+import { Logo } from '@/components/logo'
+import { Menu, X } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import React from 'react'
+import { cn } from '@/lib/utils'
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Sparkles, Menu, X, LogOut } from 'lucide-react';
-import { cva } from 'class-variance-authority';
-import { useAuth } from '../hooks/useAuth';
-import { motion } from 'framer-motion';
+const menuItems = [
+    { name: 'Features', href: '#link' },
+    { name: 'Benefits', href: '#link' },
+    { name: 'How It Works', href: '#link' },
+    { name: 'Pricing', href: '#link' },
+    { name: 'FAQ', href: '#link' },
+]
 
-// Navbar container variants
-const navbarVariants = cva(
-  "bg-black/5 border border-white/10 px-6 max-w-4xl w-full py-3 shadow-xl backdrop-blur-md mx-auto transition-[border-radius] duration-200",
-  {
-    variants: {
-      isMenuOpen: {
-        true: "rounded-xl",
-        false: "rounded-full"
-      }
-    },
-    defaultVariants: {
-      isMenuOpen: false
-    }
-  }
-);
+export const HeroHeader = () => {
+    const [menuState, setMenuState] = React.useState(false)
+    const [isScrolled, setIsScrolled] = React.useState(false)
 
-// Navigation item variants
-const navItemVariants = cva(
-  "px-4 py-2 rounded-full text-xs font-geist-mono transition-all duration-300",
-  {
-    variants: {
-      active: {
-        true: "text-white bg-white/10",
-        false: "text-white/60 hover:text-white hover:bg-white/5"
-      }
-    },
-    defaultVariants: {
-      active: false
-    }
-  }
-);
-
-// Mobile menu item variants
-const mobileMenuItemVariants = cva(
-  "block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono transition-all duration-200",
-  {
-    variants: {
-      active: {
-        true: "text-white bg-white/10",
-        false: "text-white/60 hover:text-white hover:bg-white/5"
-      }
-    },
-    defaultVariants: {
-      active: false
-    }
-  }
-);
-
-// Action button variants
-const actionButtonVariants = cva(
-  "text-xs font-geist-mono transition-all duration-300",
-  {
-    variants: {
-      variant: {
-        default: "text-white/60 hover:text-white",
-        primary: "px-4 py-2 bg-white text-black rounded-full font-medium hover:bg-white/90"
-      }
-    },
-    defaultVariants: {
-      variant: "default"
-    }
-  }
-);
-
-// Navigation Items Component
-const NavItems = ({ currentPath }: { currentPath: string }) => {
-  const { isAuthenticated, isConfigured } = useAuth()
-  
-  const navItems = [
-    { id: 'import', label: 'Create', path: '/create' },
-    ...(isAuthenticated && isConfigured ? [
-      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-      { id: 'courses', label: 'Courses', path: '/courses' },
-      { id: 'exams', label: 'exams', path: '/exams' },
-      { id: 'account', label: 'Account', path: '/account' },
-    ] : [
-      { id: 'courses', label: 'Explore', path: '/courses' },
-    ])
-  ];
-
-  return (
-    <nav className="hidden md:flex items-center space-x-1 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-fade-in">
-      {navItems.map((item) => (
-        <Link
-          key={item.id}
-          href={item.path}
-          className={navItemVariants({ active: currentPath === item.path })}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  );
-};
-
-// Action Buttons Component
-const ActionButtons = () => {
-  const { user, signOut, loading, isConfigured } = useAuth()
-
-  if (loading) {
+    React.useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50)
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
     return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <div className="w-8 h-4 bg-white/10 rounded animate-pulse" />
-      </div>
-    )
-  }
+        <header>
+            <nav
+                data-state={menuState && 'active'}
+                className="fixed z-20 w-full px-2">
+                <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12', isScrolled && 'bg-background/50 max-w-4xl rounded-2xl lg:rounded-full border backdrop-blur-lg lg:px-5')}>
+                    <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
+                        <div className="flex w-full justify-between lg:w-auto">
+                            <Link
+                                href="/"
+                                aria-label="home"
+                                className="flex items-center space-x-2">
+                                <Logo />
+                            </Link>
 
-  if (!isConfigured) {
-    return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <span className="text-white/50 font-geist-mono text-xs">Setup Required</span>
-      </div>
-    )
-  }
+                            <button
+                                onClick={() => setMenuState(!menuState)}
+                                aria-label={menuState == true ? 'Close Menu' : 'Open Menu'}
+                                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden">
+                                <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
+                                <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+                            </button>
+                        </div>
 
-  if (user) {
-    return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <div className="flex items-center space-x-3">
-          <span className="text-white/70 font-geist-mono text-sm">
-            {user.user_metadata?.full_name || user.email}
-          </span>
-          <motion.button
-            onClick={signOut}
-            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <LogOut className="w-4 h-4" />
-          </motion.button>
-        </div>
-      </div>
-    )
-  }
+                        <div className="absolute inset-0 m-auto hidden size-fit lg:block">
+                            <ul className="flex gap-8 text-sm">
+                                {menuItems.map((item, index) => (
+                                    <li key={index}>
+                                        <Link
+                                            href={item.href}
+                                            className="text-muted-foreground hover:text-accent-foreground block duration-150">
+                                            <span>{item.name}</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
 
-  return (
-    <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-      <Link href="/login" className={actionButtonVariants()}>
-        Login
-      </Link>
-      
-      <Link href="/login" className={actionButtonVariants({ variant: "primary" })}>
-        Start Learning
-      </Link>
-    </div>
-  )
-}
-
-// Main Nav Component
-export default function Nav({ currentPath }: { currentPath: string }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
-
-  if(loading){
-    return <>
-      <div><p>loading</p></div>
-    </>
-  }
-
-  const navItems = [
-    { id: 'import', label: 'Create', path: '/import' },
-    ...(isAuthenticated && isConfigured ? [
-      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-      { id: 'courses', label: 'Courses', path: '/courses' },
-      { id: 'exams', label: 'Learning', path: '/exams' },
-      { id: 'account', label: 'Account', path: '/account' },
-    ] : [
-      { id: 'courses', label: 'Explore', path: '/courses' },
-    ])
-  ];
-
-  return (
-    <nav className="fixed top-6 transform z-50 w-full px-4 animate-slide-down">
-      {/* Glass floating navbar */}
-      <div className={navbarVariants({ isMenuOpen })}>
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center animate-fade-in">
-            <Link 
-              href="/"
-              className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
-            >
-              <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-sm font-syne font-medium text-white">LearnHub</span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <NavItems currentPath={currentPath} />
-
-          {/* Action Buttons */}
-          <ActionButtons />
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden animate-fade-in">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200 hover:scale-110 active:scale-90"
-            >
-              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="pt-4 pb-2 space-y-2 border-t border-white/10 mt-3">
-            {navItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`${mobileMenuItemVariants({ active: currentPath === item.path })} animate-slide-in`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            
-            {/* Mobile Auth Actions */}
-            <div className="pt-2 border-t border-white/10 mt-2">
-              {user && isConfigured ? (
-                <div className="space-y-2">
-                  <div className="px-3 py-2 text-white/70 font-geist-mono text-xs">
-                    {user.user_metadata?.full_name || user.email}
-                  </div>
-                  <button
-                    onClick={() => {
-                      signOut()
-                      setIsMenuOpen(false)
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
-                  >
-                    Sign Out
-                  </button>
+                        <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
+                            <div className="lg:hidden">
+                                <ul className="space-y-6 text-base">
+                                    {menuItems.map((item, index) => (
+                                        <li key={index}>
+                                            <Link
+                                                href={item.href}
+                                                className="text-muted-foreground hover:text-accent-foreground block duration-150">
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    size="sm"
+                                    className={cn("rounded-full",isScrolled && 'lg:hidden')}>
+                                    <Link href="#">
+                                        <span>Login</span>
+                                    </Link>
+                                </Button>
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    className={cn("rounded-full",isScrolled && 'lg:hidden')}>
+                                    <Link href="#">
+                                        <span>Sign Up</span>
+                                    </Link>
+                                </Button>
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    className={cn("rounded-full ring-1 border-[0.5px] border-white/25 ",isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                    <Link href="#">
+                                        <span>Get Started</span>
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              ) : isConfigured ? (
-                <Link
-                  href="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
-                >
-                  Login
-                </Link>
-              ) : (
-                <div className="px-3 py-2 text-white/50 font-geist-mono text-xs">
-                  Setup Required
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
+            </nav>
+        </header>
+    )
 }
