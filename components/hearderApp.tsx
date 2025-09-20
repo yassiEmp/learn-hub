@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 
 // Navbar container variants
 const navbarVariants = cva(
-  "bg-black/5 border border-white/10 px-6 max-w-4xl w-full py-3 shadow-xl backdrop-blur-md mx-auto transition-[border-radius] duration-200",
+  "bg-background/80 border border-border/20 px-6 max-w-4xl w-full py-3 shadow-xl backdrop-blur-md mx-auto transition-[border-radius] duration-200",
   {
     variants: {
       isMenuOpen: {
@@ -29,8 +29,8 @@ const navItemVariants = cva(
   {
     variants: {
       active: {
-        true: "text-white bg-white/10",
-        false: "text-white/60 hover:text-white hover:bg-white/5"
+        true: "text-foreground bg-muted/60",
+        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       }
     },
     defaultVariants: {
@@ -45,8 +45,8 @@ const mobileMenuItemVariants = cva(
   {
     variants: {
       active: {
-        true: "text-white bg-white/10",
-        false: "text-white/60 hover:text-white hover:bg-white/5"
+        true: "text-foreground bg-muted/60",
+        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       }
     },
     defaultVariants: {
@@ -61,8 +61,8 @@ const actionButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-white/60 hover:text-white",
-        primary: "px-4 py-2 bg-white text-black rounded-full font-medium hover:bg-white/90"
+        default: "text-muted-foreground hover:text-foreground",
+        primary: "px-4 py-2 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90"
       }
     },
     defaultVariants: {
@@ -109,7 +109,7 @@ const ActionButtons = () => {
   if (loading) {
     return (
       <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <div className="w-8 h-4 bg-white/10 rounded animate-pulse" />
+        <div className="w-8 h-4 bg-muted/50 rounded animate-pulse" />
       </div>
     )
   }
@@ -117,7 +117,7 @@ const ActionButtons = () => {
   if (!isConfigured) {
     return (
       <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <span className="text-white/50 font-geist-mono text-xs">Setup Required</span>
+        <span className="text-muted-foreground/70 font-geist-mono text-xs">Setup Required</span>
       </div>
     )
   }
@@ -126,12 +126,12 @@ const ActionButtons = () => {
     return (
       <div className="hidden md:flex items-center space-x-3 animate-fade-in">
         <div className="flex items-center space-x-3">
-          <span className="text-white/70 font-geist-mono text-sm">
+          <span className="text-foreground/80 font-geist-mono text-sm">
             {user.user_metadata?.full_name || user.email}
           </span>
           <motion.button
             onClick={signOut}
-            className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-300"
+            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -189,10 +189,10 @@ export default function Nav({ currentPath }: { currentPath: string }) {
               href="/"
               className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
             >
-              <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-foreground" />
               </div>
-              <span className="text-sm font-syne font-medium text-white">LearnHub</span>
+              <span className="text-sm font-syne font-medium text-foreground">LearnHub</span>
             </Link>
           </div>
 
@@ -206,7 +206,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
           <div className="md:hidden animate-fade-in">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200 hover:scale-110 active:scale-90"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200 hover:scale-110 active:scale-90"
             >
               {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -215,7 +215,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
 
         {/* Mobile Menu */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="pt-4 pb-2 space-y-2 border-t border-white/10 mt-3">
+          <div className="pt-4 pb-2 space-y-2 border-t border-border/20 mt-3">
             {navItems.map((item) => (
               <Link
                 key={item.id}
@@ -228,10 +228,10 @@ export default function Nav({ currentPath }: { currentPath: string }) {
             ))}
             
             {/* Mobile Auth Actions */}
-            <div className="pt-2 border-t border-white/10 mt-2">
+            <div className="pt-2 border-t border-border/20 mt-2">
               {user && isConfigured ? (
                 <div className="space-y-2">
-                  <div className="px-3 py-2 text-white/70 font-geist-mono text-xs">
+                  <div className="px-3 py-2 text-foreground/80 font-geist-mono text-xs">
                     {user.user_metadata?.full_name || user.email}
                   </div>
                   <button
@@ -239,7 +239,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                       signOut()
                       setIsMenuOpen(false)
                     }}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
+                    className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
                   >
                     Sign Out
                   </button>
@@ -248,12 +248,12 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                 <Link
                   href="/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200"
+                  className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
                 >
                   Login
                 </Link>
               ) : (
-                <div className="px-3 py-2 text-white/50 font-geist-mono text-xs">
+                <div className="px-3 py-2 text-muted-foreground/70 font-geist-mono text-xs">
                   Setup Required
                 </div>
               )}

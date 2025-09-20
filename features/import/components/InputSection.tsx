@@ -146,13 +146,13 @@ const InputSection: React.FC = () => {
                 <div
                     className={cn(
                         "relative p-6 sm:p-8 rounded-2xl overflow-hidden transition-all duration-300",
-                        "border border-white/10 bg-black/40 backdrop-blur-xl",
-                        "hover:border-white/20 hover:-translate-y-1 will-change-transform"
+                        "border-2 border-border/30 bg-background/40 backdrop-blur-xl",
+                        "hover:border-border/60 hover:-translate-y-1 will-change-transform",
                     )}
                 >
                     {/* Subtle dot pattern background */}
                     <div className="absolute inset-0 opacity-20">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[length:8px_8px]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--foreground)_0.02_1px,transparent_1px)] bg-[length:8px_8px]" />
                     </div>
 
                     <div className="relative flex flex-col space-y-6">
@@ -162,11 +162,11 @@ const InputSection: React.FC = () => {
                             variants={itemVariants}
                         >
                             <motion.div 
-                                className="w-12 h-12 rounded-xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/10 transition-all duration-300 group-hover:bg-white/15"
+                                className="w-12 h-12 rounded-xl flex items-center justify-center bg-foreground/10 backdrop-blur-sm border-2 border-border/80 transition-all duration-300 group-hover:bg-muted/80 group-hover:border-border/60 shadow-sm"
                                 whileHover={{ scale: 1.05 }}
                                 transition={{ duration: 0.15 }}
                             >
-                                <BookOpen className="w-6 h-6 text-white/90" />
+                                <BookOpen className="w-6 h-6 text-foreground" />
                             </motion.div>
                             
                             <div className="flex-1">
@@ -174,7 +174,7 @@ const InputSection: React.FC = () => {
                                     <Textarea
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
-                                        className="bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 text-base sm:text-lg resize-none min-h-[120px] p-4 focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-200 backdrop-blur-sm font-geist-mono"
+                                        className="bg-foreground/40 border-2 border-border/90 rounded-xl text-foreground placeholder:text-muted-foreground/70 text-base sm:text-lg resize-none min-h-[120px] p-4 focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition-all duration-200 backdrop-blur-sm font-geist-mono shadow-sm"
                                         placeholder={`Create course for ${placeholderText}`}
                                     />
                                 </motion.div>
@@ -204,7 +204,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono"
+                                        className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <Video className="w-4 h-4" />
@@ -216,7 +216,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono"
+                                        className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         <Image className="w-4 h-4" />
@@ -228,7 +228,7 @@ const InputSection: React.FC = () => {
                                         variant="outline"
                                         size="sm"
                                         type="button"
-                                        className="bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono"
+                                        className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
                                         <Plus className="w-4 h-4" />
                                         More
@@ -244,10 +244,10 @@ const InputSection: React.FC = () => {
                                 <motion.button
                                     type="submit"
                                     className={cn(
-                                        "relative px-8 py-3 rounded-xl font-medium text-black",
-                                        "bg-white hover:bg-white/90",
+                                        "relative px-8 py-3 rounded-xl font-medium text-primary-foreground",
+                                        "bg-primary hover:bg-primary/90 border-2 border-primary/20",
                                         "transition-all duration-300 group overflow-hidden",
-                                        "shadow-lg hover:shadow-xl",
+                                        "shadow-lg hover:shadow-xl hover:border-primary/40",
                                         "active:scale-[0.98] w-full sm:w-auto font-geist-mono"
                                     )}
                                     whileHover={{ 

@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import Nav from '@/components/hearderApp';
-import { HeroSection } from './import-page/HeroSection-dark';
+import { HeroSection } from './import-page/HeroSection-white';
 import { FeaturesSection } from './import-page/FeaturesSection';
 import { StatsSection } from './import-page/StatsSection';
 import { SuccessStoriesSection } from './import-page/SuccessStoriesSection';

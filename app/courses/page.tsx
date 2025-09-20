@@ -1,6 +1,6 @@
 "use client"
 import { CourseBrowser } from '@/components/CourseBrowser'
-import Nav from '@/components/Header'
+import Nav from '@/components/hearderApp'
 import React, { Suspense } from 'react'
 import Loading from '../loading'
 

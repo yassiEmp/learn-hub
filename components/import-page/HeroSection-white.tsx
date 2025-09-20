@@ -2,6 +2,7 @@ import { motion, easeInOut } from "framer-motion";
 import { ShaderBackground } from '../ui/ShaderBackground';
 import Title from '../../features/import/components/Title';
 import InputSection from '../../features/import/components/InputSection';
+import { useTheme } from "next-themes";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,15 +35,32 @@ const itemVariants = {
 };
 
 export const HeroSection = () => {
+  const { theme, setTheme } = useTheme()
+  console.log(theme)
+
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-background">
       {/* WebGL Shader Background - Only for header */}
       <div className="absolute inset-0 z-0">
-        <ShaderBackground />
+        {theme == "dark" ? <ShaderBackground /> : <> <div
+          className="absolute inset-0 z-0"
+          style={{
+            background: "#ffffff",
+            backgroundImage: `
+        radial-gradient(
+          circle at top left,
+          rgba(173, 109, 244, 0.5),
+          transparent 70%
+        )
+      `,
+            filter: "blur(80px)",
+            backgroundRepeat: "no-repeat",
+          }}
+        /></>}
       </div>
 
       {/* Dark overlay to ensure text readability */}
-      <div className="absolute inset-0 bg-black/30 z-10" />
+      {/* <div className="absolute inset-0 bg-purple-100/30 z-10" /> */}
 
       {/* Hero Content */}
       <motion.div
@@ -58,15 +76,7 @@ export const HeroSection = () => {
           >
             <Title />
 
-            <motion.p
-              className="text-xl md:text-2xl text-white/90 font-geist-mono max-w-3xl mx-auto leading-relaxed font-medium"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-            >
-              Transform your ideas into comprehensive courses with the power of AI.
-              Simply describe what you want to learn or teach.
-            </motion.p>
+
           </motion.div>
 
           <motion.div

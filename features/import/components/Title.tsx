@@ -3,12 +3,12 @@ import AnimatedTextCycle from '@/components/ui/AnimatedTextCycle';
 import { motion , Variants } from 'framer-motion';
 
 const headingPhrases = [
-    "Create Courses",
-    "Learn Quickly", 
-    "Master Skills",
-    "Teach Effectively",
-    "Build Knowledge",
-    "Share Expertise",
+    "Flash Card", 
+    "Multiple Choice Question",
+    "Spaced Repatition",
+    "learn Effectively",
+    "learn Quick",
+    "Get Good Grades",
 ];
 
 const Title: React.FC = React.memo(() => {
@@ -61,11 +61,11 @@ const Title: React.FC = React.memo(() => {
                 <AnimatedTextCycle 
                     words={headingPhrases}
                     interval={3000}
-                    className="text-white"
+                    className="text-foreground"
                 />
             </motion.span>
             <motion.span 
-                className="bg-gradient-to-r from-white/80 via-white/60 to-white/80 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
+                className="bg-gradient-to-r from-foreground/80 via-foreground/60 to-foreground/80 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
                 variants={lineVariants}
             >
                 with AI

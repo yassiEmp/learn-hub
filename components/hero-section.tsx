@@ -33,7 +33,6 @@ export default function HeroSection() {
 
     return (
         <>
-            <HeroHeader />
             <main className="overflow-hidden">
                 <div className="min-h-screen w-full relative bg-background">
                     {/* X Organizations Black Background with Top Glow */}
@@ -53,7 +52,7 @@ export default function HeroSection() {
                         <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
                     </div>
                     <section>
-                        <div className="relative pt-24 md:pt-36">
+                        <div className="relative pt-24 md:pt-36 ">
                             <AnimatedGroup
                                 variants={{
                                     container: {
@@ -79,11 +78,11 @@ export default function HeroSection() {
                                         },
                                     },
                                 }}
-                                className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 lg:top-32">
+                                className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 lg:top-32 ">
                                 <Image
                                     src={app}
                                     alt="background"
-                                    className="hidden size-full dark:block"
+                                    className="hidden size-full dark:block "
                                     width="3276"
                                     height="4095"
                                 />
@@ -155,7 +154,7 @@ export default function HeroSection() {
                                                         disabled:pointer-events-none disabled:opacity-50
                                                         [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
                                         >
-                                            Start Testing for free
+                                            Generate Your First Exam For Free 
                                         </button>
                                         <p className='text-muted-foreground mt-3 block text-center text-sm'>No credit card required!</p>
                                     </AnimatedGroup>
@@ -175,7 +174,7 @@ export default function HeroSection() {
                                     ...transitionVariants,
                                 }}>
                                 <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-                                    <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
+                                    <div className="mt-0.5 inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                                         <Image
                                             className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
                                             src={app}
