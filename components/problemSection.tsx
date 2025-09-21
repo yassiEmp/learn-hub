@@ -137,7 +137,7 @@ const withMasterIt = [
 
 export default function ProblemSection() {
     return (
-        <section  className='flex flex-col items-center mb-32'>
+        <section  className='flex flex-col items-center mb-32' id="Benefits">
             <div className="bg-background/50 py-24 pb-6 ">
                 <div className="mx-auto w-full max-w-7xl px-6 flex items-center flex-col">
                     <div>

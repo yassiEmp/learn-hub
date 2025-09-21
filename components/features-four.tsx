@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 export default function FeaturesSection() {
     return (
         <section>
-            <div className="bg-background/50 py-24">
+            <div className="bg-background/50 py-24" id='Features'>
                 <div className="mx-auto w-full max-w-5xl px-6">
                     <div>
                         <h2 className="text-foreground mt-4 text-4xl font-semibold">All you need to Learn Fast </h2>
