@@ -268,13 +268,19 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
         </p>
         
         <div className="flex items-center gap-2 mt-2">
-          <Image
-            width={32}
-            src={course.instructorAvatar}
-            alt={course.instructor}
-            className="w-8 h-8 rounded-full object-cover border border-white/20"
-            onError={e => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(course.instructor || 'Unknown')}&background=random`; }}
-          />
+          {(() => {
+            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(course.instructor || 'Unknown')}&background=random&format=png`;
+            const avatarSrc = (course.instructorAvatar && course.instructorAvatar.trim().length > 0) ? course.instructorAvatar : fallback;
+            return (
+              <Image
+                width={32}
+                height={32}
+                src={avatarSrc}
+                alt={course.instructor}
+                className="w-8 h-8 rounded-full object-cover border border-white/20"
+              />
+            );
+          })()}
           <span className="text-xs text-white/70">{course.instructor}</span>
         </div>
         

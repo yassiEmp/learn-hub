@@ -135,18 +135,18 @@ const InputSection: React.FC = () => {
 
     return (
         <motion.form 
-            className="w-full px-4 sm:p-6 min-h-fit" 
+            className="w-full px-4 sm:p-6 min-h-fit mt-8" 
             onSubmit={handleSubmit}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            <div className="relative group w-full max-w-4xl mx-auto">
+            <div className="relative group w-full max-w-4xl mx-auto ">
                 {/* Glass card */}
                 <div
                     className={cn(
                         "relative p-6 sm:p-8 rounded-2xl overflow-hidden transition-all duration-300",
-                        "border-2 border-border/30 bg-background/40 backdrop-blur-xl",
+                        "border-2 border-foreground/10  bg-background/40 backdrop-blur-xl",
                         "hover:border-border/60 hover:-translate-y-1 will-change-transform",
                     )}
                 >

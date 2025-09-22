@@ -181,7 +181,7 @@ const createVariantsWithTransition = (
   if (!transition) return baseVariants;
 
   const { exit: _, ...mainTransition } = transition;
-
+  console.log(_)
   return {
     ...baseVariants,
     visible: {

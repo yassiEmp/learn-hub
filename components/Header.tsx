@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import React from 'react'
 import { cn } from '@/lib/utils'
+import { useTheme } from 'next-themes'
 
 const menuItems = [
     { name: 'Benefits', href: '#Benefits' },
@@ -17,7 +18,12 @@ const menuItems = [
 export const HeroHeader = () => {
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
-
+    const { setTheme } = useTheme()
+    // Remove forcing theme during render to respect system/default theme
+    React.useEffect(() => {
+        setTheme('light');
+    }, [setTheme]);
+    
     React.useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50)
@@ -82,24 +88,24 @@ export const HeroHeader = () => {
                                     asChild
                                     variant="outline"
                                     size="sm"
-                                    className={cn("rounded-full",isScrolled && 'lg:hidden')}>
-                                    <Link href="#">
+                                    className={cn("rounded-full", isScrolled && 'lg:hidden')}>
+                                    <Link href="#call">
                                         <span>Login</span>
                                     </Link>
                                 </Button>
                                 <Button
                                     asChild
                                     size="sm"
-                                    className={cn("rounded-full",isScrolled && 'lg:hidden')}>
-                                    <Link href="#">
+                                    className={cn("rounded-full", isScrolled && 'lg:hidden')}>
+                                    <Link href="#call">
                                         <span>Sign Up</span>
                                     </Link>
                                 </Button>
                                 <Button
                                     asChild
                                     size="sm"
-                                    className={cn("rounded-full ring-1 border-[0.5px] border-white/25 ",isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="#">
+                                    className={cn("rounded-full ring-1 border-[0.5px] border-white/25 ", isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                                    <Link href="#call">
                                         <span>Get Started</span>
                                     </Link>
                                 </Button>

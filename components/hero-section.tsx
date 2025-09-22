@@ -1,13 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
-import { ArrowRight, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import Image from 'next/image'
 import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
-import { HeroHeader } from '@/components/Header'
 import app from '@/public/app-2.png'
 import appDark from '@/public/app-2-dark.png'
+import { ArrowRight } from 'lucide-react'
 
 const transitionVariants = {
     item: {
@@ -21,7 +19,7 @@ const transitionVariants = {
             filter: 'blur(0px)',
             y: 0,
             transition: {
-                type: 'spring',
+                type: 'spring' as const,
                 bounce: 0.3,
                 duration: 1.5,
             },
@@ -43,7 +41,6 @@ export default function HeroSection() {
                         }}
                     />
 
-                    {/* Your Content/Components */}
                     <div
                         aria-hidden
                         className="absolute inset-0 isolate hidden opacity-65 contain-strict lg:block">
@@ -145,7 +142,8 @@ export default function HeroSection() {
                                             ...transitionVariants,
                                         }}
                                         className="mt-12 flex flex-col items-center justify-center gap-2 ">
-                                        <button
+                                        <Link
+                                            href="#call"
                                             className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
                                                         h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors
                                                         shadow-md shadow-black/20 border-[0.5px] border-white/25 ring-1
@@ -155,7 +153,7 @@ export default function HeroSection() {
                                                         [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
                                         >
                                             Generate Your First Exam For Free 
-                                        </button>
+                                        </Link>
                                         <p className='text-muted-foreground mt-3 block text-center text-sm'>No credit card required!</p>
                                     </AnimatedGroup>
                                 </div>
@@ -194,7 +192,7 @@ export default function HeroSection() {
                             </AnimatedGroup>
                         </div>
                     </section>
-                    <section className="bg-background pb-16 pt-16 md:pb-32">
+                    {/* <section className="bg-background pb-16 pt-16 md:pb-32">
                         <div className="group relative m-auto max-w-5xl px-6">
                             <div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
                                 <Link
@@ -282,7 +280,7 @@ export default function HeroSection() {
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    </section> */}
                 </div>
             </main>
         </>

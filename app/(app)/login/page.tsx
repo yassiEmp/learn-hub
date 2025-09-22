@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { motion, Variants } from 'framer-motion'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
-import FloatingParticle from '../../components/FloatingParticle'
-import { SocialLoginButtons } from '../../components/SocialLoginButtons'
+import FloatingParticle from '../../../components/FloatingParticle'
+import { SocialLoginButtons } from '../../../components/SocialLoginButtons'
 import { AuthError } from '@supabase/supabase-js'
 
 type MessageType = 'success' | 'error' | 'info'

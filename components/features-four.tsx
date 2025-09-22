@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@/lib/utils'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Bold, Calendar1, Ellipsis, Italic, Strikethrough, Underline, Zap, Upload, HelpCircle, Brain, TrendingUp, FileText, BookOpen, Target, Activity } from 'lucide-react'
+import { Bold, Calendar1, Ellipsis, Italic, Strikethrough, Underline, Zap, Upload, HelpCircle, Brain, TrendingUp, FileText, BookOpen, Target } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/card'
 
@@ -31,7 +31,7 @@ export default function FeaturesSection() {
                             </div>
                             <div className="text-center">
                                 <h3 className="text-foreground text-xl font-semibold">Supports Multiple Formats</h3>
-                                <p className="text-muted-foreground mt-4 text-balance text-lg">Whether it's lecture notes, textbooks, or videos, our platform handles them all. No conversions, no manual input — just upload and learn.</p>
+                                <p className="text-muted-foreground mt-4 text-balance text-lg">Whether it&apos;s lecture notes, textbooks, or videos, our platform handles them all. No conversions, no manual input — just upload and learn.</p>
                             </div>
                         </Card>
                         <Card className="p-6 md:col-span-2">

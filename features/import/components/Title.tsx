@@ -3,9 +3,8 @@ import AnimatedTextCycle from '@/components/ui/AnimatedTextCycle';
 import { motion , Variants } from 'framer-motion';
 
 const headingPhrases = [
-    "Flash Card", 
-    "Multiple Choice Question",
-    "Spaced Repatition",
+    "Generate Flash Card", 
+    "Generate MCQ's",
     "learn Effectively",
     "learn Quick",
     "Get Good Grades",
@@ -49,7 +48,7 @@ const Title: React.FC = React.memo(() => {
 
     return (
         <motion.h1 
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-syne font-medium leading-tight tracking-tight text-center"
+            className="text-3xl sm:text-4xl md:text-5xl font-syne font-medium leading-tight tracking-tight text-center mt-28 mb-8"
             variants={titleVariants}
             initial="hidden"
             animate="visible"
@@ -63,12 +62,6 @@ const Title: React.FC = React.memo(() => {
                     interval={3000}
                     className="text-foreground"
                 />
-            </motion.span>
-            <motion.span 
-                className="bg-gradient-to-r from-foreground/80 via-foreground/60 to-foreground/80 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
-                variants={lineVariants}
-            >
-                with AI
             </motion.span>
         </motion.h1>
     );

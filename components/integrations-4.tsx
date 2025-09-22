@@ -1,8 +1,6 @@
 import { Gemini, Replit, MagicUI, VSCodium, MediaWiki, GooglePaLM } from '@/components/logos'
 import { cn } from '@/lib/utils'
 import { LogoIcon } from '@/components/logo'
-import { Button } from '@/components/ui/Button'
-import Link from 'next/link'
 
 export default function IntegrationsSection() {
     return (
@@ -50,17 +48,18 @@ export default function IntegrationsSection() {
                         <h2 className="text-balance text-3xl font-semibold md:text-4xl">Import Note And Courses From your favorite tools</h2>
                         <p className="text-muted-foreground">Import <span className='text-secondary-foreground/90'>PDF | notes | YouTube link and more...</span> from Drop-box , Google-drives , Whatsapp , Youtube , Pictures and get instant quizzes, flashcards, and practice exams that help you learn fast.</p>
 
-                        <button
+                        <a
+                            href="#call"
                             className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
-                                                        h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors
-                                                        shadow-md shadow-black/20 border-[0.5px] border-white/25 ring-1
-                                                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
-                                                        ring-[--ring-color] [--ring-color:color-mix(in_oklab,var(--color-foreground)15%,var(--color-primary))]
-                                                        disabled:pointer-events-none disabled:opacity-50
-                                                        [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
+                                        h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors
+                                        shadow-md shadow-black/20 border-[0.5px] border-white/25 ring-1
+                                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
+                                        ring-[--ring-color] [--ring-color:color-mix(in_oklab,var(--color-foreground)15%,var(--color-primary))]
+                                        disabled:pointer-events-none disabled:opacity-50
+                                        [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
                         >
                             Try It Now
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

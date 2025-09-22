@@ -6,10 +6,11 @@ import { Sparkles, Menu, X, LogOut } from 'lucide-react';
 import { cva } from 'class-variance-authority';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 
 // Navbar container variants
 const navbarVariants = cva(
-  "bg-background/80 border border-border/20 px-6 max-w-4xl w-full py-3 shadow-xl backdrop-blur-md mx-auto transition-[border-radius] duration-200",
+  "bg-background/20 border px-6 max-w-4xl w-full py-3 border-foreground/10 backdrop-blur-md mx-auto transition-[border-radius] duration-200",
   {
     variants: {
       isMenuOpen: {
@@ -29,7 +30,7 @@ const navItemVariants = cva(
   {
     variants: {
       active: {
-        true: "text-foreground bg-muted/60",
+        true: "text-foreground bg-muted/30 border border-foreground/10",
         false: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       }
     },
@@ -159,7 +160,8 @@ const ActionButtons = () => {
 export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
-
+  const {setTheme} = useTheme()
+  setTheme("dark")
   if(loading){
     return <>
       <div><p>loading</p></div>

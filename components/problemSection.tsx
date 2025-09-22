@@ -1,10 +1,6 @@
 'use client'
-import { cn } from '@/lib/utils'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Bold, Calendar1, Ellipsis, Italic, Strikethrough, Underline, Zap, Upload, HelpCircle, Brain, TrendingUp, FileText, BookOpen, Target, Activity } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/card'
 import Image from 'next/image'
+import Link from 'next/link';
 const withoutMasterIt = [
     // Least Impactful (1-3)
     {
@@ -137,7 +133,7 @@ const withMasterIt = [
 
 export default function ProblemSection() {
     return (
-        <section  className='flex flex-col items-center mb-32' id="Benefits">
+        <section  className='flex flex-col items-center mb-32' id="Benefitsé">
             <div className="bg-background/50 py-24 pb-6 ">
                 <div className="mx-auto w-full max-w-7xl px-6 flex items-center flex-col">
                     <div>
@@ -175,7 +171,8 @@ export default function ProblemSection() {
                     </div>
                 </div>
             </div>
-            <button
+            <Link
+                href="#call"
                 className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
                             h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200
                             shadow-md shadow-black/10 dark:shadow-black/30 border border-primary/20 dark:border-primary/30
@@ -186,7 +183,7 @@ export default function ProblemSection() {
                             active:scale-[0.98] transform"
             >
                 Generate Your First Exam For Free
-            </button>
+            </Link>
         </section>
     )
 }

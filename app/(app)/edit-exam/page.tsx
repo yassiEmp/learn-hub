@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import { ExamEditor } from '@/components/ExamEditor'
-import Nav from '@/components/Header'
+import Nav from '@/components/hearderApp'
 import { AuthGuard } from '@/components/AuthGuard'
 
 const Page = () => {

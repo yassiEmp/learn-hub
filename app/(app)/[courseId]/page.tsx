@@ -7,6 +7,8 @@ import { useParams } from 'next/navigation'
 import Loading from './detail/loading'
 // import { useEffect } from 'react';
 
+export const dynamic = 'force-dynamic'
+
 const Page = () => {
   const params = useParams()
   const {courseId} = params

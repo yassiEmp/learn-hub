@@ -35,7 +35,7 @@ const itemVariants = {
 };
 
 export const HeroSection = () => {
-  const { theme, setTheme } = useTheme()
+  const { theme } = useTheme()
   console.log(theme)
 
   return (
