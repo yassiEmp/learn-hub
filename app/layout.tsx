@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const syne = Syne({
   subsets: ["latin"],
@@ -23,6 +25,8 @@ export default function RootLayout({
       <body
         className={`${syne.className} antialiased w-full h-full overflow-x-hidden`}
       >
+        <SpeedInsights />
+        <Analytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
