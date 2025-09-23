@@ -262,3 +262,79 @@ body {
 .prose-enhanced blockquote {
   @apply border-l-4 border-l-blue-400 bg-blue-400/5 pl-4 py-2 rounded-r-lg my-4 text-white/90 font-geist-mono;
 } */
+
+/* Custom scrollbar utilities */
+.scrollbar-hide {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+@keyframes autoScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes autoScrollHorizontal {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes autoScrollContinuous {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+/* Auto-scroll utility classes */
+.auto-scroll {
+  animation: autoScroll 10s linear infinite alternate;
+}
+
+.auto-scroll-horizontal {
+  animation: autoScrollHorizontal 15s linear infinite alternate;
+}
+.auto-scroll-horizontal:hover {
+  animation: autoScrollHorizontal 15s linear infinite alternate;
+  animation-play-state: paused;
+}
+.auto-scroll-continuous {
+  animation: autoScrollContinuous 8s linear infinite alternate;
+}
+
+.auto-scroll-pause:hover {
+  animation-play-state: paused;
+}
+.animation-stop{
+  animation-play-state: initial;
+}
+
+@media (min-width: 768px) {
+  .auto-scroll,
+  .auto-scroll-horizontal,
+  .auto-scroll-continuous {
+    animation: none !important;
+  }
+
+  .auto-scroll:hover,
+  .auto-scroll-horizontal:hover,
+  .auto-scroll-continuous:hover,
+  .auto-scroll-pause:hover {
+    animation: none !important;
+  }
+}

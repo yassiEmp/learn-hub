@@ -1,4 +1,3 @@
-'use client'
 import Image from 'next/image'
 import Link from 'next/link';
 const withoutMasterIt = [
@@ -133,7 +132,7 @@ const withMasterIt = [
 
 export default function ProblemSection() {
     return (
-        <section  className='flex flex-col items-center mb-32' id="Benefitsé">
+        <section className='flex flex-col items-center mb-32' id="Benefitsé">
             <div className="bg-background/50 py-24 pb-6 ">
                 <div className="mx-auto w-full max-w-7xl px-6 flex items-center flex-col">
                     <div>
@@ -143,30 +142,39 @@ export default function ProblemSection() {
 
                     </div>
 
-                    <div className="grid gap-4 grid-col-1 md:grid-cols-2 dark:bg-transparent bg-gray-100/40 w-full mx-auto rounded-3xl p-4">
-                        <div className='w-full h-full bg-red-100/40 dark:bg-red-950/20 p-4 rounded-2xl'>
+                    <div className="grid gap-4 grid-col-1 md:grid-cols-2 dark:bg-transparent bg-gray-100/40 w-full mx-auto rounded-3xl p-2 md:p-4">
+                        <div className='w-full h-full bg-red-100/40 dark:bg-red-950/20 p-2 md:p-4 rounded-2xl overflow-x-hidden'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>Without Master-It</p>
-                            {withoutMasterIt.map((el, index) =>
-                                <div key={index} className='w-full bg-background dark:bg-background/60 rounded-xl border border-red-200 dark:border-red-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200'>
-                                    <div className='flex'>
-                                        <Image src='./red-cross.svg' width={21} height={21} alt="a red " className='mr-2' />
-                                        <p className='font-medium text-lg'>{el.point}</p>
-                                    </div>
-                                    <p className='text-muted-foreground text-sm '>{el.description}</p>
+                            <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
+                                <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
+                                    {withoutMasterIt.map((el, index) =>
+                                        <div key={index} className='w-full min-w-[245px] bg-background dark:bg-background/60 rounded-xl border border-red-200 dark:border-red-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
+                                            <div className='flex'>
+                                                <Image src='./red-cross.svg' width={21} height={21} alt="a red cross" className='mr-2' />
+                                                <p className='font-medium text-lg'>{el.point}</p>
+                                            </div>
+                                            <p className='text-muted-foreground text-sm '>{el.description}</p>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
-                        <div className='w-full h-full bg-green-100/40 dark:bg-green-950/20 p-4 rounded-2xl'>
+                        <div className='w-full h-full bg-green-100/40 dark:bg-green-950/20 p-4 rounded-2xl overflow-x-hidden'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>With Master-It</p>
-                            {withMasterIt.map((el, index) =>
-                                <div key={index} className='w-full bg-background dark:bg-background/60 rounded-xl border border-green-200 dark:border-green-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200'>
-                                    <div className='flex'>
-                                        <Image src='./green-check.svg' width={21} height={21} alt="a red " className='mr-2' />
-                                        <p className='font-medium text-lg capitalize'>{el.point}</p>
-                                    </div>
-                                    <p className='text-muted-foreground text-sm '>{el.description}</p>
+
+                            <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
+                                <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
+                                    {withMasterIt.map((el, index) =>
+                                        <div key={index} className='w-full min-w-[245px]  bg-background dark:bg-background/60 rounded-xl border border-green-200 dark:border-green-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
+                                            <div className='flex'>
+                                                <Image src='./green-check.svg' width={21} height={21} alt="a red " className='mr-2' />
+                                                <p className='font-medium text-lg capitalize'>{el.point}</p>
+                                            </div>
+                                            <p className='text-muted-foreground text-sm '>{el.description}</p>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </div>
