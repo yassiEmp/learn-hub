@@ -11,8 +11,8 @@ const syne = Syne({
 })
 
 export const metadata: Metadata = {
-  title: "Master-It",
-  description: "Master-it is the ultimate AI-powered study and productivity app. Beyond reminders and focus tools, it helps you truly learn with interactive flashcards, fill-in-the-gap exercises, and personalized exam generation based on your study material. Whether you’re preparing for school exams, certifications, or self-learning, Master-it adapts to your needs. Beat procrastination, stay productive, and learn smarter with Master-it.",
+  title: "flashmind",
+  description: "flashmind is the ultimate AI-powered study and productivity app. Beyond reminders and focus tools, it helps you truly learn with interactive flashcards, fill-in-the-gap exercises, and personalized exam generation based on your study material. Whether you’re preparing for school exams, certifications, or self-learning, flashmind adapts to your needs. Beat procrastination, stay productive, and learn smarter with flashmind.",
 };
 
 export default function RootLayout({

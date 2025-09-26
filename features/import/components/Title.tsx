@@ -48,13 +48,13 @@ const Title: React.FC = React.memo(() => {
 
     return (
         <motion.h1 
-            className="text-3xl sm:text-4xl md:text-5xl font-syne font-medium leading-tight tracking-tight text-center mt-28 mb-8"
+            className="text-3xl sm:text-4xl md:text-5xl font-syne font-medium leading-tight tracking-tight text-center mb-8"
             variants={titleVariants}
             initial="hidden"
             animate="visible"
         >
             <motion.span 
-                className="text-white block mb-2"
+                className="text-white block mb-2 text-center"
                 variants={lineVariants}
             >
                 <AnimatedTextCycle 

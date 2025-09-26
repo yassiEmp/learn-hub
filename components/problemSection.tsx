@@ -85,7 +85,7 @@ const withMasterIt = [
     // Low Impact (4-6)
     {
         point: "Test Your Knowleadge While you are learning ",
-        description: "Test your knowleadge while learning with all the different test available on Master-It so you can track your evolution and be sure you are learning effectivelly"
+        description: "Test your knowleadge while learning with all the different test available on flashmind so you can track your evolution and be sure you are learning effectivelly"
     },
     {
         point: "Automatically Crafted Exams",
@@ -119,7 +119,7 @@ const withMasterIt = [
     {
         point: "Planned Tests Before Exams",
         description:
-            "Master-It plans test series before your exams to show you what to focus on.",
+            "flashmind plans test series before your exams to show you what to focus on.",
     },
 
     // Most Impactful (11)
@@ -144,7 +144,7 @@ export default function ProblemSection() {
 
                     <div className="grid gap-4 grid-col-1 md:grid-cols-2 dark:bg-transparent bg-gray-100/40 w-full mx-auto rounded-3xl p-2 md:p-4">
                         <div className='w-full h-full bg-red-100/40 dark:bg-red-950/20 p-2 md:p-4 rounded-2xl overflow-x-hidden'>
-                            <p className='text-2xl font-bold text-foreground text-center mb-4'>Without Master-It</p>
+                            <p className='text-2xl font-bold text-foreground text-center mb-4'>Without flashmind</p>
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
                                 <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
                                     {withoutMasterIt.map((el, index) =>
@@ -160,7 +160,7 @@ export default function ProblemSection() {
                             </div>
                         </div>
                         <div className='w-full h-full bg-green-100/40 dark:bg-green-950/20 p-4 rounded-2xl overflow-x-hidden'>
-                            <p className='text-2xl font-bold text-foreground text-center mb-4'>With Master-It</p>
+                            <p className='text-2xl font-bold text-foreground text-center mb-4'>With flashmind</p>
 
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
                                 <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>

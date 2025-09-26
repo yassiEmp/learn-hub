@@ -8,11 +8,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 const placeholderPhrases = [
-    "Learning Python programming from scratch",
-    "Mastering digital marketing strategies",
-    "Building mobile apps with React Native",
-    "Understanding machine learning basics",
-    "Creating stunning UI/UX designs",
+    "Create Exam to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
+    "Create flashcard to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
+    "Create fill-in the gap test to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
+    "Create ture/false test to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
+    "Create FlashCard for Learning Python programming ",
+    "Create Flashcard for Learning Math calculus"
 ];
 
 const InputSection: React.FC = () => {
@@ -135,7 +136,7 @@ const InputSection: React.FC = () => {
 
     return (
         <motion.form 
-            className="w-full px-4 sm:p-6 min-h-fit mt-8" 
+            className="w-full px-4 sm:p-6 min-h-fit mt-2" 
             onSubmit={handleSubmit}
             variants={containerVariants}
             initial="hidden"
@@ -145,9 +146,9 @@ const InputSection: React.FC = () => {
                 {/* Glass card */}
                 <div
                     className={cn(
-                        "relative p-6 sm:p-8 rounded-2xl overflow-hidden transition-all duration-300",
+                        "relative p-6 sm:p-8 rounded-2xl overflow-hidden duration-300",
                         "border-2 border-foreground/10  bg-background/40 backdrop-blur-xl",
-                        "hover:border-border/60 hover:-translate-y-1 will-change-transform",
+                        "hover:border-border/60 -change-transform",
                     )}
                 >
                     {/* Subtle dot pattern background */}
@@ -175,7 +176,7 @@ const InputSection: React.FC = () => {
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
                                         className="bg-foreground/40 border-2 border-border/90 rounded-xl text-foreground placeholder:text-muted-foreground/70 text-base sm:text-lg resize-none min-h-[120px] p-4 focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition-all duration-200 backdrop-blur-sm font-geist-mono shadow-sm"
-                                        placeholder={`Create course for ${placeholderText}`}
+                                        placeholder={`${placeholderText}`}
                                     />
                                 </motion.div>
                             </div>
@@ -206,7 +207,6 @@ const InputSection: React.FC = () => {
                                         type="button"
                                         className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
-                                        <Plus className="w-4 h-4" />
                                         <Video className="w-4 h-4" />
                                         Video
                                     </Button>
@@ -218,7 +218,6 @@ const InputSection: React.FC = () => {
                                         type="button"
                                         className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
-                                        <Plus className="w-4 h-4" />
                                         <Image className="w-4 h-4" />
                                         Image
                                     </Button>
@@ -260,7 +259,7 @@ const InputSection: React.FC = () => {
                                     {/* Button content */}
                                     <div className="relative flex items-center justify-center gap-2">
                                         <span className="font-medium">
-                                            Create Course
+                                            Create Exam
                                         </span>
                                         <motion.div
                                             className="flex items-center"

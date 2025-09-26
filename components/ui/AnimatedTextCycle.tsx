@@ -122,7 +122,7 @@ export default React.memo(function AnimatedTextCycle({
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={currentIndex}
-            className={`absolute top-0 left-0 font-bold ${className}`}
+            className={`absolute top-0 left-0 font-bold ${className} bg-gradient-to-r  from-80% from-[#EFA6DF] to-[#4CB9DF] to-95%% bg-clip-text text-transparent`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -133,10 +133,11 @@ export default React.memo(function AnimatedTextCycle({
               height: "fit-content"
             }}
           >
-            {words[currentIndex]}
+            {words[currentIndex] + " ?"}
           </motion.span>
         </AnimatePresence>
       </motion.span>
     </>
   );
 });
+

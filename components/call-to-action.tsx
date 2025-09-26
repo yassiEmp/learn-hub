@@ -35,7 +35,7 @@ export default function CallToAction() {
             <div className="mx-auto max-w-5xl px-6">
                 <div className="mx-auto max-w-md text-center">
                     <h2 className="text-balance text-3xl font-semibold md:text-4xl">Create, Learn and Succeed</h2>
-                    <p className="text-muted-foreground mt-4 text-balance">Join a community of over 100+ learner and teacher who have already discovered the power of Master-It.</p>
+                    <p className="text-muted-foreground mt-4 text-balance">Join a community of over 100+ learner and teacher who have already discovered the power of flashmind.</p>
                     
                     <form className="mx-auto my-6 w-full max-w-xs" onSubmit={handleSubmit}>
                         <label 

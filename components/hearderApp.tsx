@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Menu, X, LogOut } from 'lucide-react';
 import { cva } from 'class-variance-authority';
@@ -75,7 +75,7 @@ const actionButtonVariants = cva(
 // Navigation Items Component
 const NavItems = ({ currentPath }: { currentPath: string }) => {
   const { isAuthenticated, isConfigured } = useAuth()
-  
+
   const navItems = [
     { id: 'import', label: 'Create', path: '/create' },
     ...(isAuthenticated && isConfigured ? [
@@ -148,7 +148,7 @@ const ActionButtons = () => {
       <Link href="/login" className={actionButtonVariants()}>
         Login
       </Link>
-      
+
       <Link href="/login" className={actionButtonVariants({ variant: "primary" })}>
         Start Learning
       </Link>
@@ -160,9 +160,11 @@ const ActionButtons = () => {
 export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
-  const {setTheme} = useTheme()
-  setTheme("dark")
-  if(loading){
+  const { setTheme } = useTheme()
+  useEffect(() => {
+    setTheme("dark")
+  })
+  if (loading) {
     return <>
       <div><p>loading</p></div>
     </>
@@ -187,14 +189,14 @@ export default function Nav({ currentPath }: { currentPath: string }) {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center animate-fade-in">
-            <Link 
+            <Link
               href="/"
               className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
             >
               <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-foreground" />
               </div>
-              <span className="text-sm font-syne font-medium text-foreground">LearnHub</span>
+              <span className="text-sm font-syne font-medium text-foreground">flashmind</span>
             </Link>
           </div>
 
@@ -228,7 +230,7 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                 {item.label}
               </Link>
             ))}
-            
+
             {/* Mobile Auth Actions */}
             <div className="pt-2 border-t border-border/20 mt-2">
               {user && isConfigured ? (
