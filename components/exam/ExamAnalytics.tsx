@@ -207,7 +207,7 @@ export const ExamAnalyticsComp = ({
   onQuestionClick
 }: ExamAnalyticsProps) => {
   const results = analytics.resultTrue
-  const userAnswers = analytics.resultForExercice
+  const userAnswers = analytics.resultForExercise
   const totalQuestions = exam.exercices.length
   const correctAnswers = Array.from(results.values()).filter(Boolean).length
   const incorrectAnswers = results.size - correctAnswers
