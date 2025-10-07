@@ -161,7 +161,7 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
         analytics={
           {
             resultTrue: answerResults,
-            resultForExercice: userAnswers,
+            resultForExercise: userAnswers,
             correctAnswer: correctAnswers,
             accuracy: Exam.exercices.length > 0
               ? Math.round(
