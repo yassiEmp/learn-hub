@@ -1,6 +1,29 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Custom Scrollbar Styles */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 * {
@@ -336,5 +359,26 @@ body {
   .auto-scroll-continuous:hover,
   .auto-scroll-pause:hover {
     animation: none !important;
+  }
+}
+
+/* MCQ Component Overflow Fixes */
+.mcq-container {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.mcq-option-text {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Ensure proper text wrapping on all devices */
+@media (max-width: 640px) {
+  .mcq-option-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 }

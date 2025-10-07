@@ -1,4 +1,4 @@
-import type { Exam } from '@/components/ExamComponant'
+import type { Exam } from '@/components/exam'
 
 export const sampleExam: Exam = {
   id: 'intro-js-001',
@@ -35,16 +35,7 @@ export const sampleExam: Exam = {
       answer: 'array'
     }
   ],
-  mode: 'Exercice',
-  currentFlashCard: 0,
-  currentExercice: 0,
-  resultForExercice: new Map(),
-  resultTrue: new Map(),
-  gradeAnalitycs: {
-    accuracy: 0,
-    correctAnswer: 0,
-    incorrectAnswer: 0
-  }
+  mode: 'Exercice'
 }
 
 
