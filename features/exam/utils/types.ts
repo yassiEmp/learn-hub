@@ -2,13 +2,26 @@
 // 📘 Learning Science–Aligned Exam Type System
 // ===============================================
 
+//================================
+// 🧠 clean types for ai generation 
+//=================================
+// This replaces the 'exercises' property of Exam with 'exercises' of type CleanExercise[].
+export type CleanExam = Omit<Exam, 'mode' | 'exercises'> & { exercises: CleanExercise[] }; // A "clean" Exercise type with metadata removed
+export type CleanExercise = Omit<Exercise, 'meta'>;
+export type CreateExam = (content:string)=>Promise<CleanExam>
+export type CleanExerciseFeedback = 
+| Omit<MCQFeedback,'shownAt' | 'wasHelpful'>
+| Omit<FillInFeedback,'shownAt' | 'wasHelpful'>
+| Omit<TrueOrFalseFeedback,'shownAt' | 'wasHelpful'>
+| Omit<FlashcardFeedback,'shownAt' | 'wasHelpful'>;
+export type CleanExerciseFeedbackMap = Map<number,CleanExerciseFeedback>
 // -----------------------------
 // 🧠 Core Exam and Exercise Types
 // -----------------------------
 export type Exam = {
   id: string;
-  name: string;
-  exercices: Exercise[];
+  title: string;
+  exercises: Exercise[];
   mode: 'flashCard' | 'Exercice';
 };
 
@@ -17,33 +30,31 @@ export type Exam = {
 // -----------------------------
 export type Exercise =
   | {
-      type: 'fill-in';
-      content: string;
-      options: string[];
-      answer: string;
-      meta?: CognitiveMetadata;
-    }
+    type: 'fill-in';
+    content: string;
+    options: string[];
+    answer: string;
+    meta?: CognitiveMetadata;
+  }
   | {
-      type: 'yes/no';
-      content: string;
-      options: ['yes', 'no'];
-      answer: 'yes' | 'no';
-      meta?: CognitiveMetadata;
-    }
+    type: 'true/false';
+    content: string;
+    answer: 'true' | 'false';
+    meta?: CognitiveMetadata;
+  }
   | {
-      type: 'mcq';
-      content: string;
-      options: string[];
-      answer: string;
-      meta?: CognitiveMetadata;
-    }
+    type: 'mcq';
+    content: string;
+    options: string[];
+    answer: string;
+    meta?: CognitiveMetadata;
+  }
   | {
-      type: 'flashcard';
-      content: string;
-      options: [];
-      answer: string;
-      meta?: CognitiveMetadata;
-    };
+    type: 'flashcard';
+    content: string;
+    answer: string;
+    meta?: CognitiveMetadata;
+  };
 
 // -----------------------------
 // 🧩 Cognitive Metadata (Learning-Science Layer)
@@ -96,6 +107,41 @@ export type Feedback = {
   wasHelpful?: boolean;
 };
 
+// Base feedback type
+export type BaseFeedback = {
+  shownAt: string; // ISO timestamp
+  wasHelpful?: boolean;
+};
+
+// MCQ Feedback: map option index → explanation
+export type MCQFeedback = BaseFeedback & {
+  type: 'mcq';
+  explanations: Map<number, string>; // each option index -> explanation
+};
+
+// Fill-in Feedback: map option index → explanation
+export type FillInFeedback = BaseFeedback & {
+  type: 'fill-in';
+  explanations: Map<number, string>; // each option index -> explanation
+};
+
+// True/False Feedback
+export type TrueOrFalseFeedback = BaseFeedback & {
+  type: 'true/false';
+  explanation?: string; // short explanation why true or false
+};
+
+// Flashcard Feedback
+export type FlashcardFeedback = BaseFeedback & {
+  type: 'flashcard';
+  explanation?: string; // elaboration / mnemonic
+};
+export type ExerciseFeedback =
+  | MCQFeedback
+  | FillInFeedback
+  | TrueOrFalseFeedback
+  | FlashcardFeedback;
+export type ExerciseFeedbackMap = Map<number,ExerciseFeedback>
 // -----------------------------
 // 🧭 Learning Session Types
 // -----------------------------
@@ -129,7 +175,6 @@ export interface MCQProps {
 // True/False Question Component
 export interface TrueOrFalseProps {
   content: string;
-  options: ['yes', 'no'];
   selectedAnswer?: string;
   correctAnswer?: string;
   onAnswerSelect?: (answer: string) => void;

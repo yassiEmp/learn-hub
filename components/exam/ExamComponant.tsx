@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import ProgressBar from '../ProgressBar'
 import { ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { Exam } from './types'
+import { Exam } from '../../features/exam/utils/types'
 import MCQ from './MCQ'
 import TrueOrFalse from './TrueOrFalse'
 import { FlipCard } from './FlipCard'
@@ -17,7 +17,7 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
   const [isExamComplete, setIsExamComplete] = useState<boolean>(false)
   const [showResults, setShowResults] = useState<boolean>(false)
 
-  const currentExercice = Exam.exercices[currentExerciceIdx]
+  const currentExercice = Exam.exercises[currentExerciceIdx]
   const isFlashcardMode = Exam.mode === 'flashCard'
 
 
@@ -32,29 +32,29 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
     } else {
       // For non-flashcard modes, check if answer is correct
       // We'll get the correct answer from the current exercise
-      const currentExercise = Exam.exercices[exerciseIndex]
+      const currentExercise = Exam.exercises[exerciseIndex]
       const correctAnswer = currentExercise?.answer
       const isAnswerCorrect = answer === correctAnswer
       setAnswerResults(prev => new Map(prev.set(exerciseIndex, isAnswerCorrect)))
     }
-  }, [currentExerciceIdx, currentFlashCardIdx, isFlashcardMode, Exam.exercices])
+  }, [currentExerciceIdx, currentFlashCardIdx, isFlashcardMode, Exam.exercises])
 
   // Navigation functions
   const goToNext = useCallback(() => {
     if (isFlashcardMode) {
-      if (currentFlashCardIdx < Exam.exercices.length - 1) {
+      if (currentFlashCardIdx < Exam.exercises.length - 1) {
         setCurrentFlashCardIdx(prev => prev + 1)
       } else {
         setIsExamComplete(true)
       }
     } else {
-      if (currentExerciceIdx < Exam.exercices.length - 1) {
+      if (currentExerciceIdx < Exam.exercises.length - 1) {
         setCurrentExerciceIdx(prev => prev + 1)
       } else {
         setIsExamComplete(true)
       }
     }
-  }, [currentExerciceIdx, currentFlashCardIdx, isFlashcardMode, Exam.exercices.length])
+  }, [currentExerciceIdx, currentFlashCardIdx, isFlashcardMode, Exam.exercises.length])
 
   const goToPrevious = useCallback(() => {
     if (isFlashcardMode) {
@@ -114,11 +114,10 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
             isCorrect={answerResults.get(currentIndex)}
           />
         )
-      case 'yes/no':
+      case 'true/false':
         return (
           <TrueOrFalse
             content={currentExercice.content}
-            options={currentExercice.options}
             selectedAnswer={selectedAnswers.get(currentIndex)}
             correctAnswer={currentExercice.answer}
             onAnswerSelect={handleAnswerSubmit}
@@ -163,12 +162,12 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
             resultTrue: answerResults,
             resultForExercise: userAnswers,
             correctAnswer: correctAnswers,
-            accuracy: Exam.exercices.length > 0
+            accuracy: Exam.exercises.length > 0
               ? Math.round(
-                  (correctAnswers / Exam.exercices.length) * 100
+                  (correctAnswers / Exam.exercises.length) * 100
                 )
               : 0,
-            incorrectAnswer: Exam.exercices.length - correctAnswers
+            incorrectAnswer: Exam.exercises.length - correctAnswers
           }
         }
         onRetry={() => {
@@ -204,8 +203,8 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
   return (
     <main className="flex flex-col items-center min-h-full h-full text-white">
       <div className="w-full max-w-6xl">
-        <h1 className='text-2xl text-center mt-4 mb-6'>{Exam.name}</h1>
-        <ProgressBar lenght={Exam.exercices.length} res={answerResults} />
+        <h1 className='text-2xl text-center mt-4 mb-6'>{Exam.title}</h1>
+        <ProgressBar lenght={Exam.exercises.length} res={answerResults} />
 
         <div className="mt-4 sm:mt-6 flex justify-center w-full overflow-hidden">
           {renderQuestion()}
@@ -243,9 +242,9 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
         {/* Progress indicator */}
         <div className="text-center text-sm text-gray-400 mt-4">
           {isFlashcardMode ? (
-            <>Flashcard {currentFlashCardIdx + 1} of {Exam.exercices.length}</>
+            <>Flashcard {currentFlashCardIdx + 1} of {Exam.exercises.length}</>
           ) : (
-            <>Question {currentExerciceIdx + 1} of {Exam.exercices.length}</>
+            <>Question {currentExerciceIdx + 1} of {Exam.exercises.length}</>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { courseApi } from '@/utils/api-client';
 import { Course, Lesson, CourseResponse } from '@/types/course';
 import { supabase } from '@/lib/supabase';
@@ -17,8 +17,18 @@ export function useCourses(): UseCoursesResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  
+  // Use ref to track if we've already fetched courses to prevent unnecessary re-fetches
+  const hasFetched = useRef(false);
+  const lastUserId = useRef<string | null>(null);
 
   useEffect(() => {
+    // Only fetch if we haven't fetched before or if the user has changed
+    const currentUserId = user?.id || null;
+    if (hasFetched.current && lastUserId.current === currentUserId) {
+      return;
+    }
+    
     setLoading(true);
     courseApi.getAll()
       .then(async (data: CourseResponse[]) => {
@@ -133,12 +143,22 @@ export function useCourses(): UseCoursesResult {
         const cats = Array.from(new Set(data.map((c: CourseResponse) => c.category || 'Uncategorized')));
         setCategories(['All', ...cats]);
         setLoading(false);
+        
+        // Mark as fetched and update user tracking
+        hasFetched.current = true;
+        lastUserId.current = currentUserId;
       })
       .catch((err: unknown) => {
         setError(err?.toString() || 'Failed to load courses');
         setLoading(false);
       });
-  }, [user]);
+  }, [user]); // Depend on user object for proper effect triggering
 
-  return { courses, categories, loading, error };
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
+    courses,
+    categories,
+    loading,
+    error
+  }), [courses, categories, loading, error]);
 } 

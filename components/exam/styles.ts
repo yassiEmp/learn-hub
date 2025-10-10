@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { ButtonVariant } from './types'
+import { ButtonVariant } from '../../features/exam/utils/types'
 
 export const buttonVarient = cva(
   "w-full rounded-md transition-colors flex p-4 items-center mt-1 mb-1",

@@ -30,7 +30,7 @@ const features = [
   {
     icon: HelpCircle,
     title: "Multiple Question Types",
-    description: "MCQs, fill-in-the-blank, yes/no questions, and flashcards — all automatically generated to test your knowledge from every angle.",
+    description: "MCQs, fill-in-the-blank, true/false questions, and flashcards — all automatically generated to test your knowledge from every angle.",
     color: "from-orange-500 to-red-600"
   },
   {

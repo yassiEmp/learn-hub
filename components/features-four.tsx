@@ -40,7 +40,7 @@ export default function FeaturesSection() {
                             </div>
                             <div className="text-center">
                                 <h3 className="text-foreground text-xl font-semibold">Multiple Question Types</h3>
-                                <p className="text-muted-foreground mt-4 text-balance text-lg">MCQs, fill-in-the-blank, yes/no questions, and flashcards — all automatically generated to test your knowledge from every angle.</p>
+                                <p className="text-muted-foreground mt-4 text-balance text-lg">MCQs, fill-in-the-blank, true/false questions, and flashcards — all automatically generated to test your knowledge from every angle.</p>
                             </div>
                         </Card>
                         <Card className="p-6">
@@ -185,7 +185,7 @@ export const QuestionTypesIllustration = ({ className }: { className?: string })
                     <span className="text-xs">Fill</span>
                 </div>
                 <div className="w-8 h-6 bg-accent rounded flex items-center justify-center">
-                    <span className="text-xs">Yes/No</span>
+                    <span className="text-xs">True/False</span>
                 </div>
             </div>
         </div>

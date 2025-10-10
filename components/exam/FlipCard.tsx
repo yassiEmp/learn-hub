@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FlipCardProps } from './types'
+import { FlipCardProps } from '../../features/exam/utils/types'
 import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Check, X } from 'lucide-react'
 
 export function FlipCard({ question, answer, handleValidationClick, showResult, isCorrect }: FlipCardProps) {

@@ -10,6 +10,7 @@
     "syncTask": "node --env-file=.env.local notion-sync/sync-tasks.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@langchain/core": "^0.3.61",
     "@langchain/google-genai": "^0.2.14",
     "@langchain/langgraph": "^0.3.6",

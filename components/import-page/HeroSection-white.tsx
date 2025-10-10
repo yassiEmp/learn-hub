@@ -1,7 +1,6 @@
 import { motion, easeInOut } from "framer-motion";
 import { ShaderBackground } from '../ui/ShaderBackground';
-import Title from '../../features/import/components/Title';
-import InputSection from '../../features/import/components/InputSection';
+import InputSection from '../InputSection';
 import { useTheme } from "next-themes";
 
 const containerVariants = {
@@ -60,7 +59,7 @@ export const HeroSection = () => {
       </div>
 
       {/* Dark overlay to ensure text readability */}
-      {/* <div className="absolute inset-0 bg-purple-100/30 z-10" /> */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/70  from-70% to-95% to-transparent" />
 
       {/* Hero Content */}
       <motion.div
@@ -70,13 +69,37 @@ export const HeroSection = () => {
         animate="visible"
       >
         <div className="w-full max-w-4xl mx-auto space-y-14 sm:space-y-12 text-center">
+          {/* Main Title and Instructions */}
           <motion.div
             className="space-y-6"
             variants={itemVariants}
           >
-            <Title />
-
-
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight">
+              Transform Your Content Into
+              <span className="block bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
+                Interactive Learning
+              </span>
+            </h1>
+            
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Simply paste your notes, PDFs, videos, or any learning material below and we&apos;ll create personalized exams, flashcards, and quizzes for you.
+            </p>
+            
+            {/* Visual indicator pointing to input */}
+            <motion.div 
+              className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
+              animate={{ 
+                y: [0, -5, 0],
+                opacity: [0.7, 1, 0.7]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <span>↓ Paste your content here ↓</span>
+            </motion.div>
           </motion.div>
 
           <motion.div

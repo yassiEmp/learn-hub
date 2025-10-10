@@ -8,10 +8,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 const placeholderPhrases = [
-    "Create Exam to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
-    "Create flashcard to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
-    "Create fill-in the gap test to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
-    "Create ture/false test to verify my knowleadge about X ......(paste your note/course/pdf...).....;",
+    "Create Exam to verify my knowledge about X ......(paste your note/course/pdf...).....;",
+    "Create flashcard to verify my knowledge about X ......(paste your note/course/pdf...).....;",
+    "Create fill-in the gap test to verify my knowledge about X ......(paste your note/course/pdf...).....;",
+    "Create true/false test to verify my knowledge about X ......(paste your note/course/pdf...).....;",
     "Create FlashCard for Learning Python programming ",
     "Create Flashcard for Learning Math calculus"
 ];
@@ -243,8 +243,8 @@ const InputSection: React.FC = () => {
                                 <motion.button
                                     type="submit"
                                     className={cn(
-                                        "relative px-8 py-3 rounded-xl font-medium text-primary-foreground",
-                                        "bg-primary hover:bg-primary/90 border-2 border-primary/20",
+                                        "relative px-8 py-3 rounded-xl font-medium text-black",
+                                        "bg-teal-200 hover:bg-teal-300/90 border-2 border-teal-500 ",
                                         "transition-all duration-300 group overflow-hidden",
                                         "shadow-lg hover:shadow-xl hover:border-primary/40",
                                         "active:scale-[0.98] w-full sm:w-auto font-geist-mono"
