@@ -23,6 +23,7 @@ export type Exam = {
   title: string;
   exercises: Exercise[];
   mode: 'flashCard' | 'Exercice';
+  courseId?: string; // Optional course ID for navigation
 };
 
 // -----------------------------

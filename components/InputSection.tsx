@@ -1,19 +1,19 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
-import { ArrowRight, BookOpen, Plus, Video, Image } from 'lucide-react';
+import { ArrowRight, BookOpen, Plus, Video, ImageIcon } from 'lucide-react';
 import { motion , Variants } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 const placeholderPhrases = [
-    "Create Exam to verify my knowledge about X ......(paste your note/course/pdf...).....;",
-    "Create flashcard to verify my knowledge about X ......(paste your note/course/pdf...).....;",
-    "Create fill-in the gap test to verify my knowledge about X ......(paste your note/course/pdf...).....;",
-    "Create true/false test to verify my knowledge about X ......(paste your note/course/pdf...).....;",
-    "Create FlashCard for Learning Python programming ",
-    "Create Flashcard for Learning Math calculus"
+    "Create a course about Python programming fundamentals...",
+    "Create a course about React.js and modern web development...",
+    "Create a course about machine learning and data science...",
+    "Create a course about digital marketing strategies...",
+    "Create a course about financial analysis and investment...",
+    "Create a course about project management methodologies..."
 ];
 
 const InputSection: React.FC = () => {
@@ -218,7 +218,7 @@ const InputSection: React.FC = () => {
                                         type="button"
                                         className="bg-muted/40 border-2 border-border/30 text-foreground hover:bg-muted/60 hover:border-border/50 transition-all duration-200 gap-2 backdrop-blur-sm text-sm font-geist-mono shadow-sm"
                                     >
-                                        <Image className="w-4 h-4" />
+                                        <ImageIcon className="w-4 h-4" />
                                         Image
                                     </Button>
                                 </motion.div>
@@ -259,7 +259,7 @@ const InputSection: React.FC = () => {
                                     {/* Button content */}
                                     <div className="relative flex items-center justify-center gap-2">
                                         <span className="font-medium">
-                                            Create Exam
+                                            Create Course
                                         </span>
                                         <motion.div
                                             className="flex items-center"

@@ -77,12 +77,12 @@ export const HeroSection = () => {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight">
               Transform Your Content Into
               <span className="block bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
-                Interactive Learning
+                Interactive Courses
               </span>
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Simply paste your notes, PDFs, videos, or any learning material below and we&apos;ll create personalized exams, flashcards, and quizzes for you.
+              Simply paste your notes, PDFs, videos, or any learning material below and we&apos;ll create a structured course for you. Once your course is ready, you can create personalized exams, flashcards, and quizzes directly from the course page.
             </p>
             
             {/* Visual indicator pointing to input */}
@@ -98,7 +98,7 @@ export const HeroSection = () => {
                 ease: "easeInOut"
               }}
             >
-              <span>↓ Paste your content here ↓</span>
+              <span>↓ Paste your content to create a course ↓</span>
             </motion.div>
           </motion.div>
 

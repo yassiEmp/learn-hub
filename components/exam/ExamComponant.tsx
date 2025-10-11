@@ -7,8 +7,10 @@ import TrueOrFalse from './TrueOrFalse'
 import { FlipCard } from './FlipCard'
 import { FillInGap } from './FillInGap'
 import { ExamAnalyticsComp } from './ExamAnalytics'
+import { useRouter } from 'next/navigation'
 
 const ExamComponant = ({ Exam }: { Exam: Exam }) => {
+  const router = useRouter()
   const [currentExerciceIdx, setCurrentExerciceIdx] = useState<number>(0)
   const [currentFlashCardIdx, setCurrentFlashCardIdx] = useState<number>(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Map<number, string>>(new Map())
@@ -180,12 +182,12 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
           setUserAnswers(new Map())
         }}
         onViewLesson={() => {
-          // Implement lesson viewing logic
-          console.log('View lesson')
+         // Navigate back to the course page
+         router.push(`/${Exam.courseId || ''}`);
         }}
         onViewSummary={() => {
-          // Implement summary viewing logic
-          console.log('View summary')
+          // Navigate back to the course page
+          router.push(`/${Exam.courseId || ''}`);
         }}
         onQuestionClick={(questionIndex) => {
           setIsExamComplete(false)

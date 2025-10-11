@@ -145,7 +145,7 @@ const QuestionGrid = ({
   results,
   onQuestionClick
 }: {
-  questions: { type: string; content: string; answer: string; options: string[] }[]
+  questions: { type: string; content: string; answer: string; options?: string[] }[]
   results: Map<number, boolean>
   onQuestionClick: (index: number) => void
 }) => {

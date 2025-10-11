@@ -151,7 +151,7 @@ class AiClient {
             model: "gemini-2.0-flash-exp",
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0.2,
-            maxOutputTokens: 4000,
+            maxOutputTokens: 40000,
         });
         this.config = config;
     }
