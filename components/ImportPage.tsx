@@ -1,7 +1,7 @@
 "use client"
 import React from 'react'
 import Nav from '@/components/hearderApp';
-import { HeroSection } from './import-page/HeroSection';
+import { HeroSection } from './import-page/HeroSection-white';
 
 const ImportPage = () => {
   return (

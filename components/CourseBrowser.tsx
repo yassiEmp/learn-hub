@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Search, Filter, Grid, List } from 'lucide-react';
 import { CourseCard } from './CourseCard';
 import { Course } from '../types/course';
@@ -7,7 +7,7 @@ import FloatingParticle from './FloatingParticle';
 import { useRouter } from 'next/navigation';
 import { useCourses } from '../features/course/hooks/useCourses';
 
-export const CourseBrowser: React.FC = () => {
+const CourseBrowserComponent: React.FC = () => {
   const { courses, categories, loading, error } = useCourses();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,32 +15,36 @@ export const CourseBrowser: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const router = useRouter();
 
-  const filteredCourses = courses
-    .filter(course => {
-      const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
-      const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           course.instructor?.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'popular':
-          return (b.studentsCount || 0) - (a.studentsCount || 0);
-        case 'rating':
-          return (b.rating || 0) - (a.rating || 0);
-        case 'price-low':
-          return (a.price || 0) - (b.price || 0);
-        case 'price-high':
-          return (b.price || 0) - (a.price || 0);
-        default:
-          return 0;
-      }
-    });
+  // Memoize filtered courses to prevent recalculation on every render
+  const filteredCourses = useMemo(() => {
+    return courses
+      .filter(course => {
+        const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
+        const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             course.instructor?.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'popular':
+            return (b.studentsCount || 0) - (a.studentsCount || 0);
+          case 'rating':
+            return (b.rating || 0) - (a.rating || 0);
+          case 'price-low':
+            return (a.price || 0) - (b.price || 0);
+          case 'price-high':
+            return (b.price || 0) - (a.price || 0);
+          default:
+            return 0;
+        }
+      });
+  }, [courses, selectedCategory, searchTerm, sortBy]);
 
-  const handleCourseSelect = (course: Course) => {
+  // Memoize callback to prevent unnecessary re-renders
+  const handleCourseSelect = useCallback((course: Course) => {
     router.push(`/course/${course.id}/detail`);
-  };
+  }, [router]);
 
   const containerVariants : Variants= {
     hidden: { opacity: 0 },
@@ -263,3 +267,6 @@ export const CourseBrowser: React.FC = () => {
     </div>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+export const CourseBrowser = React.memo(CourseBrowserComponent);

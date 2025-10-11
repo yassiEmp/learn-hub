@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Session, User } from '@supabase/supabase-js'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -208,7 +208,8 @@ export function useAuth() {
     }
   }, [isConfigured])
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     user,
     session,
     loading,
@@ -220,5 +221,5 @@ export function useAuth() {
     resetPassword,
     isAuthenticated: !!user,
     isConfigured
-  }
+  }), [user, session, loading, signIn, signUp, signInWithProvider, signOut, requireAuth, resetPassword, isConfigured])
 }

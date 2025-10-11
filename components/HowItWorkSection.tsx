@@ -21,7 +21,7 @@ const HowItWorkSection = () => {
                     <div className="text-center">
                         <div className="bg-destructive text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">2</div>
                         <h4 className="text-white text-xl font-semibold mb-4">Generate Your Exam</h4>
-                        <p className="text-gray-300 text-sm leading-relaxed">Our AI-powered engine automatically generates MCQs, fill-in-the-blank, yes/no questions, and flashcards — all tailored to your content in seconds.</p>
+                        <p className="text-gray-300 text-sm leading-relaxed">Our AI-powered engine automatically generates MCQs, fill-in-the-blank, true/false questions, and flashcards — all tailored to your content in seconds.</p>
                     </div>
                     
                     {/* Step 3 */}

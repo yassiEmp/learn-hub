@@ -14,7 +14,7 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
 }) => {
   const questionTypes = [
     { id: 'multiple-choice', label: 'Multiple Choice', icon: Circle },
-    { id: 'true-false', label: 'Yes / NO', icon: ToggleLeft },
+    { id: 'true-false', label: 'True / False', icon: ToggleLeft },
     { id: 'flash-card', label: 'Flash card', icon: Copy },
     { id: 'fill-text', label: 'Fill text', icon: Zap },
     { id: 'short-answer', label: 'Short Answer', icon: Edit3 },
@@ -86,26 +86,26 @@ export const QuestionEditor: React.FC<QuestionEditorProps> = ({
             <label className="block text-sm font-geist-mono text-white/70 mb-2">Response</label>
             <div className="flex space-x-4">
               <motion.button
-                onClick={() => onUpdate({ correctAnswer: 'yes' })}
+                onClick={() => onUpdate({ correctAnswer: 'true' })}
                 className={cn(
                   "px-5 py-3 rounded-xl border font-geist-mono font-medium text-sm",
-                  question.correctAnswer === 'yes' ? "bg-blue-500 text-white border-blue-500" : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
+                  question.correctAnswer === 'true' ? "bg-blue-500 text-white border-blue-500" : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
                 )}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                YES
+                TRUE
               </motion.button>
               <motion.button
-                onClick={() => onUpdate({ correctAnswer: 'no' })}
+                onClick={() => onUpdate({ correctAnswer: 'false' })}
                 className={cn(
                   "px-5 py-3 rounded-xl border font-geist-mono font-medium text-sm",
-                  question.correctAnswer === 'no' ? "bg-blue-500 text-white border-blue-500" : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
+                  question.correctAnswer === 'false' ? "bg-blue-500 text-white border-blue-500" : "bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white"
                 )}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                NO
+                FALSE
               </motion.button>
             </div>
           </div>

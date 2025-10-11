@@ -16,7 +16,7 @@ export type {
   TrueOrFalseProps,
   FlipCardProps,
   FillInGapProps
-} from './types'
+} from '../../features/exam/utils/types'
 
 // Export styles
 export { buttonVarient, getButtonVariant } from './styles'

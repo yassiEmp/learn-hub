@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { TrueOrFalseProps } from './types'
+import { TrueOrFalseProps } from '../../features/exam/utils/types'
 import { CheckCircle, XCircle, Circle, Check, X } from 'lucide-react'
 
-const TrueOrFalse = ({ content, options, selectedAnswer, correctAnswer, onAnswerSelect, showResult, isCorrect }: TrueOrFalseProps) => {
+const TrueOrFalse = ({ content, selectedAnswer, correctAnswer, onAnswerSelect, showResult, isCorrect }: TrueOrFalseProps) => {
+  const options = ['true', 'false'];
   const [hoveredOption, setHoveredOption] = useState<string | null>(null)
   const [selectedOption, setSelectedOption] = useState<string | null>(selectedAnswer || null)
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { MCQProps } from './types'
+import { MCQProps } from '../../features/exam/utils/types'
 import { CheckCircle, XCircle, Circle, Check, X } from 'lucide-react'
 
 const MCQ = ({ options, content, selectedAnswer, correctAnswer, onAnswerSelect, showResult, isCorrect }: MCQProps) => {

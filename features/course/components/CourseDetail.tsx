@@ -4,7 +4,9 @@ import { ArrowLeft, Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Code,
 import { Course } from '../../../types/course';
 import { motion , Variants } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../../hooks/useAuth';
 
 interface CourseDetailProps {
   course: Course;
@@ -58,16 +60,47 @@ function formatDuration(minutes?: number, fallback?: string): string {
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
   const router = useRouter();
+  const { session, user } = useAuth();
   const [activeTab, setActiveTab] = useState('lesson');
+  const [isGeneratingExam, setIsGeneratingExam] = useState(false);
   // const [courseContent, setCourseContent] = useState(course.content || '');
   const CategoryIcon = getCategoryIcon(course.category);
   const categoryColor = getCategoryColor(course.category);
+  
+  // Check if current user is the course creator
+  const isCourseCreator = user?.id === course.owner_id;
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'lesson', label: 'lesson' },
     { id: 'instructor', label: 'Instructor' },
   ];
+
+  // Add exam generation handler
+  const handleGenerateExam = async () => {
+    setIsGeneratingExam(true);
+    try {
+      const response = await fetch(`/api/v1/course/${course.id}/exam`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate exam');
+      }
+
+      const data = await response.json();
+      router.push(`/exam/${data.data.exam.id}`);
+    } catch (error) {
+      console.error('Error generating exam:', error);
+      alert('Failed to generate exam. Please try again.');
+    } finally {
+      setIsGeneratingExam(false);
+    }
+  };
 
   const containerVariants : Variants = {
     hidden: { opacity: 0 },
@@ -193,9 +226,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
-                <img
+                <Image
                   src={course.instructorAvatar}
                   alt={course.instructor}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full border-2 border-white/20"
                 />
                 <div>
@@ -326,9 +361,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                 {activeTab === 'instructor' && (
                   <div className="space-y-6">
                     <div className="flex items-start space-x-6">
-                      <img
+                      <Image
                         src={course.instructorAvatar}
                         alt={course.instructor}
+                        width={96}
+                        height={96}
                         className="w-24 h-24 rounded-full border-2 border-white/20"
                       />
                       <div className="flex-1">
@@ -421,6 +458,29 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                       <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
                       <span>Continue Learning</span>
                     </motion.button>
+                    
+                    {/* Generate Exam Button - Always show for enrolled users */}
+                    <motion.button
+                      className={`w-full py-4 px-6 rounded-xl font-geist-mono font-medium hover:opacity-90 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                        isCourseCreator 
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                          : 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleGenerateExam}
+                      disabled={isGeneratingExam}
+                    >
+                      <BookOpen className="w-5 h-5" />
+                      <span>
+                        {isGeneratingExam 
+                          ? 'Generating Exam...' 
+                          : isCourseCreator 
+                            ? 'Generate Exam (Creator)' 
+                            : 'Generate Exam'
+                        }
+                      </span>
+                    </motion.button>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -445,6 +505,29 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ course}) => {
                     <p className="text-center text-sm text-white/50 font-geist-mono">
                       30-day money-back guarantee
                     </p>
+                    
+                    {/* Generate Exam Button - Show for course creators or all users */}
+                    <motion.button
+                      className={`w-full py-4 px-6 rounded-xl font-geist-mono font-medium hover:opacity-90 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 ${
+                        isCourseCreator 
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                          : 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleGenerateExam}
+                      disabled={isGeneratingExam}
+                    >
+                      <BookOpen className="w-5 h-5" />
+                      <span>
+                        {isGeneratingExam 
+                          ? 'Generating Exam...' 
+                          : isCourseCreator 
+                            ? 'Generate Exam (Creator)' 
+                            : 'Generate Exam'
+                        }
+                      </span>
+                    </motion.button>
                   </div>
                 )}
 

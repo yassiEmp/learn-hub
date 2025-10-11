@@ -4,8 +4,6 @@ import { AuthGuard } from '@/components/AuthGuard'
 import React, { useState } from 'react'
 import { useCourse } from '@/features/course/hooks/useCourse'
 import { useParams } from 'next/navigation'
-import Loading from './detail/loading'
-// import { useEffect } from 'react';
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +15,7 @@ const Page = () => {
 
 
   if (course.loading) {
-    return <Loading />;
+    return <p>Loading...</p>;
   }
 
   if (!course.course) {

@@ -60,7 +60,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	col.b *= length(mbb.xy-p.xy);
 	col   *= pow(mb(mbr,p)+mb(mbg,p)+mb(mbb,p),1.75);
 	
-	fragColor = vec4(col,1.);
+	fragColor = vec4(-1.*col,1.);
 }
 
 void main() {

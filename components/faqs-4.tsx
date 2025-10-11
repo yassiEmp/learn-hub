@@ -13,7 +13,7 @@ export default function FAQsSection() {
         {
             id: 'item-2',
             question: 'What types of questions can the app generate?',
-            answer: 'MCQs, fill-in-the-blank, yes/no questions, and flashcards — all automatically generated and tailored to your material.',
+            answer: 'MCQs, fill-in-the-blank, true/false questions, and flashcards — all automatically generated and tailored to your material.',
         },
         {
             id: 'item-3',

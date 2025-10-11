@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 
 const questionTypes: QuestionType[] = [
   { id: 'multiple-choice', label: 'Multiple Choice', icon: Circle, description: 'Select one correct answer' },
-  { id: 'true-false', label: 'True/False', icon: ToggleLeft, description: 'Yes or No questions' },
+  { id: 'true-false', label: 'True/False', icon: ToggleLeft, description: 'True or False questions' },
   { id: 'short-answer', label: 'Short Answer', icon: Edit3, description: 'Brief text response' },
   { id: 'essay', label: 'Essay', icon: FileText, description: 'Long form response' },
 ];

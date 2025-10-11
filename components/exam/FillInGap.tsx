@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { FillInGapProps } from './types'
+import { FillInGapProps } from '../../features/exam/utils/types'
 import { CheckCircle, RotateCcw, Check, X, GripVertical } from 'lucide-react'
 
 export const FillInGap = ({ content, options, correctAnswers, onChange, onCheck }: FillInGapProps) => {

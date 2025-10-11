@@ -1,5 +1,5 @@
 import React from 'react'
-import { Exam , ExamAnalytics } from './types'
+import { Exam , ExamAnalytics } from '../../features/exam/utils/types'
 import { RotateCcw, BookOpen, Eye, CheckCircle, XCircle, Target, TrendingUp } from 'lucide-react'
 
 interface ExamAnalyticsProps {
@@ -145,7 +145,7 @@ const QuestionGrid = ({
   results,
   onQuestionClick
 }: {
-  questions: { type: string; content: string; answer: string; options: string[] }[]
+  questions: { type: string; content: string; answer: string; options?: string[] }[]
   results: Map<number, boolean>
   onQuestionClick: (index: number) => void
 }) => {
@@ -207,8 +207,8 @@ export const ExamAnalyticsComp = ({
   onQuestionClick
 }: ExamAnalyticsProps) => {
   const results = analytics.resultTrue
-  const userAnswers = analytics.resultForExercice
-  const totalQuestions = exam.exercices.length
+  const userAnswers = analytics.resultForExercise
+  const totalQuestions = exam.exercises.length
   const correctAnswers = Array.from(results.values()).filter(Boolean).length
   const incorrectAnswers = results.size - correctAnswers
   const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0
@@ -225,7 +225,7 @@ export const ExamAnalyticsComp = ({
               <div className="space-y-6">
                 <div>
                   <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    {exam.name}
+                    {exam.title}
                   </h1>
                   <p className="text-gray-400 mt-2">Exam completed successfully</p>
                 </div>
@@ -290,7 +290,7 @@ export const ExamAnalyticsComp = ({
             <h2 className="text-2xl font-bold">Question Overview</h2>
           </div>
           <QuestionGrid
-            questions={exam.exercices}
+            questions={exam.exercises}
             results={results}
             onQuestionClick={onQuestionClick}
           />
@@ -303,7 +303,7 @@ export const ExamAnalyticsComp = ({
             <h2 className="text-2xl font-bold">Detailed Review</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-h-96 overflow-y-auto custom-scrollbar">
-            {exam.exercices.map((question, index) => (
+            {exam.exercises.map((question, index) => (
               <QuestionCard
                 key={index}
                 questionIndex={index}
