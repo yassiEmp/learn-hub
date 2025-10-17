@@ -1,26 +1,21 @@
-"use client"
-import { useAuth } from '../hooks/useAuth'
-import { useEffect } from 'react'
+'use client'
+import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 
-interface AuthGuardProps {
-  children: React.ReactNode
-  fallback?: React.ReactNode
-}
-
-export const AuthGuard: React.FC<AuthGuardProps> = ({ children, fallback }) => {
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isConfigured } = useAuth()
   const router = useRouter()
-
+  
   useEffect(() => {
     if (!loading && !user && isConfigured) {
       router.push('/login')
     }
   }, [user, loading, isConfigured, router])
-
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -42,8 +37,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, fallback }) => {
       </div>
     )
   }
-
-  // Show configuration error if Supabase is not set up
+  
   if (!isConfigured) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -72,10 +66,10 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, fallback }) => {
       </div>
     )
   }
-
+  
   if (!user) {
-    return fallback || null
+    return null // Redirecting
   }
-
+  
   return <>{children}</>
 }

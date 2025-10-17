@@ -1,3 +1,5 @@
+import brain from '@/public/assets/brain.png'
+import book from '@/public/assets/book-up.png'
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -48,7 +50,7 @@ export default function HeroSection() {
                         <div className="h-320 absolute left-0 top-0 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
                         <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
                     </div>
-                    <section>
+                    <section className='bg-linear-180 from-white to-purple-100/70 '>
                         <div className="relative pt-24 md:pt-36 ">
                             <AnimatedGroup
                                 variants={{
@@ -75,7 +77,7 @@ export default function HeroSection() {
                                         },
                                     },
                                 }}
-                                className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 lg:top-32 ">
+                                className="mask-b-from-35% mask-b-to-90% absolute inset-0 top-56 -z-20 ">
                                 <Image
                                     src={app}
                                     alt="background"
@@ -112,13 +114,17 @@ export default function HeroSection() {
                                         </Link>
                                     </AnimatedGroup>
 
-                                    <TextEffect
-                                        preset="fade-in-blur"
-                                        speedSegment={0.3}
-                                        as="h1"
-                                        className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-                                        Turn Any Material Into Exam in Seconds.
-                                    </TextEffect>
+                                    <div className='relative'>
+                                        <Image src={brain} width={300} height={300} alt='brain image' draggable='false' className='w-3/12 absolute top-3/12 -left-10 max-w-2xs z-1'/>
+                                        <TextEffect
+                                            preset="fade-in-blur"
+                                            speedSegment={0.3}
+                                            as="h1"
+                                            className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]">
+                                            Turn Any Material Into Exam in Seconds.
+                                        </TextEffect>
+                                        <Image src={book} width={300} height={300} alt='book image' draggable="false" className='w-3/12 absolute top-3/12 -right-10 max-w-2xs z-1'/>
+                                    </div>
                                     <TextEffect
                                         per="line"
                                         preset="fade-in-blur"
@@ -145,14 +151,16 @@ export default function HeroSection() {
                                         <Link
                                             href="#call"
                                             className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
-                                                        h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors
+                                                        h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 
+                                                        hover:scale-105 hover:shadow-lg hover:shadow-primary/25
+                                                        transform transition-all duration-300 ease-out
                                                         shadow-md shadow-black/20 border-[0.5px] border-white/25 ring-1
                                                         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
                                                         ring-[--ring-color] [--ring-color:color-mix(in_oklab,var(--color-foreground)15%,var(--color-primary))]
                                                         disabled:pointer-events-none disabled:opacity-50
                                                         [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
                                         >
-                                            Generate Your First Exam For Free 
+                                            Generate Your First Exam For Free
                                         </Link>
                                         <p className='text-muted-foreground mt-3 block text-center text-sm'>No credit card required!</p>
                                     </AnimatedGroup>
@@ -172,7 +180,7 @@ export default function HeroSection() {
                                     ...transitionVariants,
                                 }}>
                                 <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-                                    <div className="mt-0.5 inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
+                                    <div className="neumorphisme-inset mt-2.5 inset-shadow-2xs dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                                         <Image
                                             className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
                                             src={app}

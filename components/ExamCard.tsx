@@ -1,29 +1,27 @@
 import React from 'react';
-import { Star, Clock, Users, Play, BookOpen, Code, Palette, Database, Smartphone, Settings } from 'lucide-react';
-import { Course } from '../types/course';
+import { Clock, BookOpen, Play, Calendar, BarChart3, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { ExamData } from '@/features/exam/hooks/useExams';
 
-interface CourseCardProps {
-  course: Course;
-  onCourseSelect: (course: Course) => void;
+interface ExamCardProps {
+  exam: ExamData;
+  onExamSelect: (exam: ExamData) => void;
   viewMode?: 'grid' | 'list';
-  showPrice?: boolean;
 }
 
 // Category icon mapping
 const getCategoryIcon = (category: string) => {
   switch (category.toLowerCase()) {
     case 'web development':
-      return Code;
+      return BookOpen;
     case 'data science':
-      return Database;
+      return BarChart3;
     case 'design':
-      return Palette;
+      return FileText;
     case 'mobile development':
-      return Smartphone;
+      return BookOpen;
     case 'devops':
-      return Settings;
+      return BookOpen;
     default:
       return BookOpen;
   }
@@ -47,14 +45,33 @@ const getCategoryColor = (category: string) => {
   }
 };
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, viewMode = 'grid' , showPrice }) => {
-  const CategoryIcon = getCategoryIcon(course.category);
-  const categoryColor = getCategoryColor(course.category);
+export const ExamCard: React.FC<ExamCardProps> = ({ exam, onExamSelect, viewMode = 'grid' }) => {
+  const category = exam.course?.category || 'General';
+  const CategoryIcon = getCategoryIcon(category);
+  const categoryColor = getCategoryColor(category);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes}m`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+  };
+
   if (viewMode === 'list') {
     return (
       <motion.div 
         className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
-        onClick={() => onCourseSelect(course)}
+        onClick={() => onExamSelect(exam)}
         whileHover={{ 
           scale: 1.01,
           y: -2,
@@ -67,7 +84,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
       >
         <div className="p-6">
           <div className="flex items-start space-x-6">
-            {/* Course Visual */}
+            {/* Exam Visual */}
             <div className="flex-shrink-0">
               <motion.div
                 className={`w-24 h-24 bg-gradient-to-br ${categoryColor} rounded-xl relative overflow-hidden border border-white/10`}
@@ -83,75 +100,51 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               </motion.div>
             </div>
 
-            {/* Course Info */}
+            {/* Exam Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <span className="inline-block bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full font-geist-mono">
-                      {course.category}
+                      {category}
                     </span>
-                    <span className="text-white/50 text-xs font-geist-mono">{course.level}</span>
+                    <span className="text-white/50 text-xs font-geist-mono">{exam.course?.level || 'General'}</span>
                   </div>
                   <h3 className="text-xl font-syne font-medium text-white mb-2 group-hover:text-white/90 transition-colors duration-300">
-                    {course.title}
+                    {exam.title}
                   </h3>
-                  <p className="text-white/60 text-sm font-geist-mono line-clamp-2 mb-3">
-                    {course.description}
-                  </p>
+                  {exam.course && (
+                    <p className="text-white/60 text-sm font-geist-mono line-clamp-2 mb-3">
+                      From: {exam.course.title}
+                    </p>
+                  )}
                 </div>
-                
-                {course.isEnrolled && (
-                  <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-green-500/20">
-                    Enrolled
-                  </span>
-                )}
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 text-sm text-white/50 font-geist-mono">
                   <div className="flex items-center">
+                    <FileText className="w-4 h-4 mr-1" />
+                    {exam.totalQuestions} questions
+                  </div>
+                  <div className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
-                    {course.duration}
+                    {formatDuration(exam.estimatedDuration)}
                   </div>
                   <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-1" />
-                    {course.studentsCount.toLocaleString()}
-                  </div>
-                  <div className="flex items-center">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                    <span>{course.rating}</span>
+                    <Calendar className="w-4 h-4 mr-1" />
+                    {formatDate(exam.created_at)}
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-3">
-                  {course.originalPrice && showPrice && (
-                    <span className="text-white/40 line-through text-sm font-geist-mono">
-                      ${course.originalPrice === 0 && showPrice ? 'Free' : course.originalPrice}
-                    </span>
-                  )}
-                  <span className="text-xl font-syne font-medium text-white">
-                    ${course.price === 0 && showPrice ? 'Free' : course.price}
-                  </span>
-                </div>
+                <motion.button
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-geist-mono transition-all duration-300 border border-white/20"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Start Exam
+                </motion.button>
               </div>
-
-              {course.isEnrolled && course.progress !== undefined && (
-                <div className="mt-4">
-                  <div className="flex justify-between text-xs text-white/50 mb-2 font-geist-mono">
-                    <span>Progress</span>
-                    <span>{course.progress}%</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-1.5">
-                    <motion.div 
-                      className="bg-green-400 h-1.5 rounded-full" 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${course.progress}%` }}
-                      transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -162,7 +155,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
   return (
     <motion.div 
       className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden cursor-pointer group hover:border-white/20 transition-all duration-500"
-      onClick={() => onCourseSelect(course)}
+      onClick={() => onExamSelect(exam)}
       whileHover={{ 
         scale: 1.02,
         y: -5,
@@ -217,27 +210,6 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
             <Play className="h-6 w-6 text-white ml-0.5" />
           </motion.div>
         </motion.div>
-        
-        {course.originalPrice && showPrice && (
-          <motion.div 
-            className="absolute top-4 left-4 bg-red-500/20 text-red-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-red-500/20"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
-          >
-            Sale
-          </motion.div>
-        )}
-        {course.isEnrolled && (
-          <motion.div 
-            className="absolute top-4 right-4 bg-green-500/20 text-green-400 px-2 py-1 rounded-lg text-xs font-geist-mono border border-green-500/20"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
-          >
-            Enrolled
-          </motion.div>
-        )}
       </div>
       
       <motion.div 
@@ -254,87 +226,45 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onCourseSelect, 
               transition: { duration: 0.2, ease: "easeOut" }
             }}
           >
-            {course.category}
+            {category}
           </motion.span>
-          <span className="ml-2 text-white/50 text-xs font-geist-mono">{course.level}</span>
+          <span className="ml-2 text-white/50 text-xs font-geist-mono">{exam.course?.level || 'General'}</span>
         </div>
         
         <h3 className="text-lg font-syne font-medium text-white mb-2 line-clamp-2 group-hover:text-white/90 transition-colors duration-300">
-          {course.title}
+          {exam.title}
         </h3>
         
-        <p className="text-white/60 text-sm mb-4 line-clamp-2 font-geist-mono">
-          {course.description}
-        </p>
-        
-        <div className="flex items-center gap-2 mt-2">
-          {(() => {
-            const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(course.instructor || 'Unknown')}&background=random&format=png`;
-            const avatarSrc = (course.instructorAvatar && course.instructorAvatar.trim().length > 0) ? course.instructorAvatar : fallback;
-            return (
-              <Image
-                width={32}
-                height={32}
-                src={avatarSrc}
-                alt={course.instructor}
-                className="w-8 h-8 rounded-full object-cover border border-white/20"
-              />
-            );
-          })()}
-          <span className="text-xs text-white/70">{course.instructor}</span>
-        </div>
+        {exam.course && (
+          <p className="text-white/60 text-sm mb-4 line-clamp-2 font-geist-mono">
+            From: {exam.course.title}
+          </p>
+        )}
         
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3 text-xs text-white/50 font-geist-mono">
             <div className="flex items-center">
-              <Clock className="w-3 h-3 mr-1" />
-              {course.duration}
+              <FileText className="w-3 h-3 mr-1" />
+              {exam.totalQuestions} questions
             </div>
             <div className="flex items-center">
-              <Users className="w-3 h-3 mr-1" />
-              {course.studentsCount.toLocaleString()}
+              <Clock className="w-3 h-3 mr-1" />
+              {formatDuration(exam.estimatedDuration)}
             </div>
           </div>
           <div className="flex items-center">
-            <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-            <span className="text-sm font-geist-mono text-white/70">{course.rating}</span>
+            <Calendar className="w-4 h-4 text-white/50 mr-1" />
+            <span className="text-sm font-geist-mono text-white/70">{formatDate(exam.created_at)}</span>
           </div>
         </div>
         
-        {course.isEnrolled && course.progress !== undefined ? (
-          <div className="mb-4">
-            <div className="flex justify-between text-xs text-white/50 mb-2 font-geist-mono">
-              <span>Progress</span>
-              <span>{course.progress}%</span>
-            </div>
-            <div className="w-full bg-white/10 rounded-full h-1.5">
-              <motion.div 
-                className="bg-green-400 h-1.5 rounded-full" 
-                initial={{ width: 0 }}
-                animate={{ width: `${course.progress}%` }}
-                transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-              />
-            </div>
-          </div>
-        ) : (
-          showPrice && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <motion.span 
-                  className="text-xl font-syne font-medium text-white"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: 1,
-                    transition: { duration: 0.4, delay: 0.4, ease: "easeOut" }
-                  }}
-                >
-                  ${course.price === 0 ? 'Free' : course.price}
-                </motion.span>
-              </div>
-            </div>
-          )
-        )}
+        <motion.button
+          className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-geist-mono transition-all duration-300 border border-white/20"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          Start Exam
+        </motion.button>
       </motion.div>
     </motion.div>
   );

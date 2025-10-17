@@ -74,7 +74,8 @@ const actionButtonVariants = cva(
 
 // Navigation Items Component
 const NavItems = ({ currentPath }: { currentPath: string }) => {
-  const { isAuthenticated, isConfigured } = useAuth()
+  const auth = useAuth()
+  const { isAuthenticated, isConfigured } = auth
 
   const navItems = [
     { id: 'import', label: 'Create', path: '/create' },
@@ -105,7 +106,8 @@ const NavItems = ({ currentPath }: { currentPath: string }) => {
 
 // Action Buttons Component
 const ActionButtons = () => {
-  const { user, signOut, loading, isConfigured } = useAuth()
+  const authContext = useAuth()
+  const { user, auth, loading, isConfigured } = authContext
 
   if (loading) {
     return (
@@ -131,7 +133,11 @@ const ActionButtons = () => {
             {user.user_metadata?.full_name || user.email}
           </span>
           <motion.button
-            onClick={signOut}
+            onClick={() => {
+              if (user) {
+                auth.signOut()
+              }
+            }}
             className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -159,7 +165,8 @@ const ActionButtons = () => {
 // Main Nav Component
 export default function Nav({ currentPath }: { currentPath: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, signOut, loading, isAuthenticated, isConfigured } = useAuth()
+  const authContext = useAuth()
+  const { user, auth, loading, isAuthenticated, isConfigured } = authContext
   const { setTheme } = useTheme()
   useEffect(() => {
     setTheme("dark")
@@ -240,8 +247,10 @@ export default function Nav({ currentPath }: { currentPath: string }) {
                   </div>
                   <button
                     onClick={() => {
-                      signOut()
-                      setIsMenuOpen(false)
+                      if (user) {
+                        auth.signOut()
+                        setIsMenuOpen(false)
+                      }
                     }}
                     className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
                   >

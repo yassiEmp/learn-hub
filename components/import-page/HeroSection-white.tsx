@@ -1,7 +1,10 @@
+'use client';
+
 import { motion, easeInOut } from "framer-motion";
 import { ShaderBackground } from '../ui/ShaderBackground';
 import InputSection from '../InputSection';
 import { useTheme } from "next-themes";
+import { useEffect, useState } from 'react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,28 +37,52 @@ const itemVariants = {
 };
 
 export const HeroSection = () => {
-  const { theme } = useTheme()
-  console.log(theme)
+  const { theme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* WebGL Shader Background - Only for header */}
       <div className="absolute inset-0 z-0">
-        {theme == "dark" ? <ShaderBackground /> : <> <div
-          className="absolute inset-0 z-0"
-          style={{
-            background: "#ffffff",
-            backgroundImage: `
+        {!isMounted ? (
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              background: "#ffffff",
+              backgroundImage: `
         radial-gradient(
           circle at top left,
           rgba(173, 109, 244, 0.5),
           transparent 70%
         )
       `,
-            filter: "blur(80px)",
-            backgroundRepeat: "no-repeat",
-          }}
-        /></>}
+              filter: "blur(80px)",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+        ) : theme === "dark" ? (
+          <ShaderBackground />
+        ) : (
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              background: "#ffffff",
+              backgroundImage: `
+        radial-gradient(
+          circle at top left,
+          rgba(173, 109, 244, 0.5),
+          transparent 70%
+        )
+      `,
+              filter: "blur(80px)",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+        )}
       </div>
 
       {/* Dark overlay to ensure text readability */}
@@ -82,7 +109,7 @@ export const HeroSection = () => {
             </h1>
             
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Simply paste your notes, PDFs, videos, or any learning material below and we&apos;ll create a structured course for you. Once your course is ready, you can create personalized exams, flashcards, and quizzes directly from the course page.
+              Import content from multiple sources - text, URLs, documents, videos, or audio - and we&apos;ll create a structured course for you. Once your course is ready, you can create personalized exams, flashcards, and quizzes directly from the course page.
             </p>
             
             {/* Visual indicator pointing to input */}
@@ -98,7 +125,7 @@ export const HeroSection = () => {
                 ease: "easeInOut"
               }}
             >
-              <span>↓ Paste your content to create a course ↓</span>
+              <span>↓ Choose your import method to create a course ↓</span>
             </motion.div>
           </motion.div>
 

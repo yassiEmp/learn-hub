@@ -1,10 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+'use client';
+
+import React, { useRef, useEffect, useState } from 'react';
 
 interface ShaderBackgroundProps {
   className?: string;
 }
 
 export const ShaderBackground: React.FC<ShaderBackgroundProps> = ({ className = '' }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(null);
   const programRef = useRef<WebGLProgram | null>(null);
@@ -138,6 +141,12 @@ void main() {
   };
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -218,7 +227,7 @@ void main() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [fragmentShaderSource,vertexShaderSource]);
+  }, [fragmentShaderSource, vertexShaderSource, isMounted]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -246,6 +255,15 @@ void main() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  if (!isMounted) {
+    return (
+      <div 
+        className={`w-full h-full ${className}`}
+        style={{ display: 'block' }}
+      />
+    );
+  }
 
   return (
     <canvas

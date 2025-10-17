@@ -1,52 +1,60 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Search, Filter, Grid, List } from 'lucide-react';
-import { CourseCard } from './CourseCard';
-import { Course } from '../types/course';
-import { motion , Variants } from 'framer-motion';
+import { Search, Filter, Grid, List, Plus, BookOpen } from 'lucide-react';
+import { ExamCard } from './ExamCard';
+import { ExamData } from '../features/exam/hooks/useExams';
+import { motion, Variants } from 'framer-motion';
 import FloatingParticle from './FloatingParticle';
 import { useRouter } from 'next/navigation';
-import { useCourses } from '../features/course/hooks/useCourses';
+import { useExams } from '../features/exam/hooks/useExams';
 
-const CourseBrowserComponent: React.FC = () => {
-  const { courses, categories, loading, error } = useCourses();
+const ExamBrowserComponent: React.FC = () => {
+  const { exams, loading, error } = useExams();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('popular');
+  const [sortBy, setSortBy] = useState('recent');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const router = useRouter();
 
-  // Memoize filtered courses to prevent recalculation on every render
-  const filteredCourses = useMemo(() => {
-    return courses
-      .filter(course => {
-        const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
-        const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             course.instructor?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Get unique categories from exams
+  const categories = useMemo(() => {
+    const cats = new Set(exams.map(exam => exam.course?.category || 'General'));
+    return ['All', ...Array.from(cats)];
+  }, [exams]);
+
+  // Memoize filtered exams to prevent recalculation on every render
+  const filteredExams = useMemo(() => {
+    return exams
+      .filter(exam => {
+        const matchesCategory = selectedCategory === 'All' || (exam.course?.category || 'General') === selectedCategory;
+        const matchesSearch = exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             (exam.course?.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             (exam.course?.description || '').toLowerCase().includes(searchTerm.toLowerCase());
         return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case 'popular':
-            return (b.studentsCount || 0) - (a.studentsCount || 0);
-          case 'rating':
-            return (b.rating || 0) - (a.rating || 0);
-          case 'price-low':
-            return (a.price || 0) - (b.price || 0);
-          case 'price-high':
-            return (b.price || 0) - (a.price || 0);
+          case 'recent':
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          case 'oldest':
+            return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          case 'questions':
+            return b.totalQuestions - a.totalQuestions;
+          case 'duration':
+            return b.estimatedDuration - a.estimatedDuration;
+          case 'title':
+            return a.title.localeCompare(b.title);
           default:
             return 0;
         }
       });
-  }, [courses, selectedCategory, searchTerm, sortBy]);
+  }, [exams, selectedCategory, searchTerm, sortBy]);
 
   // Memoize callback to prevent unnecessary re-renders
-  const handleCourseSelect = useCallback((course: Course) => {
-    router.push(`/course/${course.id}/detail`);
+  const handleExamSelect = useCallback((exam: ExamData) => {
+    router.push(`/exam/${exam.id}`);
   }, [router]);
 
-  const containerVariants : Variants= {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -57,7 +65,7 @@ const CourseBrowserComponent: React.FC = () => {
     }
   };
 
-  const itemVariants : Variants= {
+  const itemVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 30
@@ -72,8 +80,34 @@ const CourseBrowserComponent: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading courses...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <motion.div
+        className="flex flex-col items-center space-y-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+        >
+          <BookOpen className="w-6 h-6 text-white" />
+        </motion.div>
+        <p className="text-white/60 font-geist-mono">Loading exams...</p>
+      </motion.div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="text-center">
+        <div className="text-red-500 text-xl mb-4">Error loading exams</div>
+        <p className="text-white/60 font-geist-mono">{error}</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black relative">
@@ -91,15 +125,16 @@ const CourseBrowserComponent: React.FC = () => {
         {/* Header */}
         <motion.div className="mb-12 text-center" variants={itemVariants}>
           <span className="px-3 py-1 text-xs font-geist-mono text-white bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20 inline-block">
-            Course Library
+            Exam Library
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-syne font-medium text-white mb-4 tracking-tight">
-            Discover Knowledge
+            Test Your Knowledge
           </h1>
           <p className="text-lg md:text-xl text-white/60 font-geist-mono max-w-2xl mx-auto">
-            Explore our curated collection of premium courses designed to accelerate your learning journey.
+            Practice with AI-generated exams based on your courses. Track your progress and improve your understanding.
           </p>
         </motion.div>
+
         {/* Search and Filters */}
         <motion.div 
           className="mb-12"
@@ -114,7 +149,7 @@ const CourseBrowserComponent: React.FC = () => {
                 </div>
                 <motion.input
                   type="text"
-                  placeholder="Search courses, instructors, topics..."
+                  placeholder="Search exams, courses, topics..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="block w-full pl-12 pr-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono backdrop-blur-sm"
@@ -130,10 +165,11 @@ const CourseBrowserComponent: React.FC = () => {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="border border-white/10 rounded-xl px-3 py-2 bg-white/5 text-white font-geist-mono text-sm focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 backdrop-blur-sm"
                   >
-                    <option value="popular" className='text-black'>Most Popular</option>
-                    <option value="rating" className='text-black'>Highest Rated</option>
-                    <option value="price-low" className='text-black'>Price: Low to High</option>
-                    <option value="price-high" className='text-black'>Price: High to Low</option>
+                    <option value="recent">Most Recent</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="questions">Most Questions</option>
+                    <option value="duration">Longest Duration</option>
+                    <option value="title">Alphabetical</option>
                   </select>
                 </div>
                 <div className="flex items-center space-x-1 bg-white/5 rounded-xl p-1">
@@ -196,16 +232,18 @@ const CourseBrowserComponent: React.FC = () => {
             </motion.div>
           </div>
         </motion.div>
+
         {/* Results */}
         <motion.div className="mb-8" variants={itemVariants}>
           <p className="text-white/50 font-geist-mono text-sm">
-            Showing {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''}
+            Showing {filteredExams.length} exam{filteredExams.length !== 1 ? 's' : ''}
             {selectedCategory !== 'All' && ` in ${selectedCategory}`}
             {searchTerm && ` for "${searchTerm}"`}
           </p>
         </motion.div>
-        {/* Course Grid */}
-        {filteredCourses.length > 0 ? (
+
+        {/* Exam Grid */}
+        {filteredExams.length > 0 ? (
           <motion.div 
             className={`grid gap-6 ${
               viewMode === 'grid' 
@@ -223,9 +261,9 @@ const CourseBrowserComponent: React.FC = () => {
               }
             }}
           >
-            {filteredCourses.map((course) => (
+            {filteredExams.map((exam) => (
               <motion.div
-                key={course.id}
+                key={exam.id}
                 variants={{
                   hidden: { opacity: 0, y: 30 },
                   visible: { 
@@ -234,14 +272,13 @@ const CourseBrowserComponent: React.FC = () => {
                     transition: { duration: 0.5 }
                   }
                 }}
-                onClick={() => handleCourseSelect(course)}
+                onClick={() => handleExamSelect(exam)}
                 className="cursor-pointer"
               >
-                <CourseCard
-                  course={course}
-                  onCourseSelect={handleCourseSelect}
+                <ExamCard
+                  exam={exam}
+                  onExamSelect={handleExamSelect}
                   viewMode={viewMode}
-                  showPrice={false}
                 />
               </motion.div>
             ))}
@@ -256,12 +293,26 @@ const CourseBrowserComponent: React.FC = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             >
-              <Search className="h-16 w-16 mx-auto" />
+              <BookOpen className="h-16 w-16 mx-auto" />
             </motion.div>
-            <h3 className="text-2xl font-syne font-medium text-white mb-4">No courses found</h3>
-            <p className="text-white/50 font-geist-mono">
-              Try adjusting your search terms or browse different categories.
+            <h3 className="text-2xl font-syne font-medium text-white mb-4">No exams found</h3>
+            <p className="text-white/50 font-geist-mono mb-6">
+              {exams.length === 0 
+                ? "You haven't created any exams yet. Generate exams from your courses to get started."
+                : "Try adjusting your search terms or browse different categories."
+              }
             </p>
+            {exams.length === 0 && (
+              <motion.button
+                onClick={() => router.push('/courses')}
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Browse Courses</span>
+              </motion.button>
+            )}
           </motion.div>
         )}
       </motion.div>
@@ -270,4 +321,4 @@ const CourseBrowserComponent: React.FC = () => {
 };
 
 // Memoize the component to prevent unnecessary re-renders
-export const CourseBrowser = React.memo(CourseBrowserComponent);
+export const ExamBrowser = React.memo(ExamBrowserComponent);

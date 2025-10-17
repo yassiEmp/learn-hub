@@ -1,5 +1,5 @@
 "use client"
-import { CourseBrowser } from '@/components/CourseBrowser'
+import { ExamBrowser } from '@/components/ExamBrowser'
 import Nav from '@/components/hearderApp'
 import React from 'react'
 
@@ -7,7 +7,7 @@ const Page = () => {
   return (
     <>
       <Nav currentPath="/exams" />
-      <CourseBrowser />
+      <ExamBrowser />
     </>
   )
 }
