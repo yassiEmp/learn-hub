@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { motion, Variants } from 'framer-motion'
-import { useAuth } from '../../../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
-import FloatingParticle from '../../../components/FloatingParticle'
-import { SocialLoginButtons } from '../../../components/SocialLoginButtons'
+import FloatingParticle from '../../components/FloatingParticle'
+import { SocialLoginButtons } from '../../components/SocialLoginButtons'
 import { AuthError } from '@supabase/supabase-js'
 
 type MessageType = 'success' | 'error' | 'info'
@@ -26,15 +26,42 @@ const LoginPage = () => {
   const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const [message, setMessage] = useState<Message | null>(null)
 
-  const { signIn, signUp, signInWithProvider, user, isConfigured } = useAuth()
+  const authContext = useAuth()
+  const { auth, user, isConfigured, loading: authLoading } = authContext
   const router = useRouter()
+
+  // console.log('LoginPage: Auth state:', { user: !!user, isConfigured, authLoading })
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user && isConfigured) {
+      console.log('LoginPage: Redirecting to dashboard...')
       router.push('/dashboard')
     }
   }, [user, router, isConfigured])
+
+  // Show loading state while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <motion.div
+          className="flex flex-col items-center space-y-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
+          >
+            <Sparkles className="w-6 h-6 text-white" />
+          </motion.div>
+          <p className="text-white/60 font-geist-mono">Loading...</p>
+        </motion.div>
+      </div>
+    )
+  }
 
   // Show setup message if not configured
   if (!isConfigured) {
@@ -106,7 +133,12 @@ const LoginPage = () => {
     setMessage(null)
 
     try {
-      const { error } = await signInWithProvider(provider)
+      const { error } = await auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/create`,
+        }
+      })
       if (error) {
         setMessage({
           text: getErrorMessage(error),
@@ -149,7 +181,10 @@ const LoginPage = () => {
 
     try {
       if (isLogin) {
-        const { error } = await signIn(email, password)
+        const { error } = await auth.signInWithPassword({ 
+          email: email.trim().toLowerCase(),
+          password 
+        })
         if (error) {
           setMessage({
             text: getErrorMessage(error),
@@ -165,7 +200,15 @@ const LoginPage = () => {
           }, 1000)
         }
       } else {
-        const { error } = await signUp(email, password, fullName)
+        const { error } = await auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: {
+            data: {
+              full_name: fullName.trim(),
+            }
+          }
+        })
         if (error) {
           setMessage({
             text: getErrorMessage(error),

@@ -8,7 +8,7 @@ import { Toast } from "@/components/ui/Toast";
 import { userApi, handleApiError } from "@/utils/api-client";
 
 export default function AccountPage() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [alertOpen, setAlertOpen] = useState(false);
   const [toast, setToast] = useState<{
     open: boolean;
@@ -30,10 +30,6 @@ export default function AccountPage() {
         description: "Your account and all data have been deleted.",
         variant: "destructive",
       });
-      
-      setTimeout(async () => {
-        await signOut();
-      }, 1200);
       
     } catch (error) {
       const errorMessage = handleApiError(error);
