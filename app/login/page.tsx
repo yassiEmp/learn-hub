@@ -35,8 +35,8 @@ const LoginPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user && isConfigured) {
-      console.log('LoginPage: Redirecting to dashboard...')
-      router.push('/dashboard')
+      console.log('LoginPage: Redirecting to create...')
+      router.push('/create')
     }
   }, [user, router, isConfigured])
 
@@ -196,7 +196,7 @@ const LoginPage = () => {
             type: 'success'
           })
           setTimeout(() => {
-            router.push('/dashboard')
+            router.push('/create')
           }, 1000)
         }
       } else {
