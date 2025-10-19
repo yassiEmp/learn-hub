@@ -1,97 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FlashMind - AI-Powered Learning Platform
 
-> **Note:** All project tasks and schedules are now tracked centrally in [docs/planning/TASKS.md](docs/planning/TASKS.md). When you schedule a feature or change in a planning file, add its tasks and schedule to this file, with a link back to the original context.
+Transform any content into comprehensive learning experiences with our AI-powered platform. Stop wasting hours creating practice questions and start learning smarter.
 
-## Getting Started
+## 🚀 What is FlashMind?
 
-First, run the development server:
+FlashMind is an intelligent learning platform that automatically converts your study materials into interactive quizzes, flashcards, and practice exams. Whether you're a student preparing for exams or a professional looking to master new skills, FlashMind helps you learn faster and more effectively.
 
+## ✨ Key Features
+
+### 📚 **Automatic Exam Generation**
+Stop wasting hours creating practice questions. Our proprietary system instantly transforms any text, PDF, or YouTube video into quizzes, flashcards, and exams tailored to your material.
+
+### 🔄 **Multiple Format Support**
+Whether it's lecture notes, textbooks, or videos, our platform handles them all. No conversions, no manual input — just upload and learn.
+
+### 🎯 **Multiple Question Types**
+MCQs, fill-in-the-blank, true/false questions, and flashcards — all automatically generated to test your knowledge from every angle.
+
+### 📊 **Detailed Feedback & Knowledge Insights**
+After each exam, get a breakdown of your strengths and weaknesses, along with actionable recommendations to focus your study time effectively.
+
+### 📈 **Progress Tracking & Analytics**
+Track your learning journey over time. See your improvements, identify persistent gaps, and measure your mastery across topics.
+
+## 🛠️ How It Works
+
+1. **Upload Your Material** - Paste notes, upload PDFs, or drop a YouTube link
+2. **Generate Your Exam** - Our AI creates MCQs, fill-in-the-blank, and true/false questions
+3. **Take the Exam & Get Feedback** - Complete your exam and receive detailed insights
+4. **Track Your Progress** - Monitor improvements and focus on challenging topics
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- pnpm (recommended package manager)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/flashmind.git
+cd flashmind
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+# Edit .env.local with your configuration
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Run the development server:
+```bash
+pnpm dev
+```
 
-## Learn More
+5. Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project uses a **feature-based architecture** with strict separation between features and a shared UI/component library.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Key Principles
+- **Feature Isolation:** Each feature is self-contained and independent
+- **Shared Components Are Pure:** No business logic in shared components
+- **HOCs for Feature Logic:** Use Higher-Order Components to add feature-specific behavior
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Recent Changes
-
-- Improved text cleaning in the chunk AI preprocessor (preserves emails, numbers, dates, etc.)
-- Enhanced chunk AI system for lesson generation (semantic chunking, better orchestration)
-- Representative content extraction for LLM title/description generation
-- TODOs added for analytics/database logging and improved error handling
-
-## 🏗️ Feature-Based Architecture & Coding Guidelines
-
-This project uses a **feature-based architecture** with strict separation between features and a shared UI/component library. Each feature is self-contained and independent, with no dependencies on other features. Shared components are pure and logic-free, and feature-specific logic is added via Higher-Order Components (HOCs).
-
-### 🔹 Key Principles
-- **Feature Isolation:**
-  - Each feature lives in its own folder under `features/` and manages its own UI, API, state, and logic.
-  - **No feature imports code from another feature.**
-  - Features only use generic utilities/components from `shared/`.
-- **Shared Components Are Pure:**
-  - Shared components (e.g., Button, Modal) in `shared/components/` contain no business logic.
-  - If a feature needs a variation, it wraps the shared component with an HOC in its own folder.
-- **HOCs for Feature Logic:**
-  - HOCs are used to add feature-specific behavior to shared components, keeping the base components clean and reusable.
-
-### 🔹 Folder Structure Example
+### Folder Structure
 ```
 features/
-  ├── courses/
-  │   ├── api/
-  │   ├── hooks/
-  │   ├── hocs/
-  │   └── components/
-  ├── admin/
-  │   ├── api/
-  │   ├── hooks/
-  │   ├── hocs/
-  │   └── components/
+  ├── courses/          # Course management feature
+  ├── admin/            # Admin panel feature
+  └── auth/             # Authentication feature
 shared/
-  └── components/
-      └── Button.tsx
+  ├── components/       # Reusable UI components
+  ├── hooks/           # Shared custom hooks
+  └── utils/           # Utility functions
 ```
 
-### 🔹 Coding Best Practices
-- **Never import from another feature’s folder.**
-- **If logic is shared, move it to `shared/` and keep it generic.**
-- **Use HOCs in each feature to add custom logic to shared components.**
-- **Keep shared components free of business logic.**
+## 📋 Available Scripts
 
-### 🔹 ESLint Rules Enforcing This
-- `import/no-cycle`: Prevents cross-feature dependencies.
-- `import/no-extraneous-dependencies`: Ensures only allowed imports.
-- `import/order`: Keeps imports organized.
-- React/TypeScript rules for best practices.
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
+- `pnpm type-check` - Run TypeScript type checking
 
-### 🔹 Why This Matters
-- **Scalable:** Add new features without breaking others.
-- **Maintainable:** Shared components are never polluted with business logic.
-- **Testable:** Each feature can be tested in isolation.
+## 🤝 Contributing
 
-For more details, see `.eslintrc.js` and the `/shared/components/` folder.
+We welcome contributions! Please read our contributing guidelines before submitting pull requests.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the **Non-Commercial Open Source License**.
+
+### What this means:
+- ✅ **You can view and study the source code**
+- ✅ **You can use the software for personal, educational, and non-commercial purposes**
+- ✅ **You can contribute to the project**
+- ✅ **You can create forks and modifications for personal use**
+
+### What you cannot do:
+- ❌ **Use this software for commercial purposes without explicit permission**
+- ❌ **Sell or distribute commercial versions of this software**
+- ❌ **Use this software in a commercial product or service**
+
+For commercial licensing inquiries, please contact us at [contact@flashmind.com](mailto:contact@flashmind.com).
+
+## 🆘 Support
+
+- 📧 Email: [support@flashmind.com](mailto:support@flashmind.com)
+- 📖 Documentation: [docs.flashmind.com](https://docs.flashmind.com)
+- 🐛 Issues: [GitHub Issues](https://github.com/your-username/flashmind/issues)
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org)
+- UI components powered by [Tailwind CSS](https://tailwindcss.com)
+- Icons by [Lucide React](https://lucide.dev)
+
+---
+
+**FlashMind** - Learn smarter, not harder. 🧠✨
