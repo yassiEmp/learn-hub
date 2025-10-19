@@ -142,13 +142,13 @@ export default function ProblemSection() {
 
                     </div>
 
-                    <div className="grid gap-4 grid-col-1 md:grid-cols-2 dark:bg-transparent bg-gray-100/40 w-full mx-auto rounded-3xl p-2 md:p-4">
-                        <div className='w-full h-full bg-red-100/40 dark:bg-red-950/20 p-2 md:p-4 rounded-2xl overflow-x-hidden'>
+                    <div className="grid gap-4 grid-col-1 md:grid-cols-2 bg-gray-100/40 w-full mx-auto rounded-3xl p-2 md:p-4">
+                        <div className='w-full h-full bg-red-100/40 p-2 md:p-4 rounded-2xl overflow-x-hidden'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>Without flashmind</p>
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
                                 <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
                                     {withoutMasterIt.map((el, index) =>
-                                        <div key={index} className='w-full min-w-[245px] bg-background dark:bg-background/60 rounded-xl border border-red-200 dark:border-red-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
+                                        <div key={index} className='w-full min-w-[245px] bg-background rounded-xl border border-red-200 p-2 mb-2 hover:bg-background/90 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
                                             <div className='flex'>
                                                 <Image src='./red-cross.svg' width={21} height={21} alt="a red cross" className='mr-2' />
                                                 <p className='font-medium text-lg'>{el.point}</p>
@@ -159,13 +159,13 @@ export default function ProblemSection() {
                                 </div>
                             </div>
                         </div>
-                        <div className='w-full h-full bg-green-100/40 dark:bg-green-950/20 p-4 rounded-2xl overflow-x-hidden'>
+                        <div className='w-full h-full bg-green-100/40 p-4 rounded-2xl overflow-x-hidden'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>With flashmind</p>
 
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
                                 <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
                                     {withMasterIt.map((el, index) =>
-                                        <div key={index} className='w-full min-w-[245px]  bg-background dark:bg-background/60 rounded-xl border border-green-200 dark:border-green-800/20 p-2 mb-2 hover:bg-background/90 dark:hover:bg-background/70 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
+                                        <div key={index} className='w-full min-w-[245px]  bg-background rounded-xl border border-green-200 p-2 mb-2 hover:bg-background/90 transition-colors duration-200 ml-2 mr-2 md:ml-0 md:mr-0 '>
                                             <div className='flex'>
                                                 <Image src='./green-check.svg' width={21} height={21} alt="a red " className='mr-2' />
                                                 <p className='font-medium text-lg capitalize'>{el.point}</p>
@@ -183,11 +183,11 @@ export default function ProblemSection() {
                 href="#call"
                 className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
                             h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200
-                            shadow-md shadow-black/10 dark:shadow-black/30 border border-primary/20 dark:border-primary/30
+                            shadow-md shadow-black/10 border border-primary/20
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:border-ring/50
                             disabled:pointer-events-none disabled:opacity-50
                             [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0 
-                            mt-6 hover:shadow-lg hover:shadow-primary/10 dark:hover:shadow-primary/20
+                            mt-6 hover:shadow-lg hover:shadow-primary/10
                             active:scale-[0.98] transform"
             >
                 Generate Your First Exam For Free

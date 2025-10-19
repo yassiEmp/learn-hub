@@ -31,7 +31,7 @@ export default function CallToAction() {
         }
     }
     return (
-        <section className="bg-muted dark:bg-background py-16 md:py-32 min-h-screen flex justify-center items-center" id='call'>
+        <section className="bg-muted py-16 md:py-32 min-h-screen flex justify-center items-center" id='call'>
             <div className="mx-auto max-w-5xl px-6">
                 <div className="mx-auto max-w-md text-center">
                     <h2 className="text-balance text-3xl font-semibold md:text-4xl">Create, Learn and Succeed</h2>
@@ -47,7 +47,7 @@ export default function CallToAction() {
                         <div className="flex gap-2 items-center flex-col sm:flex-row">
                             <input 
                                 type="email" 
-                                className="file:text-foreground placeholder:text-muted-foreground/75 border-gr selection:bg-primary selection:text-primary-foreground flex w-full min-w-0 rounded-md border px-3 py-1 text-base outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-foreground/35 focus-visible:ring-ring/25 dark:focus-visible:border-foreground/25 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-background ring-foreground/10 h-8 border-transparent shadow " 
+                                className="file:text-foreground placeholder:text-muted-foreground/75 border-gr selection:bg-primary selection:text-primary-foreground flex w-full min-w-0 rounded-md border px-3 py-1 text-base outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-foreground/35 focus-visible:ring-ring/25 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 aria-invalid:border-destructive bg-background ring-foreground/10 h-8 border-transparent shadow " 
                                 placeholder="Your email" 
                                 id="email" 
                                 required 

@@ -81,7 +81,7 @@ export default function HeroSection() {
                                 <Image
                                     src={app}
                                     alt="background"
-                                    className="hidden size-full dark:block "
+                                    className="hidden size-full"
                                     width="3276"
                                     height="4095"
                                 />
@@ -97,9 +97,9 @@ export default function HeroSection() {
                                     <AnimatedGroup variants={transitionVariants}>
                                         <Link
                                             href="#link"
-                                            className="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-sm shadow-zinc-950/5 transition-colors duration-300 dark:border-t-white/5 dark:shadow-zinc-950">
+                                            className="hover:bg-background bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 shadow-sm shadow-zinc-950/5 transition-colors duration-300">
                                             <span className="text-foreground text-sm">Introducing Support for AI Models</span>
-                                            <span className="dark:border-background block h-4 w-0.5 border-l bg-white dark:bg-zinc-700"></span>
+                                            <span className="block h-4 w-0.5 border-l bg-white"></span>
 
                                             <div className="bg-background group-hover:bg-muted size-6 overflow-hidden rounded-full duration-500">
                                                 <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
@@ -180,16 +180,16 @@ export default function HeroSection() {
                                     ...transitionVariants,
                                 }}>
                                 <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-                                    <div className="neumorphisme-inset mt-2.5 inset-shadow-2xs dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
+                                    <div className="neumorphisme-inset mt-2.5 inset-shadow-2xs bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
                                         <Image
-                                            className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
+                                            className="bg-background aspect-15/8 relative hidden rounded-2xl"
                                             src={app}
                                             alt="app screen"
                                             width="2700"
                                             height="1440"
                                         />
                                         <Image
-                                            className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
+                                            className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border"
                                             src={appDark}
                                             alt="app screen"
                                             width="2700"
