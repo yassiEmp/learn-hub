@@ -22,7 +22,7 @@ export const HeroHeader = () => {
     // Remove forcing theme during render to respect system/default theme
     React.useEffect(() => {
         setTheme('light');
-    }, [setTheme]);
+    });
     
     React.useEffect(() => {
         const handleScroll = () => {
