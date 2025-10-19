@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/next"
@@ -31,13 +30,7 @@ export default function RootLayout({
         <Analytics />
         <QueryProvider>
           <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-            >
-              {children}
-            </ThemeProvider>
+            {children}
           </AuthProvider>
         </QueryProvider>
       </body>

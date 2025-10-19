@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
+import { ThemeProvider } from '@/components/theme-provider'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, isConfigured } = useAuth()
@@ -71,5 +72,11 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     return null // Redirecting
   }
   
-  return <>{children}</>
+  return <ThemeProvider
+    attribute="class"
+    defaultTheme="light"
+    enableSystem
+  >
+    {children}
+  </ThemeProvider>
 }
