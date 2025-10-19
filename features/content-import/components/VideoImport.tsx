@@ -2,11 +2,10 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Video, Youtube, Loader2, Upload, Play, Pause, LogIn } from 'lucide-react';
+import { Video, Youtube, Loader2, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
-import { useAuth } from '@/hooks/useAuth';
 
 interface VideoImportProps {
   onContentImport: (result: ImportResult) => void;
@@ -26,9 +25,7 @@ export const VideoImport: React.FC<VideoImportProps> = ({ onContentImport, onPro
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
-    const { user } = useAuth();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateYouTubeUrl = (url: string): boolean => {
