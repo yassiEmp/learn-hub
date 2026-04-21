@@ -147,8 +147,12 @@ class AiClient {
     private generatedExam: unknown = null;
     
     constructor(config: { cost: "high" | "low", speed?: "fast" | "moderate" }) {
+        if(!process.env.MODEL){
+            console.error("please set the model name in the environement variables has MODEL")
+            return
+        }
         this.llm = new ChatGoogleGenerativeAI({
-            model: "gemini-2.0-flash-exp",
+            model: process.env.MODEL!,
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0.2,
             maxOutputTokens: 40000,

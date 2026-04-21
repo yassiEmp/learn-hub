@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
         // 5. Process document with AI
         const llm = new ChatGoogleGenerativeAI({
-            model: "gemini-2.0-flash-exp",
+            model: process.env.MODEL!,
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0.2,
             maxOutputTokens: 4000,

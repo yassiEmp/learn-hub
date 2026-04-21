@@ -48,7 +48,7 @@ const prompt = ChatPromptTemplate.fromMessages([
 
 // 5. Create pipeline chain with parser at the end
 const chain = prompt.pipe(new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+  model: process.env.MODEL!,
   temperature: 0.2,
   maxOutputTokens: 10000
 })).pipe(parser);
@@ -71,7 +71,7 @@ async function extractMetadata(courseText: string): Promise<Result<CourseMetadat
     try {
       // Fallback: run without parser, repair, then validate
       const modelOnlyChain = prompt.pipe(new ChatGoogleGenerativeAI({
-        model: "gemini-2.0-flash",
+        model: process.env.MODEL!,
         temperature: 0.2,
         maxOutputTokens: 10000
       }));
