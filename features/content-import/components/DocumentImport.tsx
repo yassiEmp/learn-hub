@@ -7,7 +7,7 @@ import { ImportResult } from '../utils/types';
 
 // Auth is handled by the protected layout
 import Uppy from '@uppy/core';
-import { Dashboard } from '@uppy/react';
+import Dashboard from '@uppy/react/dashboard';
 import XHRUpload from '@uppy/xhr-upload';
 
 interface DocumentImportProps {
