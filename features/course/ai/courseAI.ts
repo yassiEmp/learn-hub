@@ -24,7 +24,7 @@ const prompt = ChatPromptTemplate.fromMessages([
 ]);
 
 const chain = prompt.pipe(new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+  model: process.env.MODEL!,
   temperature: 0.2,
   maxOutputTokens: 10000
 })).pipe(parser);
@@ -40,7 +40,7 @@ export async function extractMetadata(courseText: string): Promise<Result<Course
     if (rawOutput) {
       try {
         const modelOnlyChain = prompt.pipe(new ChatGoogleGenerativeAI({
-          model: "gemini-2.0-flash",
+          model: process.env.MODEL!,
           temperature: 0.2,
           maxOutputTokens: 10000
         }));

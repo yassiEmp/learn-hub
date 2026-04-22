@@ -4,8 +4,6 @@ import { useParams } from 'next/navigation';
 import { CourseDetail } from '@/features/course/components/CourseDetail';
 import { useCourse } from '@/features/course/hooks/useCourse';
 
-export const dynamic = 'force-dynamic'
-
 const Page = () => {
   const params = useParams();
   const courseIdRaw = params.courseId;

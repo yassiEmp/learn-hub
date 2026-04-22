@@ -15,14 +15,16 @@ export function useCourse(courseId: string): UseCourseResult {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const userId = user?.id;
+  const sessionAccessToken = session?.access_token;
 
   // Use createServerClient for per-user client if session is available
   const supabase = useMemo(() => {
-    if (session?.access_token) {
-      return createServerClient(session.access_token);
+    if (sessionAccessToken) {
+      return createServerClient(sessionAccessToken);
     }
     return publicSupabase;
-  }, [session]);
+  }, [sessionAccessToken]);
 
   useEffect(() => {
     if (!courseId) return;
@@ -50,7 +52,6 @@ export function useCourse(courseId: string): UseCourseResult {
         .from('Lesson')
         .select('*')
         .eq('courseId', courseId);
-      console.log(lessonsData)
       const lessons: Lesson[] = (lessonsData as Lesson[] || []).map((l) => ({
         id: l.id?.toString() ?? '',
         title: l.title,
@@ -131,7 +132,7 @@ export function useCourse(courseId: string): UseCourseResult {
     }
     fetchCourse();
     return () => { isMounted = false; };
-  }, [courseId, user, supabase]);
+  }, [courseId, userId]);
 
   return { course, loading, error };
 } 

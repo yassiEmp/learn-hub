@@ -16,7 +16,7 @@ const LessonSchema = z.object({
 
 // AI Model
 const llm = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+  model: process.env.MODEL!,
   apiKey: process.env.GOOGLE_API_KEY!,
   temperature: 0.4,
   maxOutputTokens: 100000

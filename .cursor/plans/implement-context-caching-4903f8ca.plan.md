@@ -1,4 +1,13 @@
-<!-- 4903f8ca-2633-405a-ad60-0b6c5421d209 39724ba7-029e-4ddc-92e7-753d74a143b6 -->
+---
+name: Implement Context Caching with Raw Text
+overview: ""
+todos:
+  - id: bf09d021-40c5-4a64-a3b4-0e8e72507d73
+    content: Update explanation prompt template to include exam context
+    status: pending
+isProject: false
+---
+
 # Implement Context Caching with Raw Text
 
 ## Overview
@@ -146,14 +155,3 @@ async cleanup() {
 ## Files to Modify
 
 - `features/exam/ai/ai.ts`
-
-### To-dos
-
-- [ ] Verify @google/generative-ai package version supports caching
-- [ ] Add Google GenAI SDK imports to ai.ts
-- [ ] Add private fields for genaiClient, cachedContent, and examResponse
-- [ ] Initialize GenAI client in constructor
-- [ ] Implement generateExam with cache creation and cached LLM usage
-- [ ] Implement generateExplanation to reuse cached context
-- [ ] Add cleanup method to delete cache when done
-- [ ] Update explanation prompt template to include exam context
