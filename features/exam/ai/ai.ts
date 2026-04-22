@@ -149,7 +149,6 @@ class AiClient {
     constructor(config: { cost: "high" | "low", speed?: "fast" | "moderate" }) {
         if(!process.env.MODEL){
             console.error("please set the model name in the environement variables has MODEL")
-            return
         }
         this.llm = new ChatGoogleGenerativeAI({
             model: process.env.MODEL!,
