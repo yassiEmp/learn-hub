@@ -1,0 +1,6 @@
+allowBuilds:
+  '@tailwindcss/oxide': true
+  protobufjs: true
+  '@vercel/speed-insights': true
+  sharp: true
+  unrs-resolver: true

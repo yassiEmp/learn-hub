@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { verifyAuth, createServerClient, getTokenFromRequest } from "@/utils/supabase/server";
 import { successResponse, authErrorResponse, serverErrorResponse, notFoundResponse } from "@/utils/api-helpers";
 import { createExam } from "@/features/exam/utils/createExam";
+import { retrieveChunks, chunksToContext } from "@/lib/rag/retrieve";
 
 export async function POST(
     req: NextRequest,
@@ -40,13 +41,29 @@ export async function POST(
             .select('content')
             .eq('courseId', courseId);
 
-        // 5. Combine course and lesson content for exam generation
-        const combinedContent = `${course.title}\n\n${course.description}\n\n${
-            lessons?.map(l => l.content).join('\n\n') || ''
-        }`;
+        // 5. Retrieve the chunks of the source document most relevant to this course.
+        //    Falls back to the full course text when the document was never ingested.
+        const retrievalQuery = `${course.title}\n\n${course.description}`;
+        const { err: retrieveErr, res: chunks } = await retrieveChunks({
+            query: retrievalQuery,
+            documentId: courseId,
+        });
+
+        if (retrieveErr) {
+            console.error('RAG retrieval failed for course', courseId, retrieveErr);
+        }
+
+        const examContent = chunks?.length
+            ? `${retrievalQuery}\n\n${chunksToContext(chunks)}`
+            : `${retrievalQuery}\n\n${lessons?.map(l => l.content).join('\n\n') || ''}`;
+
+        console.log(
+            `Exam for course ${courseId}: ${chunks?.length ?? 0} retrieved chunks, ` +
+            `top similarity ${chunks?.[0]?.similarity?.toFixed(3) ?? 'n/a'}`
+        );
 
         // 6. Generate exam using AI
-        const generatedExam = await createExam(combinedContent);
+        const generatedExam = await createExam(examContent);
 
         if (generatedExam.id === "dummy-exam-retry") {
             return serverErrorResponse('Exam generation failed. Please try again.');

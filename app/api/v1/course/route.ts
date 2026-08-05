@@ -4,6 +4,7 @@ import { successResponse, authErrorResponse, errorResponse, serverErrorResponse 
 import { CreateCourseRequest, CourseResponse } from "@/types/course";
 import { NextRequest } from "next/server";
 import { aiClient } from "@/features/course/utils/chunkAI/ai/aiClient";
+import { ingestDocument } from "@/lib/rag/ingest";
 
 export async function POST(req: NextRequest) {
     try {
@@ -74,6 +75,21 @@ export async function POST(req: NextRequest) {
             console.error('Database error:', dbError);
             return serverErrorResponse('Failed to create course');
         }
+
+        // Embed the source text into the vector store so exam generation can
+        // retrieve from it instead of prompting with the whole course.
+        // Failure here must not fail course creation.
+        ingestDocument({
+            text,
+            metadata: {
+                userId: user.id,
+                documentId: course.id,
+                source: title || 'course',
+            },
+        }).then(({ err: ingestErr, res: chunkCount }) => {
+            if (ingestErr) console.error('RAG ingestion failed for course', course.id, ingestErr);
+            else console.log(`RAG ingested ${chunkCount} chunks for course ${course.id}`);
+        });
 
         // 4. Call the lesson generation API to generate lessons from the course text
         //    (We do not block on this; fire-and-forget, or you can await if you want to use the result)

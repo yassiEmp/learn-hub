@@ -83,6 +83,18 @@ shared/
   └── utils/           # Utility functions
 ```
 
+### Retrieval (RAG)
+
+Exam and flashcard generation is grounded in the user's own uploaded document.
+
+- **Chunking:** `RecursiveCharacterTextSplitter`, size 1000, overlap 200.
+- **Embeddings:** Gemini `text-embedding-004`, 768 dimensions.
+- **Vector store:** Supabase `pgvector`, table `documents`, function `match_documents`.
+- **Retrieval:** top `k = 10` chunks, filtered by `documentId`, cosine similarity.
+
+Ingestion runs at course creation (`lib/rag/ingest.ts`). Retrieval runs before
+generation (`lib/rag/retrieve.ts`) and passes only the retrieved chunks to Gemini.
+
 ## 📋 Available Scripts
 
 - `pnpm dev` - Start development server
