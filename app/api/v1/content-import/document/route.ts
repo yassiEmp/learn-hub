@@ -61,24 +61,26 @@ export async function POST(req: NextRequest) {
         Document: ${fileName} (${fileType})`;
 
         try {
-            // Convert file to buffer for AI processing
+            // Gemini takes inline binary as base64. The langchain converter only
+            // understands the "media" part type; "file" throws "Unknown content type".
             const arrayBuffer = await file.arrayBuffer();
-            const uint8Array = new Uint8Array(arrayBuffer);
+            const base64Data = Buffer.from(arrayBuffer).toString('base64');
 
-            // Send the file as a binary part to Gemini, using content as a document file (Gemini supports files as a content part)
             const response = await llm.invoke([
                 {
                     role: "user",
                     content: [
                         { type: "text", text: prompt },
-                        { type: "file", name: fileName, mimeType: fileType, data: uint8Array }
+                        { type: "media", mimeType: fileType, data: base64Data }
                     ]
                 }
             ]);
 
-            const content = response.content as string;
+            const content = typeof response.content === 'string'
+                ? response.content
+                : JSON.stringify(response.content);
 
-            if (!content) {
+            if (!content?.trim()) {
                 return errorResponse('Failed to process document content');
             }
 
@@ -104,24 +106,14 @@ export async function POST(req: NextRequest) {
 
         } catch (aiError) {
             console.error('AI processing error:', aiError);
-            
-            // Fallback: Return a generic message about document processing
-            const title = fileName?.replace(/\.[^/.]+$/, "") || 'Document Content';
-            const fallbackContent = `# ${title}\n\nThis document has been uploaded and is ready for course creation. The content will be processed by AI to extract educational material.\n\nFile: ${fileName}\nType: ${fileType}\nSize: ${fileSize ? `${(fileSize / 1024 / 1024).toFixed(1)} MB` : 'Unknown'}`;
 
-            // Create blob file object even for fallback
-            const blobFile = createBlobFile(blobResult, fileName, fileSize, 'document');
-
-            return successResponse({
-                content: fallbackContent,
-                title,
-                fileType,
-                fileSize,
-                wordCount: fallbackContent.split(' ').length,
-                blobUrl: blobResult.url,
-                blobPathname: blobResult.pathname,
-                blobFile
-            }, 'Document uploaded successfully (processing pending)');
+            // Returning placeholder text as a success made a failed extraction
+            // indistinguishable from a working one, and courses were then built
+            // from the placeholder. Report the failure instead.
+            return errorResponse(
+                'Could not extract content from this document. Please try another file.',
+                502
+            );
         }
 
     } catch (error) {

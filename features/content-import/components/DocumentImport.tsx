@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
 
-// Auth is handled by the protected layout
+import { useAuth } from '@/hooks/useAuth';
 import Uppy from '@uppy/core';
 import Dashboard from '@uppy/react/dashboard';
 import XHRUpload from '@uppy/xhr-upload';
@@ -30,7 +30,14 @@ export const DocumentImport: React.FC<DocumentImportProps> = ({ onContentImport,
   const [isProcessing, setIsProcessing] = useState(false);
   const [showUppy, setShowUppy] = useState(false);
   const uppyRef = useRef<Uppy | null>(null);
-    // Auth is handled by the protected layout
+
+  // Uppy is created once, so the token is read through a ref to stay current
+  // across session refreshes.
+  const { session } = useAuth();
+  const accessTokenRef = useRef<string | undefined>(session?.access_token);
+  useEffect(() => {
+    accessTokenRef.current = session?.access_token;
+  }, [session]);
 
   const acceptedTypes = React.useMemo(() => [
     'application/pdf',
@@ -68,12 +75,18 @@ export const DocumentImport: React.FC<DocumentImportProps> = ({ onContentImport,
         fieldName: 'document',
         formData: true, // Changed to true for Vercel Blob upload
         bundle: false,
+        // The route requires a Bearer token; without it every upload is a 401.
+        headers: () => ({
+          Authorization: `Bearer ${accessTokenRef.current ?? ''}`
+        }),
+        // The return value becomes `response.body`, so unwrap the
+        // { success, data, message } envelope from successResponse() here.
         getResponseData: (xhr: XMLHttpRequest) => {
-          try {
-            return { body: JSON.parse(xhr.responseText) };
-          } catch {
-            return { body: { content: 'Document processed successfully' } };
+          const parsed = JSON.parse(xhr.responseText);
+          if (!parsed?.success) {
+            throw new Error(parsed?.error || 'Document processing failed');
           }
+          return parsed.data;
         }
       });
 
@@ -88,9 +101,13 @@ export const DocumentImport: React.FC<DocumentImportProps> = ({ onContentImport,
         if (!file) return;
         
         try {
+          if (!response.body?.content) {
+            throw new Error('The server returned no document content');
+          }
+
           const result: ImportResult = {
             type: 'document',
-            content: response.body?.content || 'Document processed successfully',
+            content: response.body.content,
             blobUrl: response.body?.blobUrl,
             blobPathname: response.body?.blobPathname,
             metadata: {
