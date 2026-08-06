@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, Download, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
 
 interface DocumentFile {
   url: string;
@@ -80,23 +81,29 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
   };
 
   const handleDownload = async (file: DocumentFile) => {
-    if (!file.canDownload) {
+    if (!file.canDownload && !isOwner) {
       setError('You do not have permission to download this file');
       return;
     }
 
     setIsLoading(true);
     try {
-      // In a real implementation, you would fetch the file through your API
-      // to ensure proper access control
-      const response = await fetch(`/api/v1/course/${courseId}/files/${encodeURIComponent(file.pathname)}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to get download URL');
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(
+        `/api/v1/course/${courseId}/files/${file.pathname.split('/').map(encodeURIComponent).join('/')}`,
+        {
+          headers: session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {},
+        }
+      );
 
       const data = await response.json();
-      console.log(isOwner)
+
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || 'Failed to get download URL');
+      }
+
       // Create a temporary link to download the file
       const link = document.createElement('a');
       link.href = data.data.file.downloadUrl;

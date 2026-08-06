@@ -6,7 +6,7 @@ import { Lightbulb, Loader2, BookOpen, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
-// Auth is handled by the protected layout
+import { postImport } from '../utils/importClient';
 
 interface TopicImportProps {
   onContentImport: (result: ImportResult) => void;
@@ -31,22 +31,10 @@ export const TopicImport: React.FC<TopicImportProps> = ({ onContentImport, onPro
     setError(null);
 
     try {
-      const response = await fetch('/api/v1/content-import/topic', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          topic: topic.trim(),
-          source
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate content for topic');
-      }
-
-      const data = await response.json();
+      const data = await postImport<{ content: string; title?: string }>(
+        'topic',
+        { topic: topic.trim(), source }
+      );
 
       const result: ImportResult = {
         type: 'topic',

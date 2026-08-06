@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import type { CleanExercise } from '@/features/exam/utils/types';
 
 export interface ExamData {
   id: string;
   title: string;
-  exercises: any[];
+  exercises: CleanExercise[];
   created_at: string;
   updated_at: string;
   course_id: string;

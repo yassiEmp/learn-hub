@@ -5,7 +5,15 @@ import { Mic, MicOff, Upload, Loader2, Play, Pause, Square } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
-// Auth is handled by the protected layout
+import { postImport } from '../utils/importClient';
+
+interface AudioImportResponse {
+  transcript: string;
+  title?: string;
+  duration?: number;
+  blobUrl?: string;
+  blobPathname?: string;
+}
 
 interface AudioImportProps {
   onContentImport: (result: ImportResult) => void;
@@ -144,22 +152,10 @@ export const AudioImport: React.FC<AudioImportProps> = ({ onContentImport, onPro
       });
 
       // Send to API for transcription
-      const response = await fetch('/api/v1/content-import/audio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          audio: base64,
-          duration: recording.duration
-        }),
+      const data = await postImport<AudioImportResponse>('audio', {
+        audio: base64,
+        duration: recording.duration
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to transcribe audio');
-      }
-
-      const data = await response.json();
 
       const result: ImportResult = {
         type: 'audio',
@@ -209,23 +205,11 @@ export const AudioImport: React.FC<AudioImportProps> = ({ onContentImport, onPro
       });
 
       // Send to API for transcription
-      const response = await fetch('/api/v1/content-import/audio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          audio: base64,
-          fileName: file.name,
-          fileSize: file.size
-        }),
+      const data = await postImport<AudioImportResponse>('audio', {
+        audio: base64,
+        fileName: file.name,
+        fileSize: file.size
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to transcribe audio file');
-      }
-
-      const data = await response.json();
 
       const result: ImportResult = {
         type: 'audio',

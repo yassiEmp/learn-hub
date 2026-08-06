@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
         }
         const body = result.res;
 
-        const { text, style }: CreateCourseRequest & { text: string } = body;
+        const { text, style, sourceFiles }: CreateCourseRequest & {
+            text: string;
+            sourceFiles?: unknown[];
+        } = body;
 
         // 3. Validate required fields
         if (!text || !style) {
@@ -54,6 +57,9 @@ export async function POST(req: NextRequest) {
             tags: tags || [],
             duration_minutes: durationMinutes,
             language: language || 'en',
+            // The client sends these on every upload; they were dropped before,
+            // so the document viewer had nothing to list.
+            source_files: Array.isArray(sourceFiles) ? sourceFiles : [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };

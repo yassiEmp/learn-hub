@@ -2,11 +2,11 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Link, ExternalLink, Loader2, LogIn } from 'lucide-react';
+import { Link, ExternalLink, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
-import { useAuth } from '@/hooks/useAuth';
+import { postImport } from '../utils/importClient';
 
 interface URLImportProps {
   onContentImport: (result: ImportResult) => void;
@@ -18,7 +18,6 @@ export const URLImport: React.FC<URLImportProps> = ({ onContentImport, onProcess
   const [isProcessing, setIsProcessing] = useState(false);
   const [preview, setPreview] = useState<{ title?: string; description?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-    const { user } = useAuth();
 
   const validateUrl = (url: string): boolean => {
     try {
@@ -41,20 +40,12 @@ export const URLImport: React.FC<URLImportProps> = ({ onContentImport, onProcess
     setPreview(null);
 
     try {
-      const response = await fetch('/api/v1/content-import/url', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
+      const data = await postImport<{
+        content: string;
+        title?: string;
+        description?: string;
+      }>('url', { url });
 
-      if (!response.ok) {
-        throw new Error('Failed to extract content from URL');
-      }
-
-      const data = await response.json();
-      
       const result: ImportResult = {
         type: 'url',
         content: data.content,

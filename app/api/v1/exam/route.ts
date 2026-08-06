@@ -1,8 +1,20 @@
+import { NextRequest } from "next/server";
 import { createExam } from "@/features/exam/utils/createExam";
 import { CleanExam } from "@/features/exam/utils/types";
+import { verifyAuth } from "@/utils/supabase/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // This route calls Gemini. Without an auth check anyone could drive
+    // unlimited billed generation against the project's API key.
+    const { user, error: authError } = await verifyAuth(req);
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: authError || 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     const body = await req.json();
     const { content } = body;
 

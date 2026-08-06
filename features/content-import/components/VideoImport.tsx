@@ -6,6 +6,15 @@ import { Video, Youtube, Loader2, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ImportResult } from '../utils/types';
+import { postImport } from '../utils/importClient';
+
+interface VideoImportResponse {
+  transcript: string;
+  title?: string;
+  duration?: number;
+  blobUrl?: string;
+  blobPathname?: string;
+}
 
 interface VideoImportProps {
   onContentImport: (result: ImportResult) => void;
@@ -45,22 +54,10 @@ export const VideoImport: React.FC<VideoImportProps> = ({ onContentImport, onPro
     setProgress("Extracting transcript from YouTube...");
 
     try {
-      const response = await fetch('/api/v1/content-import/video', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: youtubeUrl,
-          type: 'youtube'
-        }),
+      const data = await postImport<VideoImportResponse>('video', {
+        url: youtubeUrl,
+        type: 'youtube'
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to extract YouTube transcript');
-      }
-
-      const data = await response.json();
 
       const result: ImportResult = {
         type: 'video',
@@ -157,23 +154,11 @@ export const VideoImport: React.FC<VideoImportProps> = ({ onContentImport, onPro
       });
 
       // Send to API for transcription
-      const response = await fetch('/api/v1/content-import/video', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          audio: base64,
-          fileName: file.name,
-          type: 'upload'
-        }),
+      const data = await postImport<VideoImportResponse>('video', {
+        audio: base64,
+        fileName: file.name,
+        type: 'upload'
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to transcribe video');
-      }
-
-      const data = await response.json();
 
       const result: ImportResult = {
         type: 'video',

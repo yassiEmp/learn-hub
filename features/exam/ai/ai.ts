@@ -306,5 +306,14 @@ Format instructions: ${explanationParser.getFormatInstructions()}`;
         this.conversationHistory = [];
     }
 }
-const aiClient = new AiClient({ cost: "high" })
-export default aiClient 
+/**
+ * Build a client for a single request.
+ *
+ * This was previously a module-level singleton. Serverless instances are reused
+ * across requests, so conversationHistory and generatedExam persisted between
+ * unrelated users and grew without bound on a warm instance.
+ */
+export const createAiClient = (config: { cost: "high" | "low", speed?: "fast" | "moderate" }) =>
+    new AiClient(config)
+
+export { AiClient }
