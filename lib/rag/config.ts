@@ -1,5 +1,6 @@
 import "server-only";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import type { Embeddings } from "@langchain/core/embeddings";
+import { createEmbeddings } from "@/utils/ai/model";
 
 export const CHUNK_SIZE = 1000;
 export const CHUNK_OVERLAP = 200;
@@ -13,8 +14,4 @@ export type ChunkMetadata = {
   source: string;
 };
 
-export const ragEmbeddings = (): GoogleGenerativeAIEmbeddings =>
-  new GoogleGenerativeAIEmbeddings({
-    model: EMBEDDING_MODEL,
-    apiKey: process.env.GOOGLE_API_KEY,
-  });
+export const ragEmbeddings = (): Embeddings => createEmbeddings();

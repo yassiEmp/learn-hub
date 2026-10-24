@@ -1,5 +1,5 @@
 // Required imports
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { createChatModel } from "@/utils/ai/model";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
@@ -86,11 +86,7 @@ export default async function chunkReferenceAgent(text: string): Promise<Result<
   // Pre-chunk the full text
   TEXT_CHUNKS = chunkText(text, 200);
 
-  const llm = new ChatGoogleGenerativeAI({
-    model: "gemini-2.5-pro",
-    apiKey: process.env.GOOGLE_API_KEY!,
-    temperature: 0,
-  });
+  const llm = createChatModel({ temperature: 0 });
 
   const agent = createReactAgent({
     llm,

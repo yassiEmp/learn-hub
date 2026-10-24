@@ -2,10 +2,11 @@
 // AI Client for Enhanced Chunk AI System
 // ============================================================================
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { chatModelName, createChatModel } from "@/utils/ai/model";
+import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 
 export class AIClient {
-  private llm: ChatGoogleGenerativeAI;
+  private llm: BaseChatModel;
   private retryAttempts: number;
   private cache: Map<string, { data?: unknown; metadata?: { timestamp?: number } }>;
 
@@ -16,12 +17,7 @@ export class AIClient {
     maxOutputTokens?: number;
     retryAttempts?: number;
   }) {
-    this.llm = new ChatGoogleGenerativeAI({
-      model: config.model || "gemini-2.0-flash-exp",
-      apiKey: config.apiKey,
-      temperature: config.temperature || 0.2,
-      maxOutputTokens: config.maxOutputTokens || 4000,
-    });
+    this.llm = createChatModel({ temperature: config.temperature || 0.2, maxOutputTokens: config.maxOutputTokens || 4000 });
     this.retryAttempts = config.retryAttempts || 3;
     this.cache = new Map();
   }
@@ -47,7 +43,7 @@ export class AIClient {
           success: true as const,
           data: response.content as T,
           metadata: {
-            model: this.llm.model,
+            model: chatModelName(),
             tokens: response.response_metadata?.tokenUsage?.totalTokens || 0,
             duration,
             timestamp: Date.now()
@@ -66,7 +62,7 @@ export class AIClient {
       success: false as const,
       error: lastError?.message || 'AI request failed after all retry attempts',
       metadata: {
-        model: this.llm.model,
+        model: chatModelName(),
         tokens: 0,
         duration: Date.now() - startTime,
         timestamp: Date.now()

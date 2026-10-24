@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { successResponse, errorResponse, serverErrorResponse, authErrorResponse } from "@/utils/api-helpers";
 import { quotaManager } from "@/features/content-import/utils/quotas";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { createChatModel } from "@/utils/ai/model";
 import { verifyAuth } from "@/utils/auth/server";
 import { uploadToBlob, createBlobFile } from "@/utils/blob-helpers";
 
@@ -47,12 +47,7 @@ export async function POST(req: NextRequest) {
         }
 
         // 5. Process document with AI
-        const llm = new ChatGoogleGenerativeAI({
-            model: process.env.MODEL || 'gemini-2.0-flash',
-            apiKey: process.env.GOOGLE_API_KEY,
-            temperature: 0.2,
-            maxOutputTokens: 4000,
-        });
+        const llm = createChatModel({ temperature: 0.2, maxOutputTokens: 4000 });
 
         // Create a prompt for document processing
         const prompt = `Please analyze this document and extract the main educational content. 

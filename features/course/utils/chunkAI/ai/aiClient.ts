@@ -2,7 +2,8 @@
 // AI Client for Enhanced Chunk AI System
 // ============================================================================
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { chatModelName, createChatModel } from "@/utils/ai/model";
+import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { z } from "zod";
@@ -47,11 +48,7 @@ const prompt = ChatPromptTemplate.fromMessages([
 // ... existing code ...
 
 // 5. Create pipeline chain with parser at the end
-const chain = prompt.pipe(new ChatGoogleGenerativeAI({
-  model: process.env.MODEL || 'gemini-2.0-flash',
-  temperature: 0.2,
-  maxOutputTokens: 10000
-})).pipe(parser);
+const chain = prompt.pipe(createChatModel({ temperature: 0.2, maxOutputTokens: 10000 })).pipe(parser);
 
 // 6. Function to safely parse + repair + validate
 async function extractMetadata(courseText: string): Promise<Result<CourseMetadata>> {
@@ -70,11 +67,7 @@ async function extractMetadata(courseText: string): Promise<Result<CourseMetadat
     // If parsing fails, try to repair and validate
     try {
       // Fallback: run without parser, repair, then validate
-      const modelOnlyChain = prompt.pipe(new ChatGoogleGenerativeAI({
-        model: process.env.MODEL || 'gemini-2.0-flash',
-        temperature: 0.2,
-        maxOutputTokens: 10000
-      }));
+      const modelOnlyChain = prompt.pipe(createChatModel({ temperature: 0.2, maxOutputTokens: 10000 }));
       const rawOutputChunk = await modelOnlyChain.invoke({ input: courseText });
       const rawOutputText = rawOutputChunk.content as string;
       console.error("[extractMetadata] Raw model output before repair:", rawOutputText);
@@ -95,7 +88,7 @@ async function extractMetadata(courseText: string): Promise<Result<CourseMetadat
 export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
 
 export class AIClient {
-  private llm: ChatGoogleGenerativeAI;
+  private llm: BaseChatModel;
   private retryAttempts: number;
   private cache: Map<string, { metadata?: { timestamp?: number } }>; // Use a more specific type
 
@@ -106,12 +99,7 @@ export class AIClient {
     maxOutputTokens?: number;
     retryAttempts?: number;
   }) {
-    this.llm = new ChatGoogleGenerativeAI({
-      model: config.model || "gemini-2.0-flash-exp",
-      apiKey: config.apiKey,
-      temperature: config.temperature || 0.2,
-      maxOutputTokens: config.maxOutputTokens || 4000,
-    });
+    this.llm = createChatModel({ temperature: config.temperature || 0.2, maxOutputTokens: config.maxOutputTokens || 4000 });
     
     this.retryAttempts = config.retryAttempts || 3;
     this.cache = new Map();
@@ -147,7 +135,7 @@ export class AIClient {
           success: true,
           data: response.content,
           metadata: {
-            model: this.llm.model,
+            model: chatModelName(),
             tokens: response.response_metadata?.tokenUsage?.totalTokens || 0,
             duration,
             timestamp: Date.now()

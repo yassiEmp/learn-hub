@@ -4,7 +4,8 @@
 //=================== 
 import { z } from "zod";
 import prompt from "./prompt";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { createChatModel } from "@/utils/ai/model";
+import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
@@ -139,7 +140,7 @@ const examGenPromptTemplate = ChatPromptTemplate.fromMessages([
 // Removed unused explanationGenPromptTemplate as we now build prompts dynamically
 
 class AiClient {
-    private llm: ChatGoogleGenerativeAI;
+    private llm: BaseChatModel;
     private config;
     private chain: ReturnType<typeof examGenPromptTemplate.pipe> | undefined;
     private conversationHistory: Array<HumanMessage | AIMessage> = [];
@@ -150,12 +151,7 @@ class AiClient {
         if(!process.env.MODEL){
             console.error("please set the model name in the environement variables has MODEL")
         }
-        this.llm = new ChatGoogleGenerativeAI({
-            model: process.env.MODEL || 'gemini-2.0-flash',
-            apiKey: process.env.GOOGLE_API_KEY,
-            temperature: 0.2,
-            maxOutputTokens: 40000,
-        });
+        this.llm = createChatModel({ temperature: 0.2, maxOutputTokens: 40000 });
         this.config = config;
     }
 

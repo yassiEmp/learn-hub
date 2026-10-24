@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { createChatModel } from "@/utils/ai/model";
 import { successResponse, errorResponse, serverErrorResponse, authErrorResponse } from "@/utils/api-helpers";
 import { verifyAuth } from "@/utils/auth/server";
 
@@ -60,12 +60,7 @@ async function fetchWikipedia(topic: string): Promise<TopicContent | null> {
 
 async function generateWithAI(topic: string): Promise<TopicContent | null> {
     try {
-        const llm = new ChatGoogleGenerativeAI({
-            model: process.env.MODEL || 'gemini-2.0-flash',
-            apiKey: process.env.GOOGLE_API_KEY,
-            temperature: 0.4,
-            maxOutputTokens: 8000,
-        });
+        const llm = createChatModel({ temperature: 0.4, maxOutputTokens: 8000 });
         const response = await llm.invoke([
             {
                 role: 'system',

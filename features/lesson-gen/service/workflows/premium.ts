@@ -1,7 +1,7 @@
 // import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { LessonInput, Lesson } from '../types';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { createChatModel } from "@/utils/ai/model";
 import { z } from 'zod';
 import { Result } from '../types';
 
@@ -15,12 +15,7 @@ const LessonSchema = z.object({
 });
 
 // AI Model
-const llm = new ChatGoogleGenerativeAI({
-  model: process.env.MODEL || 'gemini-2.0-flash',
-  apiKey: process.env.GOOGLE_API_KEY!,
-  temperature: 0.4,
-  maxOutputTokens: 100000
-});
+const llm = createChatModel({ temperature: 0.4, maxOutputTokens: 100000 });
 
 // Bind the schema to the model for structured output
 const llmWithStructure = llm.withStructuredOutput(LessonSchema);
@@ -53,7 +48,7 @@ Return JSON with:
         ]);
         const promptValue = await prompt.invoke({ content, title });
         const lesson = await llmWithStructure.invoke(promptValue);
-        return { err: null, res: lesson };
+        return { err: null, res: lesson as Lesson };
       } catch (error) {
         return { err: error as Error, res: null };
       }
