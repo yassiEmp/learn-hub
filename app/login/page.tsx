@@ -1,498 +1,303 @@
 "use client"
-import React, { useState, useEffect } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { motion, Variants } from 'framer-motion'
-import { useAuth } from '../../hooks/useAuth'
-import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import FloatingParticle from '../../components/FloatingParticle'
-import { SocialLoginButtons } from '../../components/SocialLoginButtons'
-import { AuthError } from '@supabase/supabase-js'
+import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock, User, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { signIn, signUp } from '@/lib/auth-client'
+import FloatingParticle from '@/components/FloatingParticle'
+import { SocialLoginButtons } from '@/components/SocialLoginButtons'
 
-type MessageType = 'success' | 'error' | 'info'
+const GOOGLE_ENABLED = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
+const MIN_PASSWORD = 8
 
-interface Message {
-  text: string
-  type: MessageType
+type AuthErr = { code?: string; message?: string; status?: number } | null | undefined
+
+function describeAuthError(error: AuthErr, isLogin: boolean): string {
+  switch (error?.code) {
+    case 'INVALID_EMAIL_OR_PASSWORD':
+    case 'INVALID_PASSWORD':
+    case 'USER_NOT_FOUND':
+      return 'That email and password don’t match. Check them and try again.'
+    case 'USER_ALREADY_EXISTS':
+    case 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL':
+      return 'An account with this email already exists. Sign in instead.'
+    case 'PASSWORD_TOO_SHORT':
+      return `Your password must be at least ${MIN_PASSWORD} characters.`
+    case 'PASSWORD_TOO_LONG':
+      return 'That password is too long. Please use a shorter one.'
+    case 'INVALID_EMAIL':
+      return 'Please enter a valid email address.'
+    case 'EMAIL_NOT_VERIFIED':
+      return 'Please verify your email before signing in.'
+  }
+  if (error?.status === 429) return 'Too many attempts. Please wait a minute and try again.'
+  if (error?.message) return error.message
+  return isLogin ? 'We couldn’t sign you in. Please try again.' : 'We couldn’t create your account. Please try again.'
 }
 
-const LoginPage = () => {
-  const [isLogin, setIsLogin] = useState(true)
+/** Only allow in-app relative redirects. */
+function safeNext(next: string | null): string {
+  return next && next.startsWith('/') && !next.startsWith('//') ? next : '/create'
+}
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.6, staggerChildren: 0.1, delayChildren: 0.2 } },
+}
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+}
+
+const inputClass =
+  'block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono disabled:opacity-60'
+
+const LoginForm = () => {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const { user, loading: authLoading, refresh } = useAuth()
+
+  const [isLogin, setIsLogin] = useState(searchParams.get('mode') !== 'signup')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [socialLoading, setSocialLoading] = useState<string | null>(null)
-  const [message, setMessage] = useState<Message | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const authContext = useAuth()
-  const { auth, user, isConfigured, loading: authLoading } = authContext
-  const router = useRouter()
+  const next = safeNext(searchParams.get('next'))
 
-  // console.log('LoginPage: Auth state:', { user: !!user, isConfigured, authLoading })
-
-  // Redirect if already authenticated
+  // Already signed in → straight into the app
   useEffect(() => {
-    if (user && isConfigured) {
-      console.log('LoginPage: Redirecting to create...')
-      router.push('/create')
-    }
-  }, [user, router, isConfigured])
+    if (!authLoading && user) router.replace(next)
+  }, [user, authLoading, router, next])
 
-  // Show loading state while auth is initializing
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <motion.div
-          className="flex flex-col items-center space-y-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"
-          >
-            <Sparkles className="w-6 h-6 text-white" />
-          </motion.div>
-          <p className="text-white/60 font-geist-mono">Loading...</p>
-        </motion.div>
-      </div>
-    )
+  const switchMode = () => {
+    setIsLogin(!isLogin)
+    setError(null)
+    setPassword('')
   }
 
-  // Show setup message if not configured
-  if (!isConfigured) {
-    return (
-      <div className="min-h-screen bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-              <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
-        <FloatingParticle />
-      </div>
-
-        <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
-          <motion.div
-            className="max-w-md w-full bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="w-16 h-16 rounded-full bg-orange-400/20 flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 text-orange-400" />
-            </div>
-            <h2 className="text-2xl font-syne font-medium text-white mb-4">
-              Setup Required
-            </h2>
-            <p className="text-white/70 font-geist-mono mb-6 leading-relaxed">
-              Please configure your Supabase credentials to enable authentication.
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
-            >
-              <span>Go Home</span>
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    )
-  }
-
-  const getErrorMessage = (error: AuthError | { message: string }): string => {
-    const errorMessage = error?.message || 'An unexpected error occurred'
-
-    // Handle common Supabase auth errors
-    switch (errorMessage) {
-      case 'Invalid login credentials':
-        return 'Invalid email or password. Please check your credentials and try again.'
-      case 'User already registered':
-        return 'An account with this email already exists. Please sign in instead.'
-      case 'Email not confirmed':
-        return 'Please check your email and click the confirmation link before signing in.'
-      case 'Password should be at least 6 characters':
-        return 'Password must be at least 6 characters long.'
-      case 'Unable to validate email address: invalid format':
-        return 'Please enter a valid email address.'
-      case 'Signup is disabled':
-        return 'Account registration is currently disabled. Please contact support.'
-      case 'Email rate limit exceeded':
-        return 'Too many emails sent. Please wait a few minutes before trying again.'
-      case 'Too many requests':
-        return 'Too many login attempts. Please wait a few minutes before trying again.'
-      case 'Authentication service is not configured':
-        return 'Authentication service is not available. Please try again later.'
-      default:
-        return errorMessage
-    }
-  }
-
-  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
-    setSocialLoading(provider)
-    setMessage(null)
-
+  const handleGoogle = async () => {
+    setError(null)
+    setGoogleLoading(true)
     try {
-      const { error } = await auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/create`,
-        }
-      })
+      const { error } = await signIn.social({ provider: 'google', callbackURL: next })
       if (error) {
-        setMessage({
-          text: getErrorMessage(error),
-          type: 'error'
-        })
+        setError(describeAuthError(error, true))
+        setGoogleLoading(false)
       }
-    } catch (err: unknown) {
-      setMessage({
-        text: getErrorMessage(err as AuthError),
-        type: 'error'
-      })
-    } finally {
-      setSocialLoading(null)
+      // On success the browser is redirected to Google.
+    } catch {
+      setError('Google sign-in is unavailable right now. Please use email instead.')
+      setGoogleLoading(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setMessage(null)
+    setError(null)
 
-    // Basic validation
-    if (!email || !password || (!isLogin && !fullName)) {
-      setMessage({
-        text: 'Please fill in all required fields.',
-        type: 'error'
-      })
-      setLoading(false)
-      return
-    }
+    const cleanEmail = email.trim().toLowerCase()
+    if (!isLogin && !fullName.trim()) return setError('Please tell us your name.')
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return setError('Please enter a valid email address.')
+    if (!password) return setError('Please enter your password.')
+    if (!isLogin && password.length < MIN_PASSWORD)
+      return setError(`Your password must be at least ${MIN_PASSWORD} characters.`)
 
-    if (password.length < 6) {
-      setMessage({
-        text: 'Password must be at least 6 characters long.',
-        type: 'error'
-      })
-      setLoading(false)
-      return
-    }
-
+    setSubmitting(true)
     try {
-      if (isLogin) {
-        const { error } = await auth.signInWithPassword({ 
-          email: email.trim().toLowerCase(),
-          password 
-        })
-        if (error) {
-          setMessage({
-            text: getErrorMessage(error),
-            type: 'error'
-          })
-        } else {
-          setMessage({
-            text: 'Successfully signed in! Redirecting...',
-            type: 'success'
-          })
-          setTimeout(() => {
-            router.push('/create')
-          }, 1000)
-        }
-      } else {
-        const { error } = await auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-            }
-          }
-        })
-        if (error) {
-          setMessage({
-            text: getErrorMessage(error),
-            type: 'error'
-          })
-        } else {
-          setMessage({
-            text: 'Account created successfully! Please check your email for the confirmation link.',
-            type: 'success'
-          })
-          // Clear form after successful signup
-          setEmail('')
-          setPassword('')
-          setFullName('')
-        }
+      const { error } = isLogin
+        ? await signIn.email({ email: cleanEmail, password })
+        : await signUp.email({ name: fullName.trim(), email: cleanEmail, password })
+
+      if (error) {
+        setError(describeAuthError(error, isLogin))
+        setSubmitting(false)
+        return
       }
-    } catch (err: unknown) {
-      setMessage({
-        text: getErrorMessage(err as AuthError),
-        type: 'error'
-      })
-    } finally {
-      setLoading(false)
+      await refresh()
+      router.replace(isLogin ? next : '/create')
+    } catch {
+      setError('Network error. Check your connection and try again.')
+      setSubmitting(false)
     }
   }
 
-  const getMessageIcon = (type: MessageType) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="h-5 w-5" />
-      case 'error':
-        return <AlertCircle className="h-5 w-5" />
-      case 'info':
-        return <Info className="h-5 w-5" />
-    }
-  }
-
-  const getMessageStyles = (type: MessageType) => {
-    switch (type) {
-      case 'success':
-        return 'text-green-400 bg-green-400/10 border-green-400/20'
-      case 'error':
-        return 'text-red-400 bg-red-400/10 border-red-400/20'
-      case 'info':
-        return 'text-blue-400 bg-blue-400/10 border-blue-400/20'
-    }
-  }
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  }
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  }
+  const busy = submitting || googleLoading
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-      <div className='w-full h-full absolute top-0 left-0 overflow-hidden'>
+      <div className="w-full h-full absolute top-0 left-0 overflow-hidden">
         <FloatingParticle />
       </div>
-      {/* Large background glow */}
       <div className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 bg-white/5 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div
-        className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8"
+        className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <div className="max-w-md w-full space-y-8">
-          {/* Header */}
           <motion.div className="text-center" variants={itemVariants}>
             <Link href="/" className="inline-flex items-center space-x-2 mb-8">
               <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-syne font-medium text-white">LearnHub</span>
+              <span className="text-xl font-syne font-medium text-white">flashmind</span>
             </Link>
-
-            <h2 className="text-3xl md:text-4xl font-syne font-medium text-white mb-2">
-              {isLogin ? 'Welcome back' : 'Create account'}
-            </h2>
-            <p className="text-white/60 font-geist-mono">
-              {isLogin
-                ? 'Sign in to continue your learning journey'
-                : 'Start your learning journey today'
-              }
+            <h1 className="text-3xl md:text-4xl font-syne font-medium text-white mb-2">
+              {isLogin ? 'Welcome back' : 'Create your account'}
+            </h1>
+            <p className="text-white/60 font-geist-mono text-sm">
+              {isLogin ? 'Sign in to keep learning' : 'Turn anything into a course in a minute'}
             </p>
           </motion.div>
 
-          {/* Form */}
           <motion.div
-            className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8"
+            className="bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8"
             variants={itemVariants}
           >
-            {/* Social Login Buttons */}
-            <motion.div variants={itemVariants}>
-              <SocialLoginButtons
-                onGoogleLogin={() => handleSocialLogin('google')}
-                onFacebookLogin={() => handleSocialLogin('facebook')}
-                loading={socialLoading}
-                isLogin={isLogin}
-              />
-            </motion.div>
+            {GOOGLE_ENABLED && (
+              <>
+                <SocialLoginButtons
+                  onGoogleLogin={handleGoogle}
+                  loading={googleLoading}
+                  disabled={submitting}
+                  isLogin={isLogin}
+                />
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-black text-white/50 font-geist-mono">or with email</span>
+                  </div>
+                </div>
+              </>
+            )}
 
-            {/* Divider */}
-            <motion.div className="relative my-6" variants={itemVariants}>
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-black/40 text-white/50 font-geist-mono">
-                  or continue with email
-                </span>
-              </div>
-            </motion.div>
-
-            <form className="space-y-6 sm:p-2" onSubmit={handleSubmit}>
+            <form className="space-y-5" onSubmit={handleSubmit} noValidate>
               {!isLogin && (
-                <motion.div variants={itemVariants}>
-                  <label className="block text-sm font-geist-mono text-white/70 mb-2">
-                    Full Name
+                <div>
+                  <label htmlFor="name" className="block text-sm font-geist-mono text-white/70 mb-2">
+                    Name
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-white/40" />
-                    </div>
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 pointer-events-none" />
                     <input
+                      id="name"
                       type="text"
+                      autoComplete="name"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono"
-                      placeholder="Enter your full name"
-                      required
+                      disabled={busy}
+                      className={inputClass}
+                      placeholder="Your name"
                     />
                   </div>
-                </motion.div>
+                </div>
               )}
 
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-geist-mono text-white/70 mb-2">
+              <div>
+                <label htmlFor="email" className="block text-sm font-geist-mono text-white/70 mb-2">
                   Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-white/40" />
-                  </div>
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 pointer-events-none" />
                   <input
+                    id="email"
                     type="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono"
-                    placeholder="Enter your email"
-                    required
+                    disabled={busy}
+                    className={inputClass}
+                    placeholder="you@example.com"
                   />
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div variants={itemVariants}>
-                <label className="block text-sm font-geist-mono text-white/70 mb-2">
+              <div>
+                <label htmlFor="password" className="block text-sm font-geist-mono text-white/70 mb-2">
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-white/40" />
-                  </div>
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40 pointer-events-none" />
                   <input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl bg-white/5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all duration-300 font-geist-mono"
-                    placeholder="Enter your password"
-                    required
-                    minLength={6}
+                    disabled={busy}
+                    className={`${inputClass} pr-10`}
+                    placeholder={isLogin ? 'Your password' : `At least ${MIN_PASSWORD} characters`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/40 hover:text-white/60 transition-colors"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                {!isLogin && (
-                  <p className="mt-1 text-xs text-white/50 font-geist-mono">
-                    Password must be at least 6 characters long
-                  </p>
-                )}
-              </motion.div>
+              </div>
 
-              {message && (
-                <motion.div
-                  className={`flex items-start space-x-3 text-sm font-geist-mono border rounded-xl p-3 ${getMessageStyles(message.type)}`}
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
+              {error && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-3 text-sm font-geist-mono border rounded-xl p-3 text-red-400 bg-red-400/10 border-red-400/20"
                 >
-                  <div className="flex-shrink-0 mt-0.5">
-                    {getMessageIcon(message.type)}
-                  </div>
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    {message.text}
+                    {error}
+                    {error.includes('already exists') && !isLogin && (
+                      <button type="button" onClick={switchMode} className="block mt-1 underline text-red-300">
+                        Go to sign in
+                      </button>
+                    )}
                   </div>
-                </motion.div>
+                </div>
               )}
 
-              <motion.button
+              <button
                 type="submit"
-                disabled={loading || socialLoading !== null}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                whileHover={{ scale: (loading || socialLoading !== null) ? 1 : 1.02 }}
-                whileTap={{ scale: (loading || socialLoading !== null) ? 1 : 0.98 }}
-                variants={itemVariants}
+                disabled={busy}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
-                {loading ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full"
-                  />
+                {submitting ? (
+                  <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                    <span>{isLogin ? 'Sign in' : 'Create account'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
-              </motion.button>
+              </button>
             </form>
 
-            {/* Toggle between login/signup */}
-            <motion.div className="mt-6 text-center" variants={itemVariants}>
+            <div className="mt-6 text-center">
               <button
-                onClick={() => {
-                  setIsLogin(!isLogin)
-                  setMessage(null)
-                  setEmail('')
-                  setPassword('')
-                  setFullName('')
-                }}
-                className="text-white/60 hover:text-white font-geist-mono text-sm transition-colors"
+                type="button"
+                onClick={switchMode}
+                disabled={busy}
+                className="text-white/60 hover:text-white font-geist-mono text-sm transition-colors disabled:opacity-50"
               >
-                {isLogin
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"
-                }
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
               </button>
-            </motion.div>
-
-            {/* Additional help text */}
-            {isLogin && (
-              <motion.div className="mt-4 text-center" variants={itemVariants}>
-                <p className="text-white/40 font-geist-mono text-xs">
-                  Forgot your password? Contact support for assistance.
-                </p>
-              </motion.div>
-            )}
+            </div>
           </motion.div>
 
-          {/* Back to home */}
           <motion.div className="text-center" variants={itemVariants}>
-            <Link
-              href="/"
-              className="text-white/50 hover:text-white/70 font-geist-mono text-sm transition-colors"
-            >
+            <Link href="/" className="text-white/50 hover:text-white/70 font-geist-mono text-sm transition-colors">
               ← Back to home
             </Link>
           </motion.div>
@@ -502,4 +307,10 @@ const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <LoginForm />
+    </Suspense>
+  )
+}

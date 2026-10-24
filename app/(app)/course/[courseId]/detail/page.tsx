@@ -1,20 +1,28 @@
 "use client"
-import React from 'react';
-import { useParams } from 'next/navigation';
-import { CourseDetail } from '@/features/course/components/CourseDetail';
-import { useCourse } from '@/features/course/hooks/useCourse';
+import React from 'react'
+import { useParams } from 'next/navigation'
+import Nav from '@/components/hearderApp'
+import { CourseDetail } from '@/features/course/components/CourseDetail'
+import { CourseStatusScreen } from '@/features/course/components/CourseStatusScreen'
+import { useCourse } from '@/features/course/hooks/useCourse'
 
 const Page = () => {
-  const params = useParams();
-  const courseIdRaw = params.courseId;
-  const courseId = String(courseIdRaw) ;
-  const { course, loading, error } = useCourse(courseId);
+  const params = useParams()
+  const courseId = String(params.courseId ?? '')
+  const { course, loading, error, stalled, refetch } = useCourse(courseId)
 
-  if (!courseId) return <div className="text-red-500 p-8">Invalid course ID.</div>;
-  if (loading ) return <p>Loading...</p>;
-  if (error || !course) return <div className="text-red-500 p-8">{error || 'Course not found.'}</div>;
+  return (
+    <>
+      <Nav />
+      {loading ? (
+        <CourseStatusScreen kind="loading" />
+      ) : error || !course ? (
+        <CourseStatusScreen kind="error" message={error ?? 'Course not found.'} onRetry={refetch} />
+      ) : (
+        <CourseDetail course={course} stalled={stalled} />
+      )}
+    </>
+  )
+}
 
-  return <CourseDetail course={course} />;
-};
-
-export default Page;
+export default Page

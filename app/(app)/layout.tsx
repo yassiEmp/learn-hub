@@ -1,23 +1,24 @@
 'use client'
 import { useAuth } from '@/hooks/useAuth'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
+import { Sparkles } from 'lucide-react'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, isConfigured } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
-  
+  const pathname = usePathname()
+
   useEffect(() => {
-    if (!loading && !user && isConfigured) {
-      router.push('/login')
+    if (!loading && !user) {
+      const next = pathname && pathname !== '/' ? `?next=${encodeURIComponent(pathname)}` : ''
+      router.replace(`/login${next}`)
     }
-  }, [user, loading, isConfigured, router])
-  
-  if (loading) {
+  }, [user, loading, router, pathname])
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <motion.div
@@ -33,50 +34,15 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
           >
             <Sparkles className="w-6 h-6 text-white" />
           </motion.div>
-          <p className="text-white/60 font-geist-mono">Loading...</p>
+          <p className="text-white/60 font-geist-mono">{loading ? 'Loading…' : 'Redirecting to sign in…'}</p>
         </motion.div>
       </div>
     )
   }
-  
-  if (!isConfigured) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4">
-        <motion.div
-          className="max-w-md w-full bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="w-16 h-16 rounded-full bg-orange-400/20 flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="w-8 h-8 text-orange-400" />
-          </div>
-          <h2 className="text-2xl font-syne font-medium text-white mb-4">
-            Setup Required
-          </h2>
-          <p className="text-white/70 font-geist-mono mb-6 leading-relaxed">
-            Authentication is not configured. Please set up your Supabase credentials in the environment variables.
-          </p>
-          <Link 
-            href="/"
-            className="inline-flex items-center space-x-2 px-6 py-3 bg-white text-black rounded-xl font-geist-mono font-medium hover:bg-white/90 transition-all duration-300"
-          >
-            <span>Go Home</span>
-          </Link>
-        </motion.div>
-      </div>
-    )
-  }
-  
-  if (!user) {
-    return null // Redirecting
-  }
-  
-  return <ThemeProvider
-    attribute="class"
-    defaultTheme="light"
-    enableSystem
-  >
-    {children}
-  </ThemeProvider>
+
+  return (
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      {children}
+    </ThemeProvider>
+  )
 }

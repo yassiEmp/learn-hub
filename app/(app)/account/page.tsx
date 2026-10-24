@@ -6,9 +6,13 @@ import { motion } from "framer-motion";
 import { DestructiveAlert } from "@/components/ui/DestructiveAlert";
 import { Toast } from "@/components/ui/Toast";
 import { userApi, handleApiError } from "@/utils/api-client";
+import { useRouter } from "next/navigation";
+import Nav from "@/components/hearderApp";
+import { LogOut } from "lucide-react";
 
 export default function AccountPage() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const router = useRouter();
   const [alertOpen, setAlertOpen] = useState(false);
   const [toast, setToast] = useState<{
     open: boolean;
@@ -23,14 +27,9 @@ export default function AccountPage() {
     
     try {
       await userApi.deleteAccount();
-      
-      setToast({
-        open: true,
-        title: "Account deleted",
-        description: "Your account and all data have been deleted.",
-        variant: "destructive",
-      });
-      
+      router.push("/");
+      await signOut();
+      return;
     } catch (error) {
       const errorMessage = handleApiError(error);
       setToast({
@@ -54,7 +53,8 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-black text-white px-4 sm:px-8 pt-28 pb-12">
+      <Nav />
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,7 +82,7 @@ export default function AccountPage() {
                     Name
                   </label>
                   <p className="text-white">
-                    {user.user_metadata?.full_name || "Not provided"}
+                    {user.name || "Not provided"}
                   </p>
                 </div>
                 <div>
@@ -92,6 +92,20 @@ export default function AccountPage() {
                   <p className="text-white font-mono text-sm">{user.id}</p>
                 </div>
               </div>
+            </div>
+
+            <div className="border-t border-gray-700 pt-6">
+              <Button
+                onClick={async () => {
+                  router.push("/");
+                  await signOut();
+                }}
+                variant="outline"
+                className="text-white"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </Button>
             </div>
 
             <div className="border-t border-gray-700 pt-6">

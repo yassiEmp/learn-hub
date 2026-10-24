@@ -2,274 +2,152 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Sparkles, Menu, X, LogOut } from 'lucide-react';
 import { cva } from 'class-variance-authority';
-import { useAuth } from '../hooks/useAuth';
-import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { useAuth } from '@/hooks/useAuth';
 
-// Navbar container variants
 const navbarVariants = cva(
   "bg-background/20 border px-6 max-w-4xl w-full py-3 border-foreground/10 backdrop-blur-md mx-auto transition-[border-radius] duration-200",
   {
-    variants: {
-      isMenuOpen: {
-        true: "rounded-xl",
-        false: "rounded-full"
-      }
-    },
-    defaultVariants: {
-      isMenuOpen: false
-    }
+    variants: { isMenuOpen: { true: "rounded-xl", false: "rounded-full" } },
+    defaultVariants: { isMenuOpen: false },
   }
 );
 
-// Navigation item variants
 const navItemVariants = cva(
   "px-4 py-2 rounded-full text-xs font-geist-mono transition-all duration-300",
   {
     variants: {
       active: {
         true: "text-foreground bg-muted/30 border border-foreground/10",
-        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-      }
+        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30",
+      },
     },
-    defaultVariants: {
-      active: false
-    }
+    defaultVariants: { active: false },
   }
 );
 
-// Mobile menu item variants
 const mobileMenuItemVariants = cva(
   "block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono transition-all duration-200",
   {
     variants: {
       active: {
         true: "text-foreground bg-muted/60",
-        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-      }
+        false: "text-muted-foreground hover:text-foreground hover:bg-muted/30",
+      },
     },
-    defaultVariants: {
-      active: false
-    }
+    defaultVariants: { active: false },
   }
 );
 
-// Action button variants
-const actionButtonVariants = cva(
-  "text-xs font-geist-mono transition-all duration-300",
-  {
-    variants: {
-      variant: {
-        default: "text-muted-foreground hover:text-foreground",
-        primary: "px-4 py-2 bg-primary text-primary-foreground rounded-full font-medium hover:bg-primary/90"
-      }
-    },
-    defaultVariants: {
-      variant: "default"
-    }
-  }
-);
+const NAV_ITEMS = [
+  { id: 'create', label: 'Create', path: '/create', match: ['/create'] },
+  { id: 'courses', label: 'My courses', path: '/courses', match: ['/courses', '/course/', '/dashboard'] },
+  { id: 'exams', label: 'Exams', path: '/exams', match: ['/exams', '/exam/'] },
+  { id: 'account', label: 'Account', path: '/account', match: ['/account'] },
+];
 
-// Navigation Items Component
-const NavItems = ({ currentPath }: { currentPath: string }) => {
-  const auth = useAuth()
-  const { isAuthenticated, isConfigured } = auth
-
-  const navItems = [
-    { id: 'import', label: 'Create', path: '/create' },
-    ...(isAuthenticated && isConfigured ? [
-      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-      { id: 'courses', label: 'Courses', path: '/courses' },
-      { id: 'exams', label: 'exams', path: '/exams' },
-      { id: 'account', label: 'Account', path: '/account' },
-    ] : [
-      { id: 'courses', label: 'Explore', path: '/courses' },
-    ])
-  ];
-
-  return (
-    <nav className="hidden md:flex items-center space-x-1 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-fade-in">
-      {navItems.map((item) => (
-        <Link
-          key={item.id}
-          href={item.path}
-          className={navItemVariants({ active: currentPath === item.path })}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  );
-};
-
-// Action Buttons Component
-const ActionButtons = () => {
-  const authContext = useAuth()
-  const { user, auth, loading, isConfigured } = authContext
-
-  if (loading) {
-    return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <div className="w-8 h-4 bg-muted/50 rounded animate-pulse" />
-      </div>
-    )
-  }
-
-  if (!isConfigured) {
-    return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <span className="text-muted-foreground/70 font-geist-mono text-xs">Setup Required</span>
-      </div>
-    )
-  }
-
-  if (user) {
-    return (
-      <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-        <div className="flex items-center space-x-3">
-          <span className="text-foreground/80 font-geist-mono text-sm">
-            {user.user_metadata?.full_name || user.email}
-          </span>
-          <motion.button
-            onClick={() => {
-              if (user) {
-                auth.signOut()
-              }
-            }}
-            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <LogOut className="w-4 h-4" />
-          </motion.button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="hidden md:flex items-center space-x-3 animate-fade-in">
-      <Link href="/login" className={actionButtonVariants()}>
-        Login
-      </Link>
-
-      <Link href="/login" className={actionButtonVariants({ variant: "primary" })}>
-        Start Learning
-      </Link>
-    </div>
-  )
+function isActive(pathname: string, match: string[]) {
+  return match.some((m) => (m.endsWith('/') ? pathname.startsWith(m) : pathname === m));
 }
 
-// Main Nav Component
-export default function Nav({ currentPath }: { currentPath: string }) {
+/** App navigation for signed-in pages. `currentPath` is optional; the URL is used by default. */
+export default function Nav({ currentPath }: { currentPath?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const authContext = useAuth()
-  const { user, auth, loading, isAuthenticated, isConfigured } = authContext
-  const { setTheme } = useTheme()
-  useEffect(() => {
-    setTheme("dark")
-  })
-  if (loading) {
-    return <>
-      <div><p>loading</p></div>
-    </>
-  }
+  const pathname = usePathname() || currentPath || '';
+  const router = useRouter();
+  const { user, signOut } = useAuth();
+  const { setTheme } = useTheme();
 
-  const navItems = [
-    { id: 'import', label: 'Create', path: '/import' },
-    ...(isAuthenticated && isConfigured ? [
-      { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-      { id: 'courses', label: 'Courses', path: '/courses' },
-      { id: 'exams', label: 'Learning', path: '/exams' },
-      { id: 'account', label: 'Account', path: '/account' },
-    ] : [
-      { id: 'courses', label: 'Explore', path: '/courses' },
-    ])
-  ];
+  useEffect(() => {
+    setTheme("dark");
+  }, [setTheme]);
+
+  const handleSignOut = async () => {
+    setIsMenuOpen(false);
+    router.push('/');
+    await signOut();
+  };
 
   return (
     <nav className="fixed top-6 transform z-50 w-full px-4 animate-slide-down">
-      {/* Glass floating navbar */}
       <div className={navbarVariants({ isMenuOpen })}>
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center animate-fade-in">
-            <Link
-              href="/"
-              className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
-            >
-              <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-foreground" />
-              </div>
-              <span className="text-sm font-syne font-medium text-foreground">flashmind</span>
-            </Link>
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
+          >
+            <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-foreground" />
+            </div>
+            <span className="text-sm font-syne font-medium text-foreground">flashmind</span>
+          </Link>
+
+          <div className="hidden md:flex items-center space-x-1">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.id}
+                href={item.path}
+                className={navItemVariants({ active: isActive(pathname, item.match) })}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop Navigation */}
-          <NavItems currentPath={currentPath} />
+          <div className="hidden md:flex items-center gap-3">
+            {user && (
+              <span className="text-foreground/80 font-geist-mono text-xs max-w-[140px] truncate">
+                {user.name || user.email}
+              </span>
+            )}
+            <button
+              onClick={handleSignOut}
+              title="Sign out"
+              aria-label="Sign out"
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-300"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
 
-          {/* Action Buttons */}
-          <ActionButtons />
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden animate-fade-in">
+          <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200 hover:scale-110 active:scale-90"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
             >
               {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="pt-4 pb-2 space-y-2 border-t border-border/20 mt-3">
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <Link
                 key={item.id}
                 href={item.path}
                 onClick={() => setIsMenuOpen(false)}
-                className={`${mobileMenuItemVariants({ active: currentPath === item.path })} animate-slide-in`}
+                className={mobileMenuItemVariants({ active: isActive(pathname, item.match) })}
               >
                 {item.label}
               </Link>
             ))}
-
-            {/* Mobile Auth Actions */}
-            <div className="pt-2 border-t border-border/20 mt-2">
-              {user && isConfigured ? (
-                <div className="space-y-2">
-                  <div className="px-3 py-2 text-foreground/80 font-geist-mono text-xs">
-                    {user.user_metadata?.full_name || user.email}
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (user) {
-                        auth.signOut()
-                        setIsMenuOpen(false)
-                      }
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              ) : isConfigured ? (
-                <Link
-                  href="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-3 py-2 rounded-lg text-xs font-geist-mono text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all duration-200"
-                >
-                  Login
-                </Link>
-              ) : (
-                <div className="px-3 py-2 text-muted-foreground/70 font-geist-mono text-xs">
-                  Setup Required
+            <div className="pt-2 border-t border-border/20 mt-2 space-y-2">
+              {user && (
+                <div className="px-3 py-2 text-foreground/80 font-geist-mono text-xs truncate">
+                  {user.name || user.email}
                 </div>
               )}
+              <button
+                onClick={handleSignOut}
+                className={mobileMenuItemVariants({ active: false })}
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>

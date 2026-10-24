@@ -1,51 +1,68 @@
 "use client"
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { ExamComponant } from '@/components/ExamComponant'
+import type { Exam } from '@/components/ExamComponant'
 import Nav from '@/components/hearderApp'
 import BGglow from '@/components/bg-glow'
-import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+import { apiFetch, errorMessage } from '@/hooks/apiFetch'
 
-const fetchExam = async (examId: string, accessToken: string) => {
-  const res = await fetch(`/api/v1/exam/${examId}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`
-    }
-  })
-  if (!res.ok) throw new Error('Failed to fetch exam')
-  const data = await res.json()
-  
-  // Transform the database response to match the Exam type expected by ExamComponant
+interface ExamDTO {
+  id: string
+  title: string
+  exercises: Exam['exercises']
+  course_id: string | null
+}
+
+const fetchExam = async (examId: string): Promise<Exam> => {
+  const data = await apiFetch<ExamDTO | { exam: ExamDTO }>(`/api/v1/exam/${examId}`)
+  const exam = 'exam' in data ? data.exam : data
   return {
-    id: data.data.id,
-    title: data.data.title,
-    exercises: data.data.exercises,
-    mode: 'Exercice' as const, // Default mode for generated exams
-    courseId: data.data.course_id // Include course ID for navigation
+    id: exam.id,
+    title: exam.title,
+    exercises: Array.isArray(exam.exercises) ? exam.exercises : [],
+    mode: 'Exercice',
+    courseId: exam.course_id ?? undefined,
   }
 }
 
 const Page = () => {
   const params = useParams()
-  const examId = params.examId as string
-  const { session } = useAuth()
-  
-  const { data: exam, isLoading, error } = useQuery({
+  const examId = String(params.examId ?? '')
+
+  const { data: exam, isPending, error, refetch } = useQuery({
     queryKey: ['exam', examId],
-    queryFn: () => fetchExam(examId, session?.access_token || ''),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!session?.access_token
+    queryFn: () => fetchExam(examId),
+    enabled: !!examId,
   })
 
-  if (isLoading) return <div className="text-center mt-24">Loading exam...</div>
-  if (error) return <div className="text-center mt-24 text-red-500">Failed to load exam.</div>
-  if (!exam) return <div className="text-center mt-24 text-red-500">Exam not found.</div>
-
   return (
-    <section className='pt-24'>
-      <Nav currentPath="/exam" />
+    <section className="pt-24 min-h-screen bg-black">
+      <Nav />
       <BGglow />
-      <ExamComponant Exam={exam} />
+      {isPending ? (
+        <p className="flex items-center justify-center gap-2 mt-24 text-white/60 font-geist-mono">
+          <Loader2 className="w-5 h-5 animate-spin" /> Loading exam…
+        </p>
+      ) : error || !exam ? (
+        <div className="text-center mt-24 space-y-4">
+          <p className="text-red-400 font-geist-mono">{errorMessage(error, 'Exam not found.')}</p>
+          <div className="flex justify-center gap-3">
+            <button onClick={() => refetch()} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-geist-mono">
+              Try again
+            </button>
+            <Link href="/exams" className="px-4 py-2 rounded-lg border border-white/15 text-white text-sm font-geist-mono">
+              All exams
+            </Link>
+          </div>
+        </div>
+      ) : exam.exercises.length === 0 ? (
+        <p className="text-center mt-24 text-white/60 font-geist-mono">This exam has no questions.</p>
+      ) : (
+        <ExamComponant Exam={exam} />
+      )}
     </section>
   )
 }

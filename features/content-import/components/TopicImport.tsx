@@ -1,153 +1,89 @@
 "use client"
-import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/Button';
+import React, { useState } from 'react';
+import { BookOpen, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
-import { Lightbulb, Loader2, BookOpen, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ImportResult } from '../utils/types';
+import { FieldError, SubmitButton } from './SourceFormParts';
+import { SourceFormProps } from './sourceTypes';
 import { postImport } from '../utils/importClient';
 
-interface TopicImportProps {
-  onContentImport: (result: ImportResult) => void;
-  onProcessingChange: (processing: boolean) => void;
-}
+type TopicSource = 'ai' | 'wikipedia';
 
-export const TopicImport: React.FC<TopicImportProps> = ({ onContentImport, onProcessingChange }) => {
-  const [topic, setTopic] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [source, setSource] = useState<'wikipedia' | 'ai'>('wikipedia');
+export const TopicImport: React.FC<SourceFormProps> = ({ disabled, onSubmit }) => {
+  const [topic, setTopic] = useState('');
+  const [source, setSource] = useState<TopicSource>('ai');
   const [error, setError] = useState<string | null>(null);
-    // Auth is handled by the protected layout
 
-  const handleGenerateContent = useCallback(async () => {
-    if (!topic.trim()) {
-      setError('Please enter a topic');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = topic.trim();
+    if (value.length < 3) {
+      setError('Type a topic — for example “Photosynthesis” or “Intro to SQL joins”.');
       return;
     }
-
-    setIsProcessing(true);
-    onProcessingChange(true);
     setError(null);
-
-    try {
-      const data = await postImport<{ content: string; title?: string }>(
-        'topic',
-        { topic: topic.trim(), source }
-      );
-
-      const result: ImportResult = {
-        type: 'topic',
-        content: data.content,
-        metadata: {
-          source: source === 'wikipedia' ? 'Wikipedia' : 'AI Generated',
-          title: data.title || topic,
-          fileType: 'research'
-        }
-      };
-
-      onContentImport(result);
-    } catch (error) {
-      console.error('Error generating topic content:', error);
-      setError(error instanceof Error ? error.message : 'Failed to generate content');
-    } finally {
-      setIsProcessing(false);
-      onProcessingChange(false);
-    }
-  }, [topic, source, onContentImport, onProcessingChange]);
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isProcessing) {
-      handleGenerateContent();
-    }
+    const chosen = source;
+    onSubmit({
+      sourceType: 'topic',
+      prepare: async () => {
+        const data = await postImport<{ content: string; title?: string }>('topic', {
+          topic: value,
+          source: chosen,
+        });
+        return { text: data.content, sourceType: 'topic' };
+      },
+    });
   };
 
+  const options: { id: TopicSource; label: string; icon: typeof Sparkles }[] = [
+    { id: 'ai', label: 'AI explains it', icon: Sparkles },
+    { id: 'wikipedia', label: 'From Wikipedia', icon: BookOpen },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-lg font-medium text-foreground mb-2">Research Topic</h3>
-        <p className="text-sm text-muted-foreground">
-          Enter a topic to research from Wikipedia or generate AI content
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <Input
-            type="text"
-            placeholder="e.g., Machine Learning, Quantum Computing, Climate Change"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isProcessing}
-            className="w-full"
-          />
-
-          {/* Source Selection */}
-          <div className="flex gap-2 sm:flex-row flex-col">
-            <Button
-              variant={source === 'wikipedia' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSource('wikipedia')}
-              disabled={isProcessing}
-              className="flex-1 sm:w-auto w-full h-16 p-3 sm:p-1"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Wikipedia
-            </Button>
-            <Button
-              variant={source === 'ai' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSource('ai')}
-              disabled={isProcessing}
-              className="flex-1 sm:w-auto w-full h-16 p-3 sm:p-1"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI Generated
-            </Button>
-          </div>
-        </div>
-
-        <Button
-          onClick={handleGenerateContent}
-          disabled={isProcessing}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <label htmlFor="source-topic" className="block text-sm text-muted-foreground">
+        No material? Just name what you want to learn.
+      </label>
+      <Input
+        id="source-topic"
+        type="text"
+        value={topic}
+        onChange={(e) => {
+          setTopic(e.target.value);
+          if (error) setError(null);
+        }}
+        disabled={disabled}
+        placeholder="e.g. Machine learning basics, The French Revolution, React hooks"
+        className="h-12 bg-foreground/5 border-foreground/15 text-foreground"
+      />
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Where should the content come from?">
+        {options.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            role="radio"
+            aria-checked={source === id}
+            disabled={disabled}
+            onClick={() => setSource(id)}
             className={cn(
-              "w-full",
-              "bg-primary hover:bg-primary/90"
+              'inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors disabled:opacity-50',
+              source === id
+                ? 'border-foreground/40 bg-foreground/10 text-foreground'
+                : 'border-foreground/10 text-muted-foreground hover:text-foreground'
             )}
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              {source === 'wikipedia' ? 'Researching...' : 'Generating...'}
-            </>
-          ) : (
-            <>
-              <Lightbulb className="w-4 h-4 mr-2" />
-              {source === 'wikipedia' ? 'Research Topic' : 'Generate Content'}
-            </>
-          )}
-        </Button>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm"
           >
-            {error}
-          </motion.div>
-        )}
-
-        <div className="text-xs flex justify-center items-center">
-          <p className='text-muted-foreground text-center p-1 bg-muted/80 border border-border/30 rounded-lg'>
-            {source === 'wikipedia'
-              ? 'Content will be extracted from Wikipedia articles'
-              : 'Content will be generated using AI based on the topic'
-            }
-          </p>
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+        <FieldError message={error} />
+        <div className="sm:ml-auto">
+          <SubmitButton disabled={disabled} />
         </div>
       </div>
-    </div>
+    </form>
   );
 };

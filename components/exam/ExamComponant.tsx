@@ -183,11 +183,11 @@ const ExamComponant = ({ Exam }: { Exam: Exam }) => {
         }}
         onViewLesson={() => {
          // Navigate back to the course page
-         router.push(`/${Exam.courseId || ''}`);
+         router.push(Exam.courseId ? `/course/${Exam.courseId}/detail` : '/courses');
         }}
         onViewSummary={() => {
           // Navigate back to the course page
-          router.push(`/${Exam.courseId || ''}`);
+          router.push(Exam.courseId ? `/course/${Exam.courseId}/detail` : '/courses');
         }}
         onQuestionClick={(questionIndex) => {
           setIsExamComplete(false)

@@ -6,7 +6,7 @@ import React from 'react'
 const Page = () => {
   return (
     <>
-      <Nav currentPath="/exams" />
+      <Nav />
       <ExamBrowser />
     </>
   )

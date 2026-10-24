@@ -73,3 +73,76 @@ export interface CourseResponse {
   created_at: string;
   updated_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// API shapes (Neon + Drizzle backend). Snake_case mirrors the JSON returned by
+// /api/v1/course, /api/v1/course/[id], /api/v1/exams and /api/v1/exam/[id].
+// ---------------------------------------------------------------------------
+
+export type CourseStatus = 'generating' | 'ready' | 'failed';
+
+export type SourceType = 'text' | 'pdf' | 'url' | 'youtube' | 'topic' | 'audio' | 'video';
+
+export interface SourceFile {
+  url: string;
+  pathname?: string;
+  type: string;
+  filename: string;
+  size: number;
+  uploadedAt: string;
+}
+
+export interface ApiCourse {
+  id: string;
+  title: string;
+  description: string | null;
+  owner_id: string;
+  content?: string | null;
+  category: string | null;
+  level: string | null;
+  price?: number | null;
+  tags: string[] | null;
+  duration_minutes: number | null;
+  language?: string | null;
+  source_type?: SourceType | string | null;
+  source_files?: SourceFile[] | null;
+  is_public?: boolean;
+  status: CourseStatus;
+  lessons_total: number | null;
+  lessons_count: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiLesson {
+  id: string;
+  title: string;
+  content: string | null;
+  summary: string | null;
+  objectives: string[] | null;
+  resources: string[] | null;
+  position: number;
+}
+
+export interface CourseWithLessons extends ApiCourse {
+  lessons: ApiLesson[];
+  is_owner: boolean;
+}
+
+export interface ExamListItem {
+  id: string;
+  title: string;
+  exercises?: unknown[];
+  course_id: string | null;
+  course: {
+    id: string;
+    title: string;
+    description?: string | null;
+    category?: string | null;
+    level?: string | null;
+  } | null;
+  totalQuestions?: number;
+  estimatedDuration?: number;
+  created_at: string;
+  updated_at?: string;
+}

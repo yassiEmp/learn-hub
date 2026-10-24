@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Download, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
 
 interface DocumentFile {
   url: string;
@@ -88,14 +87,9 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
 
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(
         `/api/v1/course/${courseId}/files/${file.pathname.split('/').map(encodeURIComponent).join('/')}`,
-        {
-          headers: session?.access_token
-            ? { Authorization: `Bearer ${session.access_token}` }
-            : {},
-        }
+        { credentials: 'same-origin' }
       );
 
       const data = await response.json();

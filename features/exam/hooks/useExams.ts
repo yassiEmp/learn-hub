@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, errorMessage } from '@/hooks/apiFetch';
 import type { ExamListItem } from '@/types/course';
 
-export type ExamData = ExamListItem & { totalQuestions: number };
+export type ExamData = ExamListItem & { totalQuestions: number; estimatedDuration: number };
 
 interface UseExamsResult {
   exams: ExamData[];
@@ -19,11 +19,15 @@ export function useExams(): UseExamsResult {
     queryFn: async () => {
       const data = await apiFetch<ExamListItem[] | { exams?: ExamListItem[] }>('/api/v1/exams');
       const list = Array.isArray(data) ? data : data?.exams ?? [];
-      return list.map((exam) => ({
-        ...exam,
-        course: exam.course ?? null,
-        totalQuestions: Array.isArray(exam.exercises) ? exam.exercises.length : 0,
-      }));
+      return list.map((exam) => {
+        const totalQuestions = exam.totalQuestions ?? (Array.isArray(exam.exercises) ? exam.exercises.length : 0);
+        return {
+          ...exam,
+          course: exam.course ?? null,
+          totalQuestions,
+          estimatedDuration: exam.estimatedDuration ?? totalQuestions * 2,
+        };
+      });
     },
     staleTime: 0,
     refetchOnMount: 'always',

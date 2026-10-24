@@ -1,158 +1,71 @@
 "use client"
-import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/Button';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/Input';
-import { Link, ExternalLink, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { ImportResult } from '../utils/types';
+import { FieldError, SubmitButton } from './SourceFormParts';
+import { SourceFormProps } from './sourceTypes';
 import { postImport } from '../utils/importClient';
 
-interface URLImportProps {
-  onContentImport: (result: ImportResult) => void;
-  onProcessingChange: (processing: boolean) => void;
+function normalizeUrl(raw: string): string | null {
+  const value = raw.trim();
+  if (!value) return null;
+  const withScheme = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  try {
+    const url = new URL(withScheme);
+    return url.hostname.includes('.') ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
-export const URLImport: React.FC<URLImportProps> = ({ onContentImport, onProcessingChange }) => {
-  const [url, setUrl] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [preview, setPreview] = useState<{ title?: string; description?: string } | null>(null);
+export const URLImport: React.FC<SourceFormProps> = ({ disabled, onSubmit }) => {
+  const [url, setUrl] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const validateUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleExtractContent = useCallback(async () => {
-    if (!url.trim() || !validateUrl(url)) {
-      setError('Please enter a valid URL');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const normalized = normalizeUrl(url);
+    if (!normalized) {
+      setError('Enter a valid web address, like https://example.com/article');
       return;
     }
-
-    setIsProcessing(true);
-    onProcessingChange(true);
+    if (/youtube\.com|youtu\.be/i.test(normalized)) {
+      setError('That looks like a YouTube link — use the “YouTube link” option instead.');
+      return;
+    }
     setError(null);
-    setPreview(null);
-
-    try {
-      const data = await postImport<{
-        content: string;
-        title?: string;
-        description?: string;
-      }>('url', { url });
-
-      const result: ImportResult = {
-        type: 'url',
-        content: data.content,
-        metadata: {
-          source: url,
-          title: data.title || 'Web Content',
-          fileType: 'webpage'
-        }
-      };
-
-      setPreview({
-        title: data.title,
-        description: data.description
-      });
-
-      onContentImport(result);
-    } catch (error) {
-      console.error('Error extracting URL content:', error);
-      setError(error instanceof Error ? error.message : 'Failed to extract content');
-    } finally {
-      setIsProcessing(false);
-      onProcessingChange(false);
-    }
-  }, [url, onContentImport, onProcessingChange]);
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isProcessing) {
-      handleExtractContent();
-    }
+    onSubmit({
+      sourceType: 'url',
+      prepare: async () => {
+        const data = await postImport<{ content: string; title?: string }>('url', { url: normalized });
+        return { text: data.content, sourceType: 'url' };
+      },
+    });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-lg font-medium text-foreground mb-2">Extract Content from URL</h3>
-        <p className="text-sm text-muted-foreground">
-          Enter a web page URL to extract and process its content
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <Input
-              type="url"
-              placeholder="https://example.com/article"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isProcessing}
-              className="w-full"
-            />
-          </div>
-          <Button
-            onClick={handleExtractContent}
-            disabled={isProcessing}
-            className={cn(
-              "px-6",
-              "bg-primary hover:bg-primary/90"
-            )}
-          >
-            {isProcessing ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <>
-                <Link className="w-4 h-4 mr-2" />
-                Extract
-              </>
-            )}
-          </Button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <label htmlFor="source-url" className="block text-sm text-muted-foreground">
+        Paste the link to a blog post, article or documentation page.
+      </label>
+      <Input
+        id="source-url"
+        type="text"
+        inputMode="url"
+        value={url}
+        onChange={(e) => {
+          setUrl(e.target.value);
+          if (error) setError(null);
+        }}
+        disabled={disabled}
+        placeholder="https://example.com/article"
+        className="h-12 bg-foreground/5 border-foreground/15 text-foreground"
+      />
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+        <FieldError message={error} />
+        <div className="sm:ml-auto">
+          <SubmitButton disabled={disabled} />
         </div>
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm"
-          >
-            {error}
-          </motion.div>
-        )}
-
-        {preview && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 bg-muted/20 border border-border/30 rounded-lg"
-          >
-            <div className="flex items-start gap-3">
-              <ExternalLink className="w-5 h-5 text-muted-foreground mt-0.5" />
-              <div className="flex-1">
-                <h4 className="font-medium text-foreground mb-1">
-                  {preview.title || 'Web Content'}
-                </h4>
-                {preview.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {preview.description}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground mt-2">
-                  Content extracted successfully and ready for course creation
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
-    </div>
+    </form>
   );
 };

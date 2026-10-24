@@ -1,50 +1,26 @@
 "use client"
-import { CourseEditor } from '@/components/CourseEditor'
-import { AuthGuard } from '@/components/AuthGuard'
-import React, { useState } from 'react'
+import React, { Suspense } from 'react'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useCourse } from '@/features/course/hooks/useCourse'
-import { useParams } from 'next/navigation'
+import { LessonReader } from '@/features/course/components/LessonReader'
+import { CourseStatusScreen } from '@/features/course/components/CourseStatusScreen'
 
-export const dynamic = 'force-dynamic'
-
-const Page = () => {
+const Reader = () => {
   const params = useParams()
-  const {courseId} = params
-  const course = useCourse(courseId as string)
-  const [currentLessonIdx,setCurrentLessonIdx] = useState(0)
+  const searchParams = useSearchParams()
+  const courseId = String(params.courseId ?? '')
+  const { course, loading, error, refetch } = useCourse(courseId)
 
+  if (loading) return <CourseStatusScreen kind="loading" />
+  if (error || !course) return <CourseStatusScreen kind="error" message={error ?? 'Course not found.'} onRetry={refetch} />
 
-  if (course.loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!course.course) {
-    return <div>Course not found.</div>;
-  }
-
-  const lessons = course.course.lessons.map((lesson, idx) => ({
-    id: lesson.id,
-    title: lesson.title,
-    duration: lesson.duration,
-    isActive: idx === currentLessonIdx, // or your own logic for active lesson
-    isCompleted: lesson.isCompleted ?? false,
-  }));
-
-  // Get the content for the current lesson, fallback to empty string if not found
-  const currentLessonContent = course.course.lessons[currentLessonIdx]?.content || "";
-
-  return (
-    <AuthGuard>
-      <CourseEditor
-        content={currentLessonContent}
-        onChange={() => {}} // or your own handler if you want to allow editing
-        courseTitle={course.course.title}
-        lessons={lessons}
-        setCurrentLesson={setCurrentLessonIdx}
-        className="h-screen"
-      />
-    </AuthGuard>
-  );
+  return <LessonReader course={course} lessonId={searchParams.get('lesson')} />
 }
 
-export default Page
+export default function Page() {
+  return (
+    <Suspense fallback={<CourseStatusScreen kind="loading" />}>
+      <Reader />
+    </Suspense>
+  )
+}

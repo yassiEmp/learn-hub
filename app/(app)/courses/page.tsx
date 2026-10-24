@@ -5,7 +5,7 @@ import Nav from '@/components/hearderApp'
 const Page = () => {
   return (
     <>
-        <Nav currentPath='/courses' />
+        <Nav />
 
           <CourseBrowser />
     </>
