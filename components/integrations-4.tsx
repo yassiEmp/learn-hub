@@ -1,0 +1,89 @@
+import { FileText, Globe, Lightbulb, Mic, Type, Youtube } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { LogoIcon } from '@/components/logo'
+
+export default function IntegrationsSection() {
+    return (
+        <section>
+            <div className="bg-muted py-24 md:py-32">
+                <div className="mx-auto max-w-5xl px-6">
+                    <div className="relative mx-auto flex max-w-sm items-center justify-between">
+                        <div className="space-y-6">
+                            <IntegrationCard position="left-top">
+                                <FileText className="size-5 text-primary" />
+                            </IntegrationCard>
+                            <IntegrationCard position="left-middle">
+                                <Youtube className="size-5 text-primary" />
+                            </IntegrationCard>
+                            <IntegrationCard position="left-bottom">
+                                <Globe className="size-5 text-primary" />
+                            </IntegrationCard>
+                        </div>
+                        <div className="mx-auto my-2 flex w-fit justify-center gap-2">
+                            <div className="bg-muted relative z-20 rounded-2xl border p-1">
+                                <IntegrationCard
+                                    className="shadow-black-950/10 size-16 border-black/25 shadow-xl"
+                                    isCenter={true}>
+                                    <LogoIcon />
+                                </IntegrationCard>
+                            </div>
+                        </div>
+                        <div
+                            role="presentation"
+                            className="absolute inset-1/3 bg-[radial-gradient(var(--dots-color)_1px,transparent_1px)] opacity-50 [--dots-color:black] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+
+                        <div className="space-y-6">
+                            <IntegrationCard position="right-top">
+                                <Type className="size-5 text-primary" />
+                            </IntegrationCard>
+                            <IntegrationCard position="right-middle">
+                                <Mic className="size-5 text-primary" />
+                            </IntegrationCard>
+                            <IntegrationCard position="right-bottom">
+                                <Lightbulb className="size-5 text-primary" />
+                            </IntegrationCard>
+                        </div>
+                    </div>
+                    <div className="mx-auto mt-12 max-w-lg space-y-6 text-center">
+                        <h2 className="text-balance text-3xl font-semibold md:text-4xl">Bring It From Wherever It Lives</h2>
+                        <p className="text-muted-foreground"><span className='text-secondary-foreground/90'>PDFs, notes, web articles, YouTube videos, audio recordings</span> or just a topic you want to learn. Drop it in and get a structured course and an exam built from it.</p>
+
+                        <a
+                            href="/login?mode=signup"
+                            className="inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap rounded-md text-sm font-medium
+                                        h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors
+                                        shadow-md shadow-black/20 border-[0.5px] border-white/25 ring-1
+                                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
+                                        ring-[--ring-color] [--ring-color:color-mix(in_oklab,var(--color-foreground)15%,var(--color-primary))]
+                                        disabled:pointer-events-none disabled:opacity-50
+                                        [&_svg]:pointer-events-none [&_svg]:drop-shadow-sm [&_svg]:size-4 [&_svg]:shrink-0"
+                        >
+                            Try It Free
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+const IntegrationCard = ({ children, className, position, isCenter = false }: { children: React.ReactNode; className?: string; position?: 'left-top' | 'left-middle' | 'left-bottom' | 'right-top' | 'right-middle' | 'right-bottom'; isCenter?: boolean }) => {
+    return (
+        <div className={cn('bg-background relative flex size-12 rounded-xl border', className)}>
+            <div className={cn('relative z-20 m-auto size-fit *:size-6', isCenter && '*:size-8')}>{children}</div>
+            {position && !isCenter && (
+                <div
+                    className={cn(
+                        'bg-linear-to-r to-muted-foreground/25 absolute z-10 h-px',
+                        position === 'left-top' && 'left-full top-1/2 w-[130px] origin-left rotate-[25deg]',
+                        position === 'left-middle' && 'left-full top-1/2 w-[120px] origin-left',
+                        position === 'left-bottom' && 'left-full top-1/2 w-[130px] origin-left rotate-[-25deg]',
+                        position === 'right-top' && 'bg-linear-to-l right-full top-1/2 w-[130px] origin-right rotate-[-25deg]',
+                        position === 'right-middle' && 'bg-linear-to-l right-full top-1/2 w-[120px] origin-right',
+                        position === 'right-bottom' && 'bg-linear-to-l right-full top-1/2 w-[130px] origin-right rotate-[25deg]'
+                    )}
+                />
+            )}
+        </div>
+    )
+}
