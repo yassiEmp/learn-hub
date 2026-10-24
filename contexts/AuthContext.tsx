@@ -1,52 +1,44 @@
 'use client'
-import { createContext, useContext, useEffect } from 'react'
-import { useAuthStore } from '@/stores/authStore'
-import { supabase } from '@/lib/supabase'
-import { User, Session } from '@supabase/supabase-js'
+import { createContext, useContext } from 'react'
+import { useSession, signOut as authSignOut } from '@/lib/auth-client'
+
+export type AppUser = {
+  id: string
+  email: string
+  name: string
+  image?: string | null
+}
 
 interface AuthContextType {
-  user: User | null
-  session: Session | null
+  user: AppUser | null
   loading: boolean
-  isConfigured: boolean
   isAuthenticated: boolean
-  auth: typeof supabase.auth
-  setUser: (user: User | null) => void
-  setSession: (session: Session | null) => void
-  setLoading: (loading: boolean) => void
-  initialize: () => Promise<void>
+  signOut: () => Promise<void>
+  refresh: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const store = useAuthStore()
-  
-  useEffect(() => {
-    // Initialize auth
-    const initAuth = async () => {
-      try {
-        await store.initialize()
-      } catch (error) {
-        console.error('AuthProvider: Auth initialization error:', error)
-      }
-    }
-    
-    initAuth()
-    
-    // Subscribe to Supabase auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        store.setSession(session)
-      }
-    )
-    
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, []) // Remove store from dependencies to prevent infinite loop
-  
-  return <AuthContext.Provider value={store}>{children}</AuthContext.Provider>
+  const { data, isPending, refetch } = useSession()
+  const user = data?.user
+    ? { id: data.user.id, email: data.user.email, name: data.user.name, image: data.user.image }
+    : null
+
+  const value: AuthContextType = {
+    user,
+    loading: isPending,
+    isAuthenticated: !!user,
+    signOut: async () => {
+      await authSignOut()
+      await refetch()
+    },
+    refresh: async () => {
+      await refetch()
+    },
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextType {

@@ -1,22 +1,10 @@
-import { supabase } from '@/lib/supabase';
 import { CreateCourseRequest, CourseResponse } from '@/types/course';
 
 // Base API configuration
 const API_BASE = '/api/v1';
 
-// Helper to get auth headers
-const getAuthHeaders = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (!session?.access_token) {
-    throw new Error('No authentication token available');
-  }
-
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${session.access_token}`
-  };
-};
+// Auth travels in the httpOnly session cookie set by Better Auth
+const getAuthHeaders = async () => ({ 'Content-Type': 'application/json' });
 
 export type Result<T> = { err: null; res: T } | { err: unknown; res: null };
 
@@ -29,6 +17,7 @@ const apiRequest = async <T>(
     const headers = await getAuthHeaders();
     
     const response = await fetch(`${API_BASE}${endpoint}`, {
+      credentials: 'same-origin',
       ...options,
       headers: {
         ...headers,
