@@ -72,7 +72,7 @@ export default function Nav({ currentPath }: { currentPath?: string }) {
   };
 
   return (
-    <nav className="fixed top-6 transform z-50 w-full px-4 animate-slide-down">
+    <nav className="fixed inset-x-0 top-6 transform z-50 px-4 animate-slide-down">
       <div className={navbarVariants({ isMenuOpen })}>
         <div className="flex items-center justify-between">
           <Link

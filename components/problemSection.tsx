@@ -59,7 +59,7 @@ export default function ProblemSection() {
                     </div>
 
                     <div className="grid gap-4 grid-col-1 md:grid-cols-2 bg-gray-100/40 w-full mx-auto rounded-3xl p-2 md:p-4">
-                        <div className='w-full h-full bg-red-100/40 p-2 md:p-4 rounded-2xl overflow-x-hidden'>
+                        <div className='w-full h-full bg-red-100/40 p-2 md:p-4 rounded-2xl overflow-x-hidden isolate [transform:translateZ(0)]'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>Without FlashMind</p>
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>
                                 <div className='flex md:flex-col w-full overflow-visible auto-scroll-horizontal '>
@@ -75,7 +75,7 @@ export default function ProblemSection() {
                                 </div>
                             </div>
                         </div>
-                        <div className='w-full h-full bg-green-100/40 p-4 rounded-2xl overflow-x-hidden'>
+                        <div className='w-full h-full bg-green-100/40 p-4 rounded-2xl overflow-x-hidden isolate [transform:translateZ(0)]'>
                             <p className='text-2xl font-bold text-foreground text-center mb-4'>With FlashMind</p>
 
                             <div className='overflow-x-auto md:overflow-hidden scrollbar-hide'>

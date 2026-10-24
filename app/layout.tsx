@@ -59,7 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${syne.className} antialiased w-full h-full overflow-x-hidden`}
+        className={`${syne.className} antialiased w-full h-full`}
       >
         <SpeedInsights />
         <Analytics />

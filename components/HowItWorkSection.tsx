@@ -74,7 +74,7 @@ export default function HowItWorkSection() {
                     {/* Desktop: sticky art card, one illustration per step, cross-faded */}
                     <div className="sticky top-[calc((100vh-min(56vh,340px))/2+28px)] mt-[10vh] hidden self-start justify-center lg:flex">
                         <div
-                            className="relative aspect-[4/3] h-[min(56vh,340px)] max-w-full overflow-hidden rounded-[26px]"
+                            className="relative isolate aspect-[4/3] h-[min(56vh,340px)] max-w-full overflow-hidden rounded-[26px] [transform:translateZ(0)]"
                             style={{ boxShadow: '0 24px 60px -24px rgba(30,27,75,0.35)' }}>
                             {STEPS.map((s, i) => <StepArt key={s.n} step={s} on={i === active} />)}
                         </div>
@@ -94,7 +94,7 @@ export default function HowItWorkSection() {
                                     key={s.n}
                                     ref={(el) => { blockRefs.current[i] = el }}
                                     className={`flex flex-col justify-center py-7 pl-7 transition-opacity duration-500 motion-reduce:transition-none md:py-10 md:pl-8 lg:min-h-[max(52vh,300px)] lg:py-0 lg:pl-14 ${i === active ? 'lg:opacity-100' : 'lg:opacity-30'}`}>
-                                    <div className="relative mb-6 aspect-[4/3] max-w-[420px] overflow-hidden rounded-[22px] lg:hidden">
+                                    <div className="relative isolate mb-6 aspect-[4/3] max-w-[420px] overflow-hidden rounded-[22px] [transform:translateZ(0)] lg:hidden">
                                         <StepArt step={s} />
                                     </div>
                                     <span className="text-xs font-bold uppercase tracking-[0.22em] text-[#4f4c94]" style={{ fontFamily: MONO }}>
