@@ -12,6 +12,8 @@ AI-powered learning platform that converts uploaded content (text, PDF, YouTube,
 pnpm dev          # Start dev server
 pnpm build        # Production build
 pnpm lint         # ESLint (ts, tsx)
+pnpm db:generate  # Generate a SQL migration from lib/db/schema.ts (drizzle-kit)
+pnpm db:migrate   # Apply migrations in drizzle/ to DATABASE_URL
 pnpm syncTask     # Sync tasks to Notion (requires .env.local)
 ```
 
@@ -20,9 +22,10 @@ No test runner is configured — `features/lesson-gen/test/lessonGen.test.ts` ex
 ## Environment Variables
 
 Copy `.env.example` to `.env.local`:
-- `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY` — Supabase auth & DB
-- `GOOGLE_API_KEY` — Gemini API (all AI generation)
-- `NEXT_PUBLIC_BASE_URL` — used for internal fetch calls between API routes (e.g. `/api/v1/course` fires-and-forgets to `/api/v1/lessons`)
+- `DATABASE_URL` — Neon Postgres (pooled connection string)
+- `BETTER_AUTH_SECRET` + `BETTER_AUTH_URL` — Better Auth sessions; `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` + `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` enable Google sign-in
+- `GOOGLE_API_KEY` — Gemini API (all AI generation); `MODEL` picks the Gemini model
+- `BLOB_READ_WRITE_TOKEN` — Vercel Blob uploads
 
 ## Path Aliases
 
@@ -39,10 +42,10 @@ features/          # Domain features (isolated)
   exam/            # Exam creation and AI question generation
   lesson-gen/      # Standalone lesson generation service (see below)
 components/        # Shared UI (shadcn primitives + app-specific)
-lib/               # supabase.ts (browser client)
-utils/             # api-helpers.ts, supabase/server.ts (server auth), ai/, textProcessing/
-contexts/          # AuthContext (wraps Zustand authStore)
-stores/            # authStore.ts (Zustand — auth state + Supabase session)
+lib/               # db/ (Drizzle schema + client), auth.ts (Better Auth server), auth-client.ts, rag/
+utils/             # api-helpers.ts, auth/server.ts (verifyAuth), ai/, textProcessing/
+contexts/          # AuthContext (wraps Better Auth useSession)
+drizzle/           # Generated SQL migrations
 types/             # Shared TypeScript types (course.ts, types.ts)
 app/               # Next.js App Router — pages and API routes
   api/v1/          # REST endpoints: course, lessons, exam, exams, content-import, user
@@ -57,12 +60,12 @@ type Result<T> = { err: null; res: T } | { err: unknown; res: null }
 ```
 Never throw across module boundaries — check `.err` before using `.res`.
 
-### Auth (Supabase)
-- Browser: `lib/supabase.ts` → `supabase` client
-- Server: `utils/supabase/server.ts` → `verifyAuth(req)`, `createServerClient(token)`, `getTokenFromRequest(req)`
-- State: `stores/authStore.ts` (Zustand) — call `initialize()` once on app mount
-- `hooks/useAuth.ts` re-exports from `contexts/AuthContext`
-- All API routes validate the Bearer token via `verifyAuth` before any DB operations
+### Database & Auth (Neon + Drizzle + Better Auth)
+- Schema: `lib/db/schema.ts` (Better Auth tables + courses, lessons, exams, enrollments, document_chunks). Change it, then `pnpm db:generate && pnpm db:migrate`.
+- Server DB access only: `import { db } from '@/lib/db'`. The browser never talks to the DB; it calls `/api/v1/*`.
+- Server auth: `utils/auth/server.ts` → `verifyAuth(req)`; session is an httpOnly cookie, no Bearer tokens.
+- Client auth: `lib/auth-client.ts` (`signIn`, `signUp`, `signOut`, `useSession`); `hooks/useAuth.ts` → `{ user, loading, isAuthenticated, signOut }`.
+- All API routes call `verifyAuth` and scope queries by `ownerId = user.id`.
 
 ### API Response helpers (`utils/api-helpers.ts`)
 Use `successResponse<T>()`, `errorResponse()`, `authErrorResponse()`, `serverErrorResponse()` — never return raw `NextResponse.json` in route handlers.
@@ -73,12 +76,12 @@ Standalone generator with three workflows selectable per request:
 - `premium` — concurrent batches (2 at a time) with structured Gemini output
 - `hybrid` — middle ground
 
-Entry point: `features/lesson-gen/service/index.ts` — exports `generateLessons(input)` as an `AsyncGenerator`. The `/api/v1/lessons` route consumes this generator and streams lessons to the DB.
+Entry point: `features/lesson-gen/service/index.ts` — exports `generateLessons(input)` as an `AsyncGenerator`. Course creation consumes it in-process inside `after()` and persists each lesson as it's yielded.
 
 ### Course Creation Flow
-1. `POST /api/v1/course` — validates auth, calls `aiClient.generateCourseMetadata()` (Gemini via LangChain), inserts course row into Supabase
-2. Fire-and-forget `fetch` to `POST /api/v1/lessons` with the raw content, workflow, and `lessonTitles`
-3. `/api/v1/lessons` streams lesson generation via the lesson-gen service, persisting each lesson as it's yielded
+1. `POST /api/v1/course` — validates auth, calls `aiClient.generateCourseMetadata()`, inserts the course with `status = 'generating'`
+2. `after()` runs lesson generation in the same function (`maxDuration = 300`), inserting lessons with `position`, then sets `status` to `ready`/`failed`
+3. The course page polls `GET /api/v1/course/[id]` while generating; `POST /api/v1/course/[id]/retry` restarts failed generation
 
 ### ChunkAI (`features/course/utils/chunkAI/`)
 Alternative processing path used when `style = "chunk"`. Preprocesses text → splits into sentences → semantic chunks → generates lessons per chunk. Entry: `EnhancedChunkAI.processText()`. Kept as a legacy/alternative to the lesson-gen service.
