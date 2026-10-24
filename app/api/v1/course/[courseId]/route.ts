@@ -1,44 +1,50 @@
 import { NextRequest } from "next/server";
-import { verifyAuth, createServerClient, getTokenFromRequest } from "@/utils/supabase/server";
-import { successResponse, authErrorResponse, serverErrorResponse, notFoundResponse, forbiddenResponse } from "@/utils/api-helpers";
-import { CreateCourseRequest, CourseResponse } from "@/types/course";
+import { and, asc, eq } from "drizzle-orm";
+import { verifyAuth } from "@/utils/auth/server";
+import {
+    successResponse,
+    authErrorResponse,
+    errorResponse,
+    serverErrorResponse,
+    notFoundResponse,
+    forbiddenResponse,
+} from "@/utils/api-helpers";
+import { db } from "@/lib/db";
+import { courses, lessons } from "@/lib/db/schema";
+import { isUuid, toCourseDTO, toLessonDTO } from "@/utils/db-mappers";
+import { catchErr } from "@/utils/utils";
 
-export async function GET(
-    req: NextRequest,
-    { params }: { params: Promise<{ courseId: string }> }
-) {
+type Params = { params: Promise<{ courseId: string }> };
+
+export async function GET(req: NextRequest, { params }: Params) {
     const { courseId } = await params;
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
-        // 2. Create user-aware supabase client
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
-        }
-        const supabase = createServerClient(token);
-        // 3. Get course from database
-        const { data: course, error: dbError } = await supabase
-            .from('courses')
-            .select('*')
-            .eq('id', courseId)
-            .single();
-        if (dbError) {
-            if (dbError.code === 'PGRST116') {
-                return notFoundResponse('Course not found');
-            }
-            console.error('Database error:', dbError);
-            return serverErrorResponse('Failed to fetch course');
-        }
-        // 4. Check ownership (only owner can view their own courses)
-        if (course.owner_id !== user.id) {
+        if (!isUuid(courseId)) return notFoundResponse('Course not found');
+
+        const [course] = await db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
+        if (!course) return notFoundResponse('Course not found');
+
+        const isOwner = course.ownerId === user.id;
+        if (!isOwner && !course.isPublic) {
             return forbiddenResponse('You do not have permission to view this course');
         }
-        return successResponse<CourseResponse>(
-            course,
+
+        const lessonRows = await db
+            .select()
+            .from(lessons)
+            .where(eq(lessons.courseId, courseId))
+            .orderBy(asc(lessons.position), asc(lessons.createdAt));
+
+        return successResponse(
+            {
+                ...toCourseDTO(course),
+                lessons: lessonRows.map(toLessonDTO),
+                is_owner: isOwner,
+            },
             'Course fetched successfully'
         );
     } catch (error) {
@@ -47,123 +53,80 @@ export async function GET(
     }
 }
 
-export async function PUT(
-    req: NextRequest,
-    { params }: { params: Promise<{ courseId: string }> }
-) {
+export async function PUT(req: NextRequest, { params }: Params) {
     const { courseId } = await params;
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
-        // 2. Create user-aware supabase client
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
+        if (!isUuid(courseId)) return notFoundResponse('Course not found');
+
+        const parsed = await catchErr(req.json());
+        if (parsed.err || !parsed.res || typeof parsed.res !== 'object') {
+            return errorResponse('The request body must be a valid JSON');
         }
-        const supabase = createServerClient(token);
-        // 3. Get course to check ownership
-        const { data: existingCourse, error: fetchError } = await supabase
-            .from('courses')
-            .select('owner_id')
-            .eq('id', courseId)
-            .single();
-        if (fetchError) {
-            if (fetchError.code === 'PGRST116') {
-                return notFoundResponse('Course not found');
-            }
-            console.error('Database error:', fetchError);
-            return serverErrorResponse('Failed to fetch course');
-        }
-        // 4. Check ownership
-        if (existingCourse.owner_id !== user.id) {
-            return forbiddenResponse('You do not have permission to update this course');
-        }
-        // 5. Parse request body
-        const body = await req.json();
-        const { title, description, content, category, level, price, tags }: Partial<CreateCourseRequest> = body;
-        // 6. Update course
-        const updateData = {
-            ...(title && { title }),
-            ...(description && { description }),
-            ...(content && { content }),
-            ...(category && { category }),
-            ...(level && { level }),
-            ...(price !== undefined && { price }),
-            ...(tags && { tags }),
-            updated_at: new Date().toISOString()
+        const body = parsed.res as Record<string, unknown>;
+        const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v : undefined);
+
+        const isPublic = body.is_public ?? body.isPublic;
+        const update: Partial<typeof courses.$inferInsert> = {
+            ...(str(body.title) && { title: str(body.title) }),
+            ...(str(body.description) && { description: str(body.description) }),
+            ...(str(body.content) && { content: str(body.content) }),
+            ...(str(body.category) && { category: str(body.category) }),
+            ...(str(body.level) && { level: str(body.level) }),
+            ...(typeof body.price === 'number' && { price: Math.max(0, Math.round(body.price)) }),
+            ...(Array.isArray(body.tags) && { tags: body.tags.filter((t): t is string => typeof t === 'string') }),
+            ...(typeof isPublic === 'boolean' && { isPublic }),
+            updatedAt: new Date(),
         };
-        const { data: updatedCourse, error: updateError } = await supabase
-            .from('courses')
-            .update(updateData)
-            .eq('id', courseId)
-            .select()
-            .single();
-        if (updateError) {
-            console.error('Update error:', updateError);
-            return serverErrorResponse('Failed to update course');
+
+        const [updated] = await db
+            .update(courses)
+            .set(update)
+            .where(and(eq(courses.id, courseId), eq(courses.ownerId, user.id)))
+            .returning();
+
+        if (!updated) {
+            const [exists] = await db.select({ id: courses.id }).from(courses).where(eq(courses.id, courseId)).limit(1);
+            return exists
+                ? forbiddenResponse('You do not have permission to update this course')
+                : notFoundResponse('Course not found');
         }
-        return successResponse<CourseResponse>(
-            updatedCourse,
-            'Course updated successfully'
-        );
+
+        return successResponse(toCourseDTO(updated), 'Course updated successfully');
     } catch (error) {
         console.error('Unexpected error in PUT /api/v1/course/[courseId]:', error);
         return serverErrorResponse('An unexpected error occurred');
     }
 }
 
-export async function DELETE(
-    req: NextRequest,
-    { params }: { params: Promise<{ courseId: string }> }
-) {
+export async function DELETE(req: NextRequest, { params }: Params) {
     const { courseId } = await params;
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
-        // 2. Create user-aware supabase client
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
+        if (!isUuid(courseId)) return notFoundResponse('Course not found');
+
+        // Lessons, exams and document chunks cascade.
+        const deleted = await db
+            .delete(courses)
+            .where(and(eq(courses.id, courseId), eq(courses.ownerId, user.id)))
+            .returning({ id: courses.id });
+
+        if (deleted.length === 0) {
+            const [exists] = await db.select({ id: courses.id }).from(courses).where(eq(courses.id, courseId)).limit(1);
+            return exists
+                ? forbiddenResponse('You do not have permission to delete this course')
+                : notFoundResponse('Course not found');
         }
-        const supabase = createServerClient(token);
-        // 3. Get course to check ownership
-        const { data: existingCourse, error: fetchError } = await supabase
-            .from('courses')
-            .select('owner_id')
-            .eq('id', courseId)
-            .single();
-        if (fetchError) {
-            if (fetchError.code === 'PGRST116') {
-                return notFoundResponse('Course not found');
-            }
-            console.error('Database error:', fetchError);
-            return serverErrorResponse('Failed to fetch course');
-        }
-        // 4. Check ownership
-        if (existingCourse.owner_id !== user.id) {
-            return forbiddenResponse('You do not have permission to delete this course');
-        }
-        // 5. Delete course
-        const { error: deleteError } = await supabase
-            .from('courses')
-            .delete()
-            .eq('id', courseId);
-        if (deleteError) {
-            console.error('Delete error:', deleteError);
-            return serverErrorResponse('Failed to delete course');
-        }
-        return successResponse(
-            null,
-            'Course deleted successfully'
-        );
+
+        return successResponse(null, 'Course deleted successfully');
     } catch (error) {
         console.error('Unexpected error in DELETE /api/v1/course/[courseId]:', error);
         return serverErrorResponse('An unexpected error occurred');
     }
-} 
+}

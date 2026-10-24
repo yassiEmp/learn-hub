@@ -1,118 +1,114 @@
 import { NextRequest } from "next/server";
 import { successResponse, errorResponse, serverErrorResponse, authErrorResponse } from "@/utils/api-helpers";
-import { verifyAuth } from "@/utils/supabase/server";
+import { verifyAuth } from "@/utils/auth/server";
 import { uploadToBlob, createBlobFile } from "@/utils/blob-helpers";
+import { detectMimeType, transcribeMedia } from "@/features/content-import/server/transcribe";
+
+export const maxDuration = 120;
+
+// Gemini inline requests are capped at ~20MB including base64 overhead.
+const MAX_MEDIA_BYTES = 15 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
 
-        const body = await req.json();
-        const { url, type, audio, fileName } = body;
+        const body = await req.json().catch(() => null);
+        if (!body || typeof body !== 'object') {
+            return errorResponse('The request body must be a valid JSON');
+        }
+        const { url, type, audio, fileName } = body as {
+            url?: unknown; type?: unknown; audio?: unknown; fileName?: string;
+        };
 
         if (type === 'youtube') {
-            return await handleYouTubeVideo(url, user.id);
+            if (typeof url !== 'string' || !url) return errorResponse('YouTube URL is required');
+            return await handleYouTubeVideo(url);
         } else if (type === 'upload') {
-            return await handleUploadedVideo(audio, fileName, user.id);
+            if (typeof audio !== 'string' || !audio) return errorResponse('Video data is required');
+            return await handleUploadedVideo(audio, user.id, fileName);
         } else {
             return errorResponse('Invalid video type');
         }
-
     } catch (error) {
         console.error('Error processing video:', error);
         return serverErrorResponse('Failed to process video');
     }
 }
 
-async function handleYouTubeVideo(url: string, userId: string) {
+async function handleYouTubeVideo(url: string) {
     try {
-        // For now, we'll use a simple approach
-        // In production, you might want to use youtube-transcript or similar service
-        const youtubeTranscriptModule = await import('youtube-transcript');
-        const transcript = await youtubeTranscriptModule.YoutubeTranscript.fetchTranscript(url);
+        const videoId = extractVideoId(url);
+        if (!videoId) return errorResponse('Invalid YouTube URL');
+
+        const { YoutubeTranscript } = await import('youtube-transcript');
+        const transcript = await YoutubeTranscript.fetchTranscript(videoId);
 
         if (!transcript || transcript.length === 0) {
             return errorResponse('No transcript available for this YouTube video');
         }
-        console.log(userId)
-        // Combine transcript segments
+
         const content = transcript
             .map(segment => segment.text)
             .join(' ')
             .replace(/\s+/g, ' ')
             .trim();
 
-        // Extract video ID for title
-        const videoId = extractVideoId(url);
-        const title = `YouTube Video ${videoId}`;
-
         return successResponse({
             transcript: content,
-            title,
-            duration: transcript.length * 10, // Rough estimate
+            title: `YouTube Video ${videoId}`,
+            duration: transcript.length * 10, // rough estimate
             source: url,
-            wordCount: content.split(' ').length
+            wordCount: content.split(/\s+/).filter(Boolean).length
         }, 'YouTube transcript extracted successfully');
-
     } catch (error) {
         console.error('YouTube transcript error:', error);
         return errorResponse('Failed to extract YouTube transcript. The video may not have captions available.');
     }
 }
 
-async function handleUploadedVideo(audio: string, userId: string ,fileName?: string) {
-    try {
-        // 1. Convert base64 to buffer and upload to Vercel Blob
-        const audioBuffer = Buffer.from(audio, 'base64');
-        const audioFile = new File([audioBuffer], fileName || 'video_audio.webm', { type: 'audio/webm' });
-        const blobResult = await uploadToBlob(audioFile, fileName || 'video_audio.webm', {
-            userId,
-            isPublic: false, // Default to private, will update based on course privacy
-            contentType: 'audio/webm',
-        });
-        console.log(userId)
-        // 2. For now, we'll simulate transcription
-        // In production, you would send the audio to Whisper API or similar service
-        
-        // This is a placeholder - you would implement actual audio transcription here
-        const mockTranscript = `This is a placeholder transcript for the uploaded video: ${fileName || 'Unknown'}. 
-        
-        In a production environment, this would be replaced with actual audio transcription using services like:
-        - OpenAI Whisper API
-        - AssemblyAI
-        - Deepgram
-        - Google Speech-to-Text
-        
-        The audio file would be processed to extract spoken content and convert it to text for course creation.`;
-
-        const title = fileName?.replace(/\.[^/.]+$/, "") || 'Uploaded Video';
-
-        // 3. Create blob file object for database storage
-        const blobFile = createBlobFile(blobResult, fileName || 'video_audio.webm', audioBuffer.length, 'audio');
-
-        return successResponse({
-            transcript: mockTranscript,
-            title,
-            duration: 0, // Would be calculated from actual audio
-            source: fileName || 'uploaded_video',
-            wordCount: mockTranscript.split(' ').length,
-            blobUrl: blobResult.url,
-            blobPathname: blobResult.pathname,
-            blobFile
-        }, 'Video transcription completed successfully');
-
-    } catch (error) {
-        console.error('Video transcription error:', error);
-        return errorResponse('Failed to transcribe video audio');
+async function handleUploadedVideo(media: string, userId: string, fileName?: string) {
+    const bytes = Buffer.from(media, 'base64');
+    if (bytes.length > MAX_MEDIA_BYTES) {
+        return errorResponse('Video is too large to transcribe (15MB limit)');
     }
+
+    const mimeType = detectMimeType(bytes, fileName, 'video');
+    const name = fileName || 'video.webm';
+
+    let blobResult: Awaited<ReturnType<typeof uploadToBlob>> | null = null;
+    try {
+        blobResult = await uploadToBlob(new File([bytes], name, { type: mimeType }), name, {
+            userId,
+            isPublic: false,
+            contentType: mimeType,
+        });
+    } catch (uploadErr) {
+        console.error('Video blob upload failed:', uploadErr);
+    }
+
+    const { err, res: transcript } = await transcribeMedia(bytes, mimeType);
+    if (err || !transcript) {
+        return errorResponse('Could not transcribe this video. Make sure it contains clear speech and try again.', 502);
+    }
+
+    return successResponse({
+        transcript,
+        title: fileName?.replace(/\.[^/.]+$/, "") || 'Uploaded Video',
+        duration: 0,
+        source: fileName || 'uploaded_video',
+        wordCount: transcript.split(/\s+/).filter(Boolean).length,
+        blobUrl: blobResult?.url,
+        blobPathname: blobResult?.pathname,
+        blobFile: blobResult ? createBlobFile(blobResult, name, bytes.length, 'audio') : undefined,
+    }, 'Video transcription completed successfully');
 }
 
-function extractVideoId(url: string): string {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/;
-    const match = url.match(regex);
-    return match ? match[1] : 'unknown';
+function extractVideoId(url: string): string | null {
+    if (/^[\w-]{11}$/.test(url)) return url;
+    const match = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/);
+    return match ? match[1] : null;
 }

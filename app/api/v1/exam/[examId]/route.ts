@@ -1,41 +1,33 @@
 import { NextRequest } from "next/server";
-import { verifyAuth, createServerClient, getTokenFromRequest } from "@/utils/supabase/server";
+import { and, eq } from "drizzle-orm";
+import { verifyAuth } from "@/utils/auth/server";
 import { successResponse, authErrorResponse, serverErrorResponse, notFoundResponse } from "@/utils/api-helpers";
+import { db } from "@/lib/db";
+import { exams } from "@/lib/db/schema";
+import { isUuid, toExamDTO } from "@/utils/db-mappers";
 
 export async function GET(
     req: NextRequest,
     { params }: { params: Promise<{ examId: string }> }
 ) {
     const { examId } = await params;
-    
+
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
+        if (!isUuid(examId)) return notFoundResponse('Exam not found');
 
-        // 2. Create Supabase client
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
-        }
-        const supabase = createServerClient(token);
+        const [exam] = await db
+            .select()
+            .from(exams)
+            .where(and(eq(exams.id, examId), eq(exams.ownerId, user.id)))
+            .limit(1);
 
-        // 3. Fetch exam from database
-        const { data: exam, error: examError } = await supabase
-            .from('exams')
-            .select('*')
-            .eq('id', examId)
-            .eq('owner_id', user.id) // Ensure user can only access their own exams
-            .single();
+        if (!exam) return notFoundResponse('Exam not found');
 
-        if (examError || !exam) {
-            return notFoundResponse('Exam not found');
-        }
-
-        return successResponse(exam, 'Exam fetched successfully');
-
+        return successResponse(toExamDTO(exam), 'Exam fetched successfully');
     } catch (error) {
         console.error('Unexpected error in GET /api/v1/exam/[examId]:', error);
         return serverErrorResponse('An unexpected error occurred');

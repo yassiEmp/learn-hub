@@ -87,6 +87,8 @@ export const courses = pgTable(
     // Lesson generation progress, polled by the course page
     status: text("status").$type<CourseStatus>().notNull().default("generating"),
     lessonsTotal: integer("lessons_total").notNull().default(0),
+    // Planned lesson titles by position, so a retry regenerates exactly what is missing
+    lessonTitles: jsonb("lesson_titles").$type<string[]>().notNull().default([]),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

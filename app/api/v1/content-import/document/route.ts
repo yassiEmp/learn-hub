@@ -2,8 +2,10 @@ import { NextRequest } from "next/server";
 import { successResponse, errorResponse, serverErrorResponse, authErrorResponse } from "@/utils/api-helpers";
 import { quotaManager } from "@/features/content-import/utils/quotas";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { verifyAuth } from "@/utils/supabase/server";
+import { verifyAuth } from "@/utils/auth/server";
 import { uploadToBlob, createBlobFile } from "@/utils/blob-helpers";
+
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
     try {
@@ -32,15 +34,21 @@ export async function POST(req: NextRequest) {
         }
 
         // 4. Upload to Vercel Blob (private by default, will update when course is created)
-        const blobResult = await uploadToBlob(file, fileName, {
-            userId: user.id,
-            isPublic: false, // Default to private, will update based on course privacy
-            contentType: fileType,
-        });
+        // Upload is best-effort: a missing blob store must not block extraction.
+        let blobResult: Awaited<ReturnType<typeof uploadToBlob>> | null = null;
+        try {
+            blobResult = await uploadToBlob(file, fileName, {
+                userId: user.id,
+                isPublic: false,
+                contentType: fileType,
+            });
+        } catch (uploadErr) {
+            console.error('Document blob upload failed:', uploadErr);
+        }
 
         // 5. Process document with AI
         const llm = new ChatGoogleGenerativeAI({
-            model: process.env.MODEL!,
+            model: process.env.MODEL || 'gemini-2.0-flash',
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0.2,
             maxOutputTokens: 4000,
@@ -91,7 +99,7 @@ export async function POST(req: NextRequest) {
             quotaManager.recordUsage('document');
 
             // 6. Create blob file object for database storage
-            const blobFile = createBlobFile(blobResult, fileName, fileSize, 'document');
+            const blobFile = blobResult ? createBlobFile(blobResult, fileName, fileSize, 'document') : undefined;
 
             return successResponse({
                 content,
@@ -99,8 +107,8 @@ export async function POST(req: NextRequest) {
                 fileType,
                 fileSize,
                 wordCount: content.split(' ').length,
-                blobUrl: blobResult.url,
-                blobPathname: blobResult.pathname,
+                blobUrl: blobResult?.url,
+                blobPathname: blobResult?.pathname,
                 blobFile // Include the full blob file object for easy storage
             }, 'Document processed successfully');
 

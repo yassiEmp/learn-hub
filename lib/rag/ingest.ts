@@ -1,17 +1,10 @@
 import "server-only";
+import { eq } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
-import { Document } from "@langchain/core/documents";
+import { db } from "@/lib/db";
+import { documentChunks } from "@/lib/db/schema";
 import type { Result } from "@/utils/utils";
-import {
-  CHUNK_OVERLAP,
-  CHUNK_SIZE,
-  ChunkMetadata,
-  QUERY_NAME,
-  TABLE_NAME,
-  ragEmbeddings,
-  ragSupabaseClient,
-} from "./config";
+import { CHUNK_OVERLAP, CHUNK_SIZE, ChunkMetadata, ragEmbeddings } from "./config";
 
 export type IngestInput = {
   /** Text already extracted upstream by pdf-parse, youtube-transcript or cheerio. */
@@ -19,8 +12,10 @@ export type IngestInput = {
   metadata: ChunkMetadata;
 };
 
+const INSERT_BATCH = 100;
+
 /**
- * Chunk, embed and store one document in the pgvector store.
+ * Chunk, embed and store one document in the document_chunks table.
  * Returns the number of chunks written.
  */
 export async function ingestDocument({
@@ -38,22 +33,27 @@ export async function ingestDocument({
     });
 
     const chunks = await splitter.splitText(text);
+    if (chunks.length === 0) return { err: null, res: 0 };
 
-    const documents = chunks.map(
-      (content, index) =>
-        new Document({
-          pageContent: content,
-          metadata: { ...metadata, chunkIndex: index },
-        })
-    );
+    const embeddings = await ragEmbeddings().embedDocuments(chunks);
 
-    await SupabaseVectorStore.fromDocuments(documents, ragEmbeddings(), {
-      client: ragSupabaseClient(),
-      tableName: TABLE_NAME,
-      queryName: QUERY_NAME,
-    });
+    const rows = chunks.map((content, index) => ({
+      documentId: metadata.documentId,
+      userId: metadata.userId,
+      chunkIndex: index,
+      content,
+      source: metadata.source || "course",
+      embedding: embeddings[index] ?? [],
+    }));
 
-    return { err: null, res: documents.length };
+    // Skip chunks the embedding call returned nothing for.
+    const valid = rows.filter((r) => r.embedding.length > 0);
+
+    for (let i = 0; i < valid.length; i += INSERT_BATCH) {
+      await db.insert(documentChunks).values(valid.slice(i, i + INSERT_BATCH));
+    }
+
+    return { err: null, res: valid.length };
   } catch (err) {
     console.error("ingestDocument failed:", err);
     return { err, res: null };
@@ -65,12 +65,7 @@ export async function deleteDocumentChunks(
   documentId: string
 ): Promise<Result<true>> {
   try {
-    const { error } = await ragSupabaseClient()
-      .from(TABLE_NAME)
-      .delete()
-      .contains("metadata", { documentId });
-
-    if (error) return { err: error, res: null };
+    await db.delete(documentChunks).where(eq(documentChunks.documentId, documentId));
     return { err: null, res: true };
   } catch (err) {
     return { err, res: null };

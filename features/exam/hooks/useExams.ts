@@ -1,76 +1,57 @@
-import { useEffect, useState, useMemo } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import type { CleanExercise } from '@/features/exam/utils/types';
+"use client"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiFetch, errorMessage } from '@/hooks/apiFetch';
+import type { ExamListItem } from '@/types/course';
 
-export interface ExamData {
-  id: string;
-  title: string;
-  exercises: CleanExercise[];
-  created_at: string;
-  updated_at: string;
-  course_id: string;
-  course: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    level: string;
-  } | null;
-  totalQuestions: number;
-  estimatedDuration: number;
-}
+export type ExamData = ExamListItem & { totalQuestions: number };
 
 interface UseExamsResult {
   exams: ExamData[];
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 }
 
+/** GET /api/v1/exams. Accepts `data` as an array or as `{ exams: [] }`. */
 export function useExams(): UseExamsResult {
-  const [exams, setExams] = useState<ExamData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user, session } = useAuth();
+  const query = useQuery({
+    queryKey: ['exams'],
+    queryFn: async () => {
+      const data = await apiFetch<ExamListItem[] | { exams?: ExamListItem[] }>('/api/v1/exams');
+      const list = Array.isArray(data) ? data : data?.exams ?? [];
+      return list.map((exam) => ({
+        ...exam,
+        course: exam.course ?? null,
+        totalQuestions: Array.isArray(exam.exercises) ? exam.exercises.length : 0,
+      }));
+    },
+    staleTime: 0,
+    refetchOnMount: 'always',
+  });
 
-  useEffect(() => {
-    if (!user || !session) {
-      setLoading(false);
-      return;
-    }
+  return {
+    exams: query.data ?? [],
+    loading: query.isPending,
+    error: query.error ? errorMessage(query.error, 'Could not load your exams.') : null,
+    refetch: () => void query.refetch(),
+  };
+}
 
-    const fetchExams = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch('/api/v1/exams', {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch exams: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setExams(data.data.exams || []);
-      } catch (err) {
-        console.error('Error fetching exams:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load exams');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExams();
-  }, [user, session]);
-
-  // Memoize the return object to prevent unnecessary re-renders
-  return useMemo(() => ({
-    exams,
-    loading,
-    error
-  }), [exams, loading, error]);
+/** POST /api/v1/course/[id]/exam → returns the new exam id. */
+export function useGenerateExam(courseId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const data = await apiFetch<{ id?: string; exam?: { id: string } }>(
+        `/api/v1/course/${courseId}/exam`,
+        { method: 'POST' }
+      );
+      const id = data?.id ?? data?.exam?.id;
+      if (!id) throw new Error('The exam was created but we could not open it. Check the Exams page.');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['exams'] });
+    },
+  });
 }

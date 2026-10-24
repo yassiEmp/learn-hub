@@ -151,7 +151,7 @@ class AiClient {
             console.error("please set the model name in the environement variables has MODEL")
         }
         this.llm = new ChatGoogleGenerativeAI({
-            model: process.env.MODEL!,
+            model: process.env.MODEL || 'gemini-2.0-flash',
             apiKey: process.env.GOOGLE_API_KEY,
             temperature: 0.2,
             maxOutputTokens: 40000,

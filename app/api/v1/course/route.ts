@@ -1,133 +1,109 @@
+import { after, NextRequest } from "next/server";
+import { count, desc, eq } from "drizzle-orm";
 import { catchErr } from "@/utils/utils";
-import { verifyAuth, createServerClient, getTokenFromRequest } from "@/utils/supabase/server";
+import { verifyAuth } from "@/utils/auth/server";
 import { successResponse, authErrorResponse, errorResponse, serverErrorResponse } from "@/utils/api-helpers";
-import { CreateCourseRequest, CourseResponse } from "@/types/course";
-import { NextRequest } from "next/server";
 import { aiClient } from "@/features/course/utils/chunkAI/ai/aiClient";
 import { ingestDocument } from "@/lib/rag/ingest";
+import { db } from "@/lib/db";
+import { courses, lessons, type SourceType } from "@/lib/db/schema";
+import { toCourseDTO } from "@/utils/db-mappers";
+import { generateAndPersistLessons } from "@/features/lesson-gen/service/persist";
+
+// Lesson generation runs in after() within this invocation.
+export const maxDuration = 300;
+
+const SOURCE_TYPES: SourceType[] = ["text", "pdf", "url", "youtube", "topic", "audio", "video"];
+
+const capitalize = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
 
 export async function POST(req: NextRequest) {
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
-        
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
 
-        // 2. Parse and validate request body
         const result = await catchErr(req.json());
         if (result.err || !result.res) {
             return errorResponse('The request body must be a valid JSON');
         }
-        const body = result.res;
-
-        const { text, style, sourceFiles }: CreateCourseRequest & {
-            text: string;
-            sourceFiles?: unknown[];
-        } = body;
-
-        // 3. Validate required fields
-        if (!text || !style) {
-            return errorResponse('Missing required fields: text and style are required');
-        }
-
-        // const validStyles = ["markdown", "aiGen", "chunk"];
-        // if (!validStyles.includes(style)) {
-        //     return errorResponse('The style must be markdown, aiGen, or chunk');
-        // }
-
-        // 1. Generate course metadata using AI
-        const { err, res } = await aiClient.generateCourseMetadata(text);
-        if (err || !res) {
-            return errorResponse(String(err), 500);
-        }
-        
-        const { title, description, category, level, tags , lessonTitles, durationMinutes, language } = res;
-
-        // 5. Create course in database using generated or provided metadata
-        const courseData = {
-            title: title , // Use provided title or generated one
-            description: description , // Use provided description or generated one
-            content: text,
-            owner_id: user.id,
-            category: category || 'General',
-            level: level || 'Beginner',
-            price: 0,
-            tags: tags || [],
-            duration_minutes: durationMinutes,
-            language: language || 'en',
-            // The client sends these on every upload; they were dropped before,
-            // so the document viewer had nothing to list.
-            source_files: Array.isArray(sourceFiles) ? sourceFiles : [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+        const { text, sourceType, sourceFiles } = result.res as {
+            text?: unknown;
+            sourceType?: unknown;
+            sourceFiles?: unknown;
+            style?: unknown;
         };
 
-        // Use the user's token to create a user-bound Supabase client
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
-        }
-        const supabase = createServerClient(token);
-
-        const { data: course, error: dbError } = await supabase
-            .from('courses')
-            .insert([courseData])
-            .select()
-            .single();
-
-        if (dbError) {
-            console.error('Database error:', dbError);
-            return serverErrorResponse('Failed to create course');
+        if (typeof text !== 'string' || !text.trim()) {
+            return errorResponse('Missing required field: text');
         }
 
-        // Embed the source text into the vector store so exam generation can
-        // retrieve from it instead of prompting with the whole course.
-        // Failure here must not fail course creation.
-        ingestDocument({
-            text,
-            metadata: {
-                userId: user.id,
-                documentId: course.id,
-                source: title || 'course',
-            },
-        }).then(({ err: ingestErr, res: chunkCount }) => {
-            if (ingestErr) console.error('RAG ingestion failed for course', course.id, ingestErr);
-            else console.log(`RAG ingested ${chunkCount} chunks for course ${course.id}`);
-        });
+        const type: SourceType = SOURCE_TYPES.includes(sourceType as SourceType)
+            ? (sourceType as SourceType)
+            : 'text';
 
-        // 4. Call the lesson generation API to generate lessons from the course text
-        //    (We do not block on this; fire-and-forget, or you can await if you want to use the result)
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/v1/lessons`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
+        // 1. Course metadata (synchronous: the client needs the course row back)
+        const { err, res: meta } = await aiClient.generateCourseMetadata(text);
+        if (err || !meta || !Array.isArray(meta.lessonTitles) || meta.lessonTitles.length === 0) {
+            if (err) console.error('Course metadata generation failed:', err);
+            return errorResponse('Could not analyze this content. Try adding more text.', 422);
+        }
+
+        const lessonTitles = meta.lessonTitles.filter((t) => typeof t === 'string' && t.trim());
+        const language = meta.language || 'en';
+
+        // 2. Insert course row
+        const [course] = await db
+            .insert(courses)
+            .values({
+                ownerId: user.id,
+                title: meta.title || 'Untitled course',
+                description: meta.description || '',
                 content: text,
-                workflow: "premium", // or use a value from the request if available
-                lessonTitles,
-                courseId: course.id,
+                category: meta.category || 'General',
+                level: capitalize(meta.level || 'beginner'),
+                price: 0,
+                tags: Array.isArray(meta.tags) ? meta.tags : [],
+                durationMinutes: Number.isFinite(meta.durationMinutes) ? Math.round(meta.durationMinutes) : null,
                 language,
-                metadata: {
-                    title,
-                    description,
-                    category,
-                    level,
-                    tags
-                }
+                sourceType: type,
+                sourceFiles: Array.isArray(sourceFiles) ? sourceFiles : [],
+                status: 'generating',
+                lessonsTotal: lessonTitles.length,
+                lessonTitles,
             })
+            .returning();
+
+        // 3. Generate lessons + RAG ingestion after the response is sent
+        after(async () => {
+            try {
+                await Promise.all([
+                    ingestDocument({
+                        text,
+                        metadata: { userId: user.id, documentId: course.id, source: course.title || 'course' },
+                    }).then(({ err: ingestErr, res: chunkCount }) => {
+                        if (ingestErr) console.error('RAG ingestion failed for course', course.id, ingestErr);
+                        else console.log(`RAG ingested ${chunkCount} chunks for course ${course.id}`);
+                    }),
+                    generateAndPersistLessons({
+                        courseId: course.id,
+                        content: text,
+                        language,
+                        plan: lessonTitles.map((title, position) => ({ title, position })),
+                    }),
+                ]);
+            } catch (bgErr) {
+                console.error('Background generation crashed for course', course.id, bgErr);
+                await db
+                    .update(courses)
+                    .set({ status: 'failed', updatedAt: new Date() })
+                    .where(eq(courses.id, course.id))
+                    .catch((e) => console.error('Could not mark course failed', e));
+            }
         });
 
-        // 6. Return success response
-        return successResponse<CourseResponse>(
-            course,
-            'Course created successfully',
-            201
-        );
-
+        return successResponse(toCourseDTO(course), 'Course created successfully', 201);
     } catch (error) {
         console.error('Unexpected error in POST /api/v1/course:', error);
         return serverErrorResponse('An unexpected error occurred');
@@ -136,36 +112,31 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
-        // 1. Verify authentication
         const { user, error: authError } = await verifyAuth(req);
-        
         if (authError || !user) {
             return authErrorResponse(authError || 'Authentication required');
         }
 
-        // 2. Get courses owned by the user
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return authErrorResponse('No authorization token provided');
-        }
-        const supabase = createServerClient(token);
+        const lessonCounts = db
+            .select({ courseId: lessons.courseId, n: count().as('n') })
+            .from(lessons)
+            .groupBy(lessons.courseId)
+            .as('lesson_counts');
 
-        const { data: courses, error: dbError } = await supabase
-            .from('courses')
-            .select('*')
-            .eq('owner_id', user.id)
-            .order('created_at', { ascending: false });
+        const rows = await db
+            .select({ course: courses, lessonsCount: lessonCounts.n })
+            .from(courses)
+            .leftJoin(lessonCounts, eq(lessonCounts.courseId, courses.id))
+            .where(eq(courses.ownerId, user.id))
+            .orderBy(desc(courses.createdAt));
 
-        if (dbError) {
-            console.error('Database error:', dbError);
-            return serverErrorResponse('Failed to fetch courses');
-        }
-
-        return successResponse<CourseResponse[]>(
-            courses || [],
+        return successResponse(
+            rows.map(({ course, lessonsCount }) => ({
+                ...toCourseDTO(course),
+                lessons_count: Number(lessonsCount ?? 0),
+            })),
             'Courses fetched successfully'
         );
-
     } catch (error) {
         console.error('Unexpected error in GET /api/v1/course:', error);
         return serverErrorResponse('An unexpected error occurred');

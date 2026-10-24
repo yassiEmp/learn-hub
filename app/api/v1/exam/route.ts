@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
 import { createExam } from "@/features/exam/utils/createExam";
 import { CleanExam } from "@/features/exam/utils/types";
-import { verifyAuth } from "@/utils/supabase/server";
+import { verifyAuth } from "@/utils/auth/server";
+
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   try {

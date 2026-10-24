@@ -1,5 +1,11 @@
-import { createServerClient } from '@/utils/supabase/server';
+import 'server-only';
 import { NextRequest } from 'next/server';
+import { eq } from 'drizzle-orm';
+import { verifyAuth } from '@/utils/auth/server';
+import { db } from '@/lib/db';
+import { courses } from '@/lib/db/schema';
+import type { BlobFile } from '@/utils/blob-helpers';
+import { isUuid } from '@/utils/db-mappers';
 
 export interface BlobAccessContext {
   userId: string;
@@ -17,78 +23,45 @@ export async function checkBlobAccess(
   courseId?: string
 ): Promise<{ hasAccess: boolean; context?: BlobAccessContext; error?: string }> {
   try {
-    // 1. Verify authentication
-    const { verifyAuth } = await import('@/utils/supabase/server');
     const { user, error: authError } = await verifyAuth(req);
-    
     if (authError || !user) {
       return { hasAccess: false, error: 'Authentication required' };
     }
 
-    // 2. If no courseId provided, check if user owns the blob (based on pathname)
+    // Without a course, the uploader owns the blob (pathname users/{id}/...)
     if (!courseId) {
-      const isOwner = blobPathname.includes(`users/${user.id}/`);
-      return { 
-        hasAccess: isOwner, 
-        context: { 
-          userId: user.id, 
-          courseId: '', 
-          isPublic: false, 
-          isOwner 
-        } 
+      const isOwner = blobPathname.startsWith(`users/${user.id}/`);
+      return {
+        hasAccess: isOwner,
+        context: { userId: user.id, courseId: '', isPublic: false, isOwner },
       };
     }
 
-    // 3. Get course information
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
-    if (!token) {
-      return { hasAccess: false, error: 'No authorization token provided' };
+    if (!isUuid(courseId)) return { hasAccess: false, error: 'Course not found' };
+
+    const [course] = await db
+      .select({ ownerId: courses.ownerId, isPublic: courses.isPublic, sourceFiles: courses.sourceFiles })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
+
+    if (!course) return { hasAccess: false, error: 'Course not found' };
+
+    // The blob must belong to this course, otherwise a public course could be
+    // used to read any other user's file.
+    const files = (Array.isArray(course.sourceFiles) ? course.sourceFiles : []) as BlobFile[];
+    if (!files.some((f) => f?.pathname === blobPathname)) {
+      return { hasAccess: false, error: 'File not found for this course' };
     }
 
-    const supabase = createServerClient(token);
-    const { data: course, error: courseError } = await supabase
-      .from('courses')
-      .select('owner_id, is_public, source_files')
-      .eq('id', courseId)
-      .single();
+    const isOwner = course.ownerId === user.id;
+    const isPublic = course.isPublic;
 
-    if (courseError || !course) {
-      return { hasAccess: false, error: 'Course not found' };
+    if (isOwner || isPublic) {
+      return { hasAccess: true, context: { userId: user.id, courseId, isPublic, isOwner } };
     }
 
-    // 4. Check access based on course privacy and ownership
-    const isOwner = course.owner_id === user.id;
-    const isPublic = course.is_public || false;
-    
-    // Owner always has access
-    if (isOwner) {
-      return { 
-        hasAccess: true, 
-        context: { 
-          userId: user.id, 
-          courseId, 
-          isPublic, 
-          isOwner: true 
-        } 
-      };
-    }
-
-    // Public courses allow access to anyone
-    if (isPublic) {
-      return { 
-        hasAccess: true, 
-        context: { 
-          userId: user.id, 
-          courseId, 
-          isPublic: true, 
-          isOwner: false 
-        } 
-      };
-    }
-
-    // Private course, not owner
     return { hasAccess: false, error: 'Access denied to private course' };
-
   } catch (error) {
     console.error('Error checking blob access:', error);
     return { hasAccess: false, error: 'Failed to verify access' };
@@ -104,14 +77,22 @@ export async function getBlobUrl(
   courseId?: string
 ): Promise<{ url?: string; error?: string }> {
   const accessCheck = await checkBlobAccess(req, blobPathname, courseId);
-  
   if (!accessCheck.hasAccess) {
     return { error: accessCheck.error || 'Access denied' };
   }
 
-  // For now, return the pathname as URL
-  // In production, you might want to generate signed URLs or proxy through your API
-  return { url: `https://your-blob-domain.com${blobPathname}` };
+  if (courseId) {
+    const [course] = await db
+      .select({ sourceFiles: courses.sourceFiles })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
+    const files = (Array.isArray(course?.sourceFiles) ? course.sourceFiles : []) as BlobFile[];
+    const file = files.find((f) => f?.pathname === blobPathname);
+    if (file?.url) return { url: file.url };
+  }
+
+  return { error: 'File URL not found' };
 }
 
 /**
@@ -122,35 +103,22 @@ export async function canModifyCourseFiles(
   courseId: string
 ): Promise<{ canModify: boolean; error?: string }> {
   try {
-    const { verifyAuth } = await import('@/utils/supabase/server');
     const { user, error: authError } = await verifyAuth(req);
-    
     if (authError || !user) {
       return { canModify: false, error: 'Authentication required' };
     }
+    if (!isUuid(courseId)) return { canModify: false, error: 'Course not found' };
 
-    const token = req.headers.get('authorization')?.replace('Bearer ', '');
-    if (!token) {
-      return { canModify: false, error: 'No authorization token provided' };
-    }
+    const [course] = await db
+      .select({ ownerId: courses.ownerId })
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .limit(1);
 
-    const supabase = createServerClient(token);
-    const { data: course, error: courseError } = await supabase
-      .from('courses')
-      .select('owner_id')
-      .eq('id', courseId)
-      .single();
-
-    if (courseError || !course) {
-      return { canModify: false, error: 'Course not found' };
-    }
-
-    const isOwner = course.owner_id === user.id;
-    return { canModify: isOwner };
-
+    if (!course) return { canModify: false, error: 'Course not found' };
+    return { canModify: course.ownerId === user.id };
   } catch (error) {
     console.error('Error checking course modification access:', error);
     return { canModify: false, error: 'Failed to verify access' };
   }
 }
-
