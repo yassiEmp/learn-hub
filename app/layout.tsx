@@ -11,9 +11,44 @@ const syne = Syne({
   weight: ["500", "700"]
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const siteTitle = "FlashMind — AI course generator: turn notes, PDFs & videos into courses and quizzes";
+const siteDescription =
+  "Paste notes, upload a PDF, drop a URL or YouTube link, record audio, or type a topic. FlashMind's AI builds a structured course with bite-sized lessons, then an exam that shows what to review. Free to start.";
+
 export const metadata: Metadata = {
-  title: "flashmind",
-  description: "flashmind is the ultimate AI-powered study and productivity app. Beyond reminders and focus tools, it helps you truly learn with interactive flashcards, fill-in-the-gap exercises, and personalized exam generation based on your study material. Whether you’re preparing for school exams, certifications, or self-learning, flashmind adapts to your needs. Beat procrastination, stay productive, and learn smarter with flashmind.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: "%s | FlashMind",
+  },
+  description: siteDescription,
+  applicationName: "FlashMind",
+  keywords: [
+    "AI course generator",
+    "turn PDF into quiz",
+    "PDF to quiz",
+    "study tool",
+    "AI study tool",
+    "notes to quiz",
+    "YouTube to course",
+    "AI quiz generator",
+    "exam prep",
+    "learn faster",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "FlashMind",
+    title: siteTitle,
+    description: siteDescription,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
